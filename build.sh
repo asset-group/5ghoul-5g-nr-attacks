@@ -56,24 +56,7 @@ then
     tar -I 'zstd -c -T0 --ultra -20 -' --owner=1000 --group=1000 --exclude '*__pycache__*' --exclude '*.a' -cf release/wdissector.tar.zst --transform 'flags=r;s|^|wdissector/|' \
     README.md icon.png imgui.ini requirements.sh container.sh bin/ modules/ configs/ bindings/ scripts/python_env.sh scripts/test_* scripts/open5gs-dbctl.sh \
     scripts/packet_hex_to_c_array.py scripts/apply_patches.sh src/wdissector.h src/ModulesInclude.hpp src/ModulesStub.cpp libs/json.hpp src/GlobalConfig.hpp $WS_HEADERS \
-    3rd-party/hostapd/ 3rd-party/adb/ 3rd-party/uhubctl/ 3rd-party/usbip/ src/drivers/wifi/rtl8812au/ src/drivers/shm_interface examples/
-
-    echo "Done!"
-
-elif [ "$1" == "release_exploiter" ]
-then
-    echo "Creating compressed release/wdexploiter.tar.zst ..."
-    WS_HEADERS=$(find ./libs/wireshark -name "*.h")
-    mkdir -p release
-    mkdir -p release
-    tar -I 'zstd -c -T0 --ultra -20 -' --owner=1000 --group=1000 --exclude '*__pycache__*' --exclude '*cef*' --exclude '*modules/python*' --exclude '*modules/server*' \
-    --exclude '*modules/webview*' --exclude '*modules/requirements.txt' --exclude '*fuzzer*' --exclude '*chrome*' \
-    --exclude '*bin/locales*'  --exclude '*bin/swiftshader*' --exclude '*pagmo*' --exclude '*GLES*' \
-    -cf release/wdexploiter.tar.zst --transform 'flags=r;s|^|wdexploiter/|' \
-    icon.png imgui.ini requirements.sh container.sh bin/ modules/ configs/ scripts/python_env.sh scripts/test_* scripts/open5gs-dbctl.sh \
-    scripts/packet_hex_to_c_array.py scripts/apply_patches.sh src/wdissector.h src/ModulesInclude.hpp src/ModulesStub.cpp libs/json.hpp \
-    src/GlobalConfig.hpp $WS_HEADERS 3rd-party/hostapd/ 3rd-party/adb/ 3rd-party/uhubctl/ 3rd-party/usbip/ src/drivers/wifi/rtl8812au/ \
-    src/drivers/shm_interface
+    3rd-party/adb/ 3rd-party/uhubctl/ 3rd-party/usbip/ src/drivers/shm_interface examples/
 
     echo "Done!"
 

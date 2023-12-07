@@ -1,0 +1,31 @@
+[submodule "3rd-party/open5gs-core"]
+	path = 3rd-party/open5gs-core
+	url = https://github.com/open5gs/open5gs.git
+[submodule "3rd-party/oai_5g_sa"]
+	path = 3rd-party/oai_5g_sa
+	url = https://gitlab.eurecom.fr/oai/openairinterface5g.git
+[submodule "3rd-party/ModemManager"]
+	path = 3rd-party/ModemManager
+	url = https://gitlab.freedesktop.org/mobile-broadband/ModemManager.git
+
+
+[submodule "libs/wireshark"]
+	path = libs/wireshark
+	url = https://gitlab.com/wireshark/wireshark.git
+[submodule "libs/fmt"]
+	path = libs/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "libs/libviface"]
+	path = libs/libviface
+	url = https://github.com/HPENetworking/libviface.git
+[submodule "libs/folly"]
+	path = libs/folly
+	url = https://github.com/facebook/folly.git
+[submodule "libs/double-conversion"]
+	path = libs/double-conversion
+	url = https://github.com/google/double-conversion.git
+
+
+[submodule "modules/QCSuper"]
+	path = modules/QCSuper
+	url = https://github.com/P1sec/QCSuper.git

@@ -1,0 +1,5 @@
+[safe]
+    directory = * 
+
+[core]
+    hooksPath = scripts/hooks

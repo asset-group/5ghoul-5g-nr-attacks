@@ -147,7 +147,7 @@ Upon successful connectivity with the smartphone or modem, the 5G fuzzer highlig
 The tool also has a graphical interface that is mostly used for development and troubleshooting the 5G connection or showcasing attack or fuzzing demos ✌. An example of the *5Ghoul* GUI is shown below.
 
 ```bash
-sudo bin/bt_fuzzer --MCC=001 --MNC=01 --EnableMutation=true --gui # Run with graphical user interface (GUI)
+sudo bin/5g_fuzzer --MCC=001 --MNC=01 --EnableMutation=true --gui # Run with graphical user interface (GUI)
 ```
 
 ![fuzzer-gui](./docs/figures/fuzzer-gui.png)

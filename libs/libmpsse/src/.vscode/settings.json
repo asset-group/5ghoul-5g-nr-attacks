@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "mpsse.h": "c",
+        "stdint.h": "c",
+        "ftdi.h": "c"
+    },
+    "cmake.configureOnOpen": false,
+    "editor.formatOnSave": true,
+    "workbench.editor.enablePreview": false
+}

@@ -1,0 +1,52 @@
+{
+    "config": {
+        "Name": "Bluetooth",
+        "Options": {
+            "DefaultProtocolEncapName": "encap:1",
+            "DefaultProtocolName": "proto:1",
+            "DefaultPrograms": [],
+            "Program": 0,
+            "CoreDump": true
+        },
+        "StateMapper": {
+            "PacketLayerOffset": 1,
+            "Mapping": [
+                {
+                    "Filter": "amqp.method.method == 60",
+                    "LayerName": "Deliver",
+                    "StateNameField": "amqp.type",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "amqp.type == 3",
+                    "LayerName": "Publish",
+                    "StateNameField": "amqp.type",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "amqp",
+                    "LayerName": "AMQP",
+                    "StateNameField": "amqp.method.class",
+                    "AppendSummary": false
+                }
+            ],
+            "Overrides": {},
+            "SaveFolder": "configs/models/generic/",
+            "ShowAllStates": true
+        },
+        "Fuzzing": {
+            "Excludes": [{
+                "ApplyTo": "",
+                "Description": "",
+                "Filter": ""
+            }]
+        },
+        "Validation": {
+            "CommonRejections": [{
+                "Description": "LMP_not_accepted",
+                "Filter": "btbrlmp.op == 4"
+            }],
+            "InitialState": "IDLE"
+        }
+    }
+}

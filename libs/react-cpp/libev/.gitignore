@@ -1,0 +1,13 @@
+/build
+/CMakeCache.txt
+/CMakeFiles
+/Makefile
+/config.h
+/install_manifest.txt
+*.cmake
+*.ninja
+.ninja_*
+*.[ado3]
+*.la
+*.so
+*.so.*

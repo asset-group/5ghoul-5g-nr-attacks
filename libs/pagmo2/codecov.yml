@@ -1,0 +1,15 @@
+coverage:
+  ignore:
+  - "tests/.*"
+  - "tutorials/.*"
+  # Exclude these large datafiles.
+  - "src/problems/cec2013_data.cpp"
+  - "src/problems/cec2014_data.cpp"
+
+  notify:
+    gitter:
+      default:
+        url: "https://webhooks.gitter.im/e/370824261ddf671fe05a"
+        threshold: 1%
+
+comment: off

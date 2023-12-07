@@ -1,0 +1,997 @@
+{
+    "StatesNodes": {
+        "IDLE": {
+            "direction": 0,
+            "layers_count": 0,
+            "node_number": 0,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649953175,
+                "tv_usec": 430022
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "RX / MAC-NR / 1": {
+            "direction": 1,
+            "layers_count": 2,
+            "node_number": 4,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 473486
+            },
+            "timeout": 0,
+            "type_value": 1
+        },
+        "RX / MAC-NR / 4": {
+            "direction": 1,
+            "layers_count": 1,
+            "node_number": 11,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936100,
+                "tv_usec": 588676
+            },
+            "timeout": 0,
+            "type_value": 4
+        },
+        "RX / MAC-NR / C-RNTI": {
+            "direction": 1,
+            "layers_count": 1,
+            "node_number": 12,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936548,
+                "tv_usec": 429375
+            },
+            "timeout": 0,
+            "type_value": 58
+        },
+        "RX / MAC-NR / Long BSR": {
+            "direction": 1,
+            "layers_count": 1,
+            "node_number": 6,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 483566
+            },
+            "timeout": 0,
+            "type_value": 62
+        },
+        "RX / MAC-NR / Padding": {
+            "direction": 1,
+            "layers_count": 1,
+            "node_number": 13,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649953194,
+                "tv_usec": 462517
+            },
+            "timeout": 0,
+            "type_value": 63
+        },
+        "RX / MAC-NR / Short BSR": {
+            "direction": 1,
+            "layers_count": 1,
+            "node_number": 7,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 908514
+            },
+            "timeout": 0,
+            "type_value": 61
+        },
+        "RX / RRC / rrcReconfigurationComplete": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 10,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 953527
+            },
+            "timeout": 0,
+            "type_value": 1
+        },
+        "RX / RRC / rrcResumeRequest1": {
+            "direction": 1,
+            "layers_count": 13,
+            "node_number": 3,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 468573
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "RX / RRC / rrcSetupComplete": {
+            "direction": 1,
+            "layers_count": 6,
+            "node_number": 2,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 464352
+            },
+            "timeout": 0,
+            "type_value": 2
+        },
+        "RX / RRC / rrcSetupRequest": {
+            "direction": 1,
+            "layers_count": 2,
+            "node_number": 1,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 438316
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "RX / RRC / securityModeComplete": {
+            "direction": 1,
+            "layers_count": 5,
+            "node_number": 8,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 913534
+            },
+            "timeout": 0,
+            "type_value": 5
+        },
+        "RX / RRC / ueCapabilityInformation": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 9,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 935047
+            },
+            "timeout": 0,
+            "type_value": 9
+        },
+        "RX / RRC / ulInformationTransfer": {
+            "direction": 1,
+            "layers_count": 5,
+            "node_number": 5,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1649936097,
+                "tv_usec": 478714
+            },
+            "timeout": 0,
+            "type_value": 7
+        }
+    },
+    "StatesTransitions": {
+        "IDLE": {
+            "from_state": null,
+            "to_state": {
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "IDLE",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 438320
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / 1": {
+            "from_state": [
+                "RX / MAC-NR / Padding",
+                "RX / MAC-NR / C-RNTI",
+                "RX / MAC-NR / Short BSR",
+                "RX / MAC-NR / Long BSR",
+                "RX / MAC-NR / 1",
+                "RX / RRC / rrcResumeRequest1"
+            ],
+            "to_state": {
+                "RX / MAC-NR / 1": {
+                    "dst_state_name": "RX / MAC-NR / 1",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 928496
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936724,
+                        "tv_usec": 518295
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 498443
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Padding": {
+                    "dst_state_name": "RX / MAC-NR / Padding",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 496546
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936722,
+                        "tv_usec": 529446
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 953529
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcResumeRequest1": {
+                    "dst_state_name": "RX / RRC / rrcResumeRequest1",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936722,
+                        "tv_usec": 829485
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649937910,
+                        "tv_usec": 147046
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936936,
+                        "tv_usec": 643540
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ueCapabilityInformation": {
+                    "dst_state_name": "RX / RRC / ueCapabilityInformation",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 935049
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ulInformationTransfer": {
+                    "dst_state_name": "RX / RRC / ulInformationTransfer",
+                    "src_state_name": "RX / MAC-NR / 1",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 478715
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / 4": {
+            "from_state": [
+                "RX / MAC-NR / 4",
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / 4": {
+                    "dst_state_name": "RX / MAC-NR / 4",
+                    "src_state_name": "RX / MAC-NR / 4",
+                    "time": {
+                        "tv_sec": 1649936147,
+                        "tv_usec": 867591
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / MAC-NR / 4",
+                    "time": {
+                        "tv_sec": 1649936100,
+                        "tv_usec": 593762
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / C-RNTI": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR",
+                "RX / MAC-NR / C-RNTI",
+                "RX / RRC / rrcSetupRequest",
+                "RX / MAC-NR / 1"
+            ],
+            "to_state": {
+                "RX / MAC-NR / 1": {
+                    "dst_state_name": "RX / MAC-NR / 1",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1649938250,
+                        "tv_usec": 280278
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1649936724,
+                        "tv_usec": 758136
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1649936627,
+                        "tv_usec": 796630
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupComplete": {
+                    "dst_state_name": "RX / RRC / rrcSetupComplete",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1649936548,
+                        "tv_usec": 444957
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1649936734,
+                        "tv_usec": 993859
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ulInformationTransfer": {
+                    "dst_state_name": "RX / RRC / ulInformationTransfer",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1649936954,
+                        "tv_usec": 104951
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / Long BSR": {
+            "from_state": [
+                "RX / RRC / securityModeComplete",
+                "RX / RRC / rrcResumeRequest1",
+                "RX / RRC / ueCapabilityInformation",
+                "RX / MAC-NR / C-RNTI",
+                "RX / RRC / ulInformationTransfer",
+                "RX / MAC-NR / 4",
+                "RX / MAC-NR / Short BSR",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / MAC-NR / Long BSR",
+                "RX / MAC-NR / 1",
+                "RX / RRC / rrcSetupComplete"
+            ],
+            "to_state": {
+                "RX / MAC-NR / 1": {
+                    "dst_state_name": "RX / MAC-NR / 1",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 493467
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / 4": {
+                    "dst_state_name": "RX / MAC-NR / 4",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936100,
+                        "tv_usec": 588677
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936777,
+                        "tv_usec": 995801
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 488542
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 908516
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936098,
+                        "tv_usec": 158605
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcResumeRequest1": {
+                    "dst_state_name": "RX / RRC / rrcResumeRequest1",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936605,
+                        "tv_usec": 301127
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupComplete": {
+                    "dst_state_name": "RX / RRC / rrcSetupComplete",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936627,
+                        "tv_usec": 801593
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936113,
+                        "tv_usec": 479326
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936934,
+                        "tv_usec": 263357
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ueCapabilityInformation": {
+                    "dst_state_name": "RX / RRC / ueCapabilityInformation",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936735,
+                        "tv_usec": 465370
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ulInformationTransfer": {
+                    "dst_state_name": "RX / RRC / ulInformationTransfer",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 648554
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / Padding": {
+            "from_state": [
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / RRC / ueCapabilityInformation",
+                "RX / RRC / securityModeComplete",
+                "RX / RRC / ulInformationTransfer",
+                "RX / MAC-NR / Padding",
+                "RX / MAC-NR / 1",
+                "RX / RRC / rrcSetupComplete"
+            ],
+            "to_state": {
+                "RX / MAC-NR / 1": {
+                    "dst_state_name": "RX / MAC-NR / 1",
+                    "src_state_name": "RX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 486645
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Padding": {
+                    "dst_state_name": "RX / MAC-NR / Padding",
+                    "src_state_name": "RX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 465030
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 504387
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ueCapabilityInformation": {
+                    "dst_state_name": "RX / RRC / ueCapabilityInformation",
+                    "src_state_name": "RX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 499216
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ulInformationTransfer": {
+                    "dst_state_name": "RX / RRC / ulInformationTransfer",
+                    "src_state_name": "RX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 469819
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / Short BSR": {
+            "from_state": [
+                "RX / RRC / ueCapabilityInformation",
+                "RX / RRC / rrcResumeRequest1",
+                "RX / RRC / securityModeComplete",
+                "RX / RRC / ulInformationTransfer",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / MAC-NR / Short BSR",
+                "RX / MAC-NR / Long BSR",
+                "RX / MAC-NR / 1",
+                "RX / RRC / rrcSetupComplete"
+            ],
+            "to_state": {
+                "RX / MAC-NR / 1": {
+                    "dst_state_name": "RX / MAC-NR / 1",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1649936722,
+                        "tv_usec": 484564
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1649936133,
+                        "tv_usec": 711401
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1649936133,
+                        "tv_usec": 706399
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcResumeRequest1": {
+                    "dst_state_name": "RX / RRC / rrcResumeRequest1",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1649936605,
+                        "tv_usec": 321014
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1649936853,
+                        "tv_usec": 747946
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 913535
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ulInformationTransfer": {
+                    "dst_state_name": "RX / RRC / ulInformationTransfer",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1649936722,
+                        "tv_usec": 204755
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / rrcReconfigurationComplete": {
+            "from_state": [
+                "RX / MAC-NR / Padding",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / RRC / rrcResumeRequest1",
+                "RX / MAC-NR / Long BSR",
+                "RX / MAC-NR / 1"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1649936098,
+                        "tv_usec": 163513
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Padding": {
+                    "dst_state_name": "RX / MAC-NR / Padding",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 506669
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1649936936,
+                        "tv_usec": 698539
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1649936954,
+                        "tv_usec": 119992
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcResumeRequest1": {
+                    "dst_state_name": "RX / RRC / rrcResumeRequest1",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 958654
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / rrcResumeRequest1": {
+            "from_state": [
+                "RX / RRC / rrcSetupRequest",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / MAC-NR / Short BSR",
+                "RX / RRC / rrcSetupComplete",
+                "RX / MAC-NR / 1",
+                "RX / RRC / rrcResumeRequest1"
+            ],
+            "to_state": {
+                "RX / MAC-NR / 1": {
+                    "dst_state_name": "RX / MAC-NR / 1",
+                    "src_state_name": "RX / RRC / rrcResumeRequest1",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 473487
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / rrcResumeRequest1",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 963502
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RRC / rrcResumeRequest1",
+                    "time": {
+                        "tv_sec": 1649936605,
+                        "tv_usec": 316003
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / RRC / rrcResumeRequest1",
+                    "time": {
+                        "tv_sec": 1649936936,
+                        "tv_usec": 693659
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcResumeRequest1": {
+                    "dst_state_name": "RX / RRC / rrcResumeRequest1",
+                    "src_state_name": "RX / RRC / rrcResumeRequest1",
+                    "time": {
+                        "tv_sec": 1649936605,
+                        "tv_usec": 336038
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupComplete": {
+                    "dst_state_name": "RX / RRC / rrcSetupComplete",
+                    "src_state_name": "RX / RRC / rrcResumeRequest1",
+                    "time": {
+                        "tv_sec": 1649936722,
+                        "tv_usec": 174999
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "RX / RRC / rrcResumeRequest1",
+                    "time": {
+                        "tv_sec": 1649936113,
+                        "tv_usec": 514773
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / ulInformationTransfer": {
+                    "dst_state_name": "RX / RRC / ulInformationTransfer",
+                    "src_state_name": "RX / RRC / rrcResumeRequest1",
+                    "time": {
+                        "tv_sec": 1649936735,
+                        "tv_usec": 29753
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / rrcSetupComplete": {
+            "from_state": [
+                "RX / RRC / rrcResumeRequest1",
+                "RX / RRC / rrcSetupRequest",
+                "RX / MAC-NR / C-RNTI",
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / rrcSetupComplete",
+                    "time": {
+                        "tv_sec": 1649936548,
+                        "tv_usec": 449766
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Padding": {
+                    "dst_state_name": "RX / MAC-NR / Padding",
+                    "src_state_name": "RX / RRC / rrcSetupComplete",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 462525
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RRC / rrcSetupComplete",
+                    "time": {
+                        "tv_sec": 1649936627,
+                        "tv_usec": 806497
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcResumeRequest1": {
+                    "dst_state_name": "RX / RRC / rrcResumeRequest1",
+                    "src_state_name": "RX / RRC / rrcSetupComplete",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 468574
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / rrcSetupRequest": {
+            "from_state": [
+                "RX / MAC-NR / C-RNTI",
+                "RX / RRC / rrcSetupRequest",
+                "RX / MAC-NR / Long BSR",
+                "IDLE",
+                "RX / MAC-NR / Short BSR",
+                "RX / MAC-NR / 1"
+            ],
+            "to_state": {
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1649936548,
+                        "tv_usec": 429377
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcResumeRequest1": {
+                    "dst_state_name": "RX / RRC / rrcResumeRequest1",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1649936722,
+                        "tv_usec": 169906
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupComplete": {
+                    "dst_state_name": "RX / RRC / rrcSetupComplete",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 464355
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1649936870,
+                        "tv_usec": 989359
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / securityModeComplete": {
+            "from_state": [
+                "RX / MAC-NR / 1",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / rrcResumeRequest1",
+                "RX / MAC-NR / Short BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / securityModeComplete",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 918523
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Padding": {
+                    "dst_state_name": "RX / MAC-NR / Padding",
+                    "src_state_name": "RX / RRC / securityModeComplete",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 491400
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RRC / securityModeComplete",
+                    "time": {
+                        "tv_sec": 1649936722,
+                        "tv_usec": 479589
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / ueCapabilityInformation": {
+            "from_state": [
+                "RX / MAC-NR / Padding",
+                "RX / MAC-NR / Long BSR",
+                "RX / MAC-NR / 1"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / ueCapabilityInformation",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 938491
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Padding": {
+                    "dst_state_name": "RX / MAC-NR / Padding",
+                    "src_state_name": "RX / RRC / ueCapabilityInformation",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 501770
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RRC / ueCapabilityInformation",
+                    "time": {
+                        "tv_sec": 1649936735,
+                        "tv_usec": 469062
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / ulInformationTransfer": {
+            "from_state": [
+                "RX / MAC-NR / Padding",
+                "RX / MAC-NR / C-RNTI",
+                "RX / MAC-NR / Short BSR",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / rrcResumeRequest1",
+                "RX / MAC-NR / 1"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / ulInformationTransfer",
+                    "time": {
+                        "tv_sec": 1649936097,
+                        "tv_usec": 483567
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Padding": {
+                    "dst_state_name": "RX / MAC-NR / Padding",
+                    "src_state_name": "RX / RRC / ulInformationTransfer",
+                    "time": {
+                        "tv_sec": 1649953194,
+                        "tv_usec": 472117
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RRC / ulInformationTransfer",
+                    "time": {
+                        "tv_sec": 1649936934,
+                        "tv_usec": 393394
+                    },
+                    "trigger": ""
+                }
+            }
+        }
+    }
+}

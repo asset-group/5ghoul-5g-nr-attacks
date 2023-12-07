@@ -1,0 +1,222 @@
+{
+    "config": {
+        "Name": "wifi_ap",
+        "Options": {
+            "DefaultProtocolName": "encap:127",
+            "DefaultProtocolEncapName": "encap:127",
+            "SaveProtocolCapture": true,
+            "LiveProtocolCapture": false,
+            "SaveLogsToFile": true,
+            "Program": 0,
+            "AutoStartProgram": true,
+            "AutoRestartProgram": false,
+            "LaunchProgramWithGDB": false,
+            "ProgramsList": [
+                "3rd-party/hostapd/hostapd",
+                "3rd-party/hostapd/hostapd_cli"
+            ],
+            "MainThreadCore": 2,
+            "SaveCoreDump": true
+        },
+        "Wifi": {
+            "WifiInterface": "wlan1",
+            "WifiSSID": "TEST_KRA",
+            "WifiPassword": "testtest",
+            "WifiChannel": 9,
+            "WifiKeyAuth": 0,
+            "WifiKeyAuthList": [
+                "WPA-EAP",
+                "WPA-PSK",
+                "SAE"
+            ],
+            "WifiRSNCrypto": 0,
+            "WifiRSNCryptoList": [
+                "CCMP",
+                "TKIP"
+            ],
+            "WifiUsername": "matheus_garbelini",
+            "WifiEAPMethod": 0,
+            "WifiEAPMethodList": [
+                "PEAP",
+                "PWD",
+                "TTLS",
+                "TLS"
+            ],
+            "WifiAllowInternet": true,
+            "WifiDHCP": true,
+            "WifiDHCPGatewayAddress": "192.172.42.1",
+            "Wifi802.11w": false,
+            "WifiCountryCode": "US"
+        },
+        "Fuzzing": {
+            "EnableDuplication": false,
+            "EnableMutation": false,
+            "EnableOptimization": false,
+            "DefaultDuplicationProbability": 0.3,
+            "DefaultMutationFieldProbability": 0.05000000000000002,
+            "DefaultMutationProbability": 0.9000000000000002,
+            "FieldMutationBackoffMultipler": 0.7,
+            "MaxFieldsMutation": 4,
+            "NormalizeProtocolLayersMutation": false,
+            "MaxDuplicationTimeMS": 6000,
+            "PacketRetry": false,
+            "PacketRetryTimeoutMS": 1500,
+            "GlobalTimeout": true,
+            "GlobalTimeoutSeconds": 6,
+            "RestoreSessionOnStartup": false,
+            "SaveSessionOnExit": false,
+            "RandomSeed": 123456789,
+            "StopCondition": {
+                "StopOnMaxIterations": true,
+                "MaxIterations": 1000,
+                "StopOnMaxTimeMinutes": true,
+                "MaxTimeMinutes": 240
+            },
+            "Selector": 0,
+            "Mutator": 1,
+            "DefaultMutators": [
+                "Random",
+                "RandomBit",
+                "RandomZeroByte",
+                "RandomFullByte",
+                "ToggleBit"
+            ],
+            "DefaultSelectors": [
+                "Random",
+                "Sequential",
+                "Overlap"
+            ],
+            "Excludes": [
+                {
+                    "ApplyTo": "D",
+                    "Description": "Probe Response",
+                    "Filter": "(wlan.fc.type_subtype == 0x0005)"
+                },
+                {
+                    "ApplyTo": "R",
+                    "Description": "Deauth",
+                    "Filter": "wlan.fc.type_subtype == 0x000c"
+                },
+                {
+                    "ApplyTo": "V",
+                    "Description": "Probe Request",
+                    "Filter": "wlan.fc.type_subtype == 0x0004"
+                },
+                {
+                    "ApplyTo": "V",
+                    "Description": "Null Data",
+                    "Filter": "wlan.fc.type_subtype == 0x0024"
+                }
+            ]
+        },
+        "Monitor": {
+            "Enable": true,
+            "PrintToStdout": true,
+            "ActiveMonitorTypes": [
+                1
+            ],
+            "MonitorsTypeList": [
+                "Serial",
+                "SSH",
+                "Microphone",
+                "ADB"
+            ],
+            "SerialUART": {
+                "SerialBaudRate": 115200,
+                "SerialMagicWords": [
+                    "brcmf_fw_crashed",
+                    "Backtrace:",
+                    "Oops:",
+                    "BUG:",
+                    "RIP:",
+                    "Call Trace:"
+                ],
+                "SerialPortName": "/dev/ttyUSB0"
+            },
+            "ADB": {
+                "ADBDevice": "3ffd4d9a",
+                "ADBFilter": "",
+                "ADBMagicWords": [
+                    "brcmf_fw_crashed",
+                    "SOC crashed",
+                    "Unable to wake SOC",
+                    "crash"
+                ],
+                "ADBProgram": "logcat"
+            },
+            "Microphone": {
+                "MicrophoneDetectionSensitivity": 0.7,
+                "MicrophoneDeviceId": -1
+            },
+            "SSH": {
+                "SSHHostAddress": "10.42.0.220",
+                "SSHUsername": "pi",
+                "SSHPassword": "raspberry123",
+                "SSHPort": 22,
+                "SSHCommand": "sudo dmesg -C && sudo dmesg -e -w",
+                "SSHEnablePreCommands": true,
+                "SSHMagicWords": [
+                    "brcmf_fw_crashed",
+                    "Backtrace:",
+                    "Oops:",
+                    "BUG:",
+                    "RIP:",
+                    "Call Trace:"
+                ],
+                "SSHPreCommands": [
+                    ""
+                ]
+            }
+        },
+        "StateMapper": {
+            "Enable": false,
+            "PacketLayerOffset": 0,
+            "SaveFolder": "configs/models/wifi_ap/",
+            "ShowAllStates": true,
+            "Mapping": [
+                {
+                    "AppendSummary": false,
+                    "Filter": "eap",
+                    "LayerName": "EAP",
+                    "StateNameField": [
+                        "eap.type",
+                        "eap.code"
+                    ]
+                },
+                {
+                    "AppendSummary": true,
+                    "Filter": "eapol",
+                    "LayerName": "802.1X",
+                    "StateNameField": [
+                        "eapol.keydes.type",
+                        "eapol.type"
+                    ]
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "wlan.fixed.action_code",
+                    "LayerName": "Action",
+                    "StateNameField": "wlan.fixed.action_code"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "wlan",
+                    "LayerName": "802.11",
+                    "StateNameField": "wlan.fc.type_subtype"
+                }
+            ],
+            "Overrides": {}
+        },
+        "Validation": {
+            "CommonRejections": [
+                {
+                    "Description": "LMP_not_accepted",
+                    "Filter": "btbrlmp.op == 4"
+                }
+            ],
+            "DefaultFragmentsLayer": "wlan",
+            "DefaultPacketLayer": "wlan",
+            "InitialState": "IDLE"
+        }
+    }
+}

@@ -1,0 +1,233 @@
+{
+    "config": {
+        "Name": "5gnr_gnb",
+        "Options": {
+            "DefaultProtocolName": "proto:mac-nr-framed",
+            "DefaultProtocolEncapName": "encap:1",
+            "SaveProtocolCapture": true,
+            "LiveProtocolCapture": false,
+            "SaveLogsToFile": true,
+            "SaveLatencyMetrics": false,
+            "SkipPacketProcessing": false,
+            "Program": 1,
+            "AutoStartProgram": true,
+            "AutoRestartProgram": false,
+            "LaunchProgramWithGDB": false,
+            "ProgramsList": [
+                "3rd-party/open5gs-core/build/tests/app/5gc",
+                "3rd-party/oai_5g_sa/cmake_targets/ran_build/build/nr-softmodem",
+                "3rd-party/oai_5g_sa/cmake_targets/ran_build/build/nr-uesoftmodem"
+            ],
+            "MainThreadCore": -1,
+            "SaveCoreDump": true
+        },
+        "NR5G": {
+            "MCC": "001",
+            "MNC": "01",
+            "AutoStartCoreNetwork": true,
+            "AutoStartBaseStation": true,
+            "CoreNetworkConfigFile": "open5gs.yaml",
+            "BaseStationConfigFile": "n78.106.conf",
+            "BaseStationArguments": "--sa --continuous-tx -E",
+            "EnableSimulator": false,
+            "SimulationConnectionTimeoutMS": 1000,
+            "SimulatorDelayUS": 2000,
+            "SimulatorUEArguments": "-r 106 --numerology 1 --band 78 -E -C 3619200000 --rfsim --sa --ssb 516",
+            "Subscribers": [
+                {
+                    "IMSI": "001010000000001",
+                    "K": "00112233445566778899AABBCCDDEEFF",
+                    "OPC": "00112233445566778899AABBCCDDEEFF",
+                    "APN": "default"
+                },
+                {
+                    "IMSI": "001010100011321",
+                    "K": "12345678901234567890123456789012",
+                    "OPC": "12345678901234561234567890123456",
+                    "APN": "default"
+                },
+                {
+                    "IMSI": "001010000064950",
+                    "K": "3ac9ec861c3d5209ddb00d88b8b2c933",
+                    "OPC": "ad3d5e6e6df84bf3fd799b39c70e7c74",
+                    "APN": "default"
+                },
+                {
+                    "IMSI": "001010000064951",
+                    "K": "3ac9ec861c3d5209ddb00d88b8b2c933",
+                    "OPC": "ad3d5e6e6df84bf3fd799b39c70e7c74",
+                    "APN": "default"
+                },
+                {
+                    "IMSI": "001020000064950",
+                    "K": "3ac9ec861c3d5209ddb00d88b8b2c933",
+                    "OPC": "ad3d5e6e6df84bf3fd799b39c70e7c74",
+                    "APN": "default"
+                },
+                {
+                    "IMSI": "001020000064951",
+                    "K": "3ac9ec861c3d5209ddb00d88b8b2c933",
+                    "OPC": "ad3d5e6e6df84bf3fd799b39c70e7c74",
+                    "APN": "default"
+                },
+                {
+                    "IMSI": "999700000064959",
+                    "K": "5FBC6D9274D7D3F03E32B12DBF582424",
+                    "OPC": "32B95812161923774B71D508A1D4D3B6",
+                    "APN": "internet"
+                },
+                {
+                    "IMSI": "901700000039907",
+                    "K": "33CD0E15C56301487706C843E5BC53C1",
+                    "OPC": "3E91AD887FB569F4A68EEB8282872B0F",
+                    "APN": "internet"
+                },
+                {
+                    "IMSI": "222010000039900",
+                    "K": "3ac9ec861c3d5209ddb00d88b8b2c933",
+                    "OPC": "ad3d5e6e6df84bf3fd799b39c70e7c74",
+                    "APN": "internet"
+                },
+                {
+                    "IMSI": "208950000039900",
+                    "K": "3ac9ec861c3d5209ddb00d88b8b2c933",
+                    "OPC": "ad3d5e6e6df84bf3fd799b39c70e7c74",
+                    "APN": "internet"
+                },
+                {
+                    "IMSI": "525070000039900",
+                    "K": "3ac9ec861c3d5209ddb00d88b8b2c933",
+                    "OPC": "ad3d5e6e6df84bf3fd799b39c70e7c74",
+                    "APN": "internet"
+                },
+                {
+                    "IMSI": "222010100000002",
+                    "K": "0c2d427dc188ed0284c4dd0fde705060",
+                    "OPC": "64f4f96c49dfac6a89b45dfa15574a75",
+                    "APN": "internet"
+                },
+                {
+                    "IMSI": "901700000039908",
+                    "K": "E5EB44B93317E84EBA206EF962A29D8C",
+                    "OPC": "4242F3B4D58A5DA39336E1F8CB643B2A",
+                    "APN": "internet"
+                }
+            ]
+        },
+        "Fuzzing": {
+            "EnableMutation": false,
+            "EnableOptimization": false,
+            "EnableDuplication": false,
+            "DefaultMutationProbability": 0.2,
+            "DefaultMutationFieldProbability": 0.1,
+            "FieldMutationBackoffMultipler": 0.5,
+            "MaxFieldsMutation": 2,
+            "DefaultDuplicationProbability": 0.2,
+            "MaxDuplicationTimeMS": 6000,
+            "NormalizeProtocolLayersMutation": true,
+            "PacketRetry": false,
+            "PacketRetryTimeoutMS": 2304,
+            "GlobalTimeout": false,
+            "GlobalTimeoutSeconds": 45,
+            "StateLoopDetection": false,
+            "StateLoopDetectionThreshold": 5,
+            "RandomSeed": 123456789,
+            "SeedIncrementEveryIteration": true,
+            "RestoreSessionOnStartup": false,
+            "SaveSessionOnExit": false,
+            "StopCondition": {
+                "MaxIterations": 10000,
+                "MaxTimeMinutes": 240,
+                "StopOnMaxIterations": true,
+                "StopOnMaxTimeMinutes": false
+            },
+            "Excludes": [
+                {
+                    "ApplyTo": "D",
+                    "Description": "Do not duplicate MAC only packets",
+                    "Filter": "!(nr-rrc || rlc-nr || nas-5gs)"
+                }
+            ]
+        },
+        "StateMapper": {
+            "Enable": false,
+            "ShowAllStates": true,
+            "SaveFolder": "configs/models/5gnr_gnb/",
+            "PacketLayerOffset": 1,
+            "IgnoreMalformedPackets": true,
+            "Mapping": [
+                {
+                    "AppendSummary": false,
+                    "Filter": "nas-5gs",
+                    "LayerName": "NAS",
+                    "StateNameField": [
+                        "nas_5gs.sm.message_type",
+                        "nas_5gs.mm.message_type"
+                    ]
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "nr-rrc",
+                    "LayerName": "RRC",
+                    "StateNameField": [
+                        "nr-rrc.c1"
+                    ]
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "rlc-nr",
+                    "LayerName": "RLC",
+                    "StateNameField": [
+                        "rlc-nr.am.cpt",
+                        "rlc-nr.am.dc"
+                    ]
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "mac-nr",
+                    "LayerName": "MAC-NR",
+                    "StateNameField": [
+                        "mac-nr.ulsch.lcid",
+                        "mac-nr.dlsch.lcid",
+                        "mac-nr.rnti-type"
+                    ]
+                }
+            ],
+            "Overrides": {}
+        },
+        "Monitor": {
+            "Enable": true,
+            "PrintToStdout": true,
+            "WaitExternalEvent": false,
+            "ActiveMonitorTypes": [
+                3
+            ],
+            "MonitorsTypeList": [
+                "SerialUART",
+                "SSH",
+                "Microphone",
+                "ADB",
+                "QCDM"
+            ],
+            "QCDM": {
+                "QCDMADB": false,
+                "QCDMDevice": "/dev/ttyUSB0",
+                "QCDMMagicWords": [
+                    "testtest"
+                ]
+            },
+            "ADB": {
+                "ADBDevice": "UWEUW4XG8XCA8PWS",
+                "ADBFilter": "",
+                "ADBMagicWords": [
+                    "ModemEvent: modem_failure",
+                    "ModemRestartStats",
+                    "SOC crashed",
+                    "Unable to wake SOC"
+                ],
+                "ADBProgram": "logcat",
+                "ADBSubSystem": "radio,crash,system,main"
+            }
+        }
+    }
+}

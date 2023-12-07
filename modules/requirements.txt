@@ -1,0 +1,17 @@
+cython >= 0.29.21					# Static compiler to accelerate server
+eventlet >= 0.30.1					# Green threads used by SocketIOServer.py
+python-socketio[client] == 4.6.1	# Socket IO Server + Client libyrary (installs support for http and websocket transport)
+flask == 2.0.1 						# Flask Server for REST endpoints
+flask_cors == 3.0.10 				# Add CORS middleware to rest
+flask_selfdoc==1.2.3				# Add flask API documentation						
+jinja2==3.0.3 						# Required by flask_selfdoc
+werkzeug==2.0.0 					# Required by flask_selfdoc
+colorama							# Colored text output
+pyserial>=3.5						# Required by QCSuper (LTE/5G Modem logging)
+crcmod								# Required by QCSuper (LTE/5G Modem logging)
+pycrate								# Required by QCSuper (LTE/5G Modem logging)
+docopt==0.6.2
+google-api-python-client			# Required by emailsender (GMail API)
+google-auth-httplib2				# Required by emailsender (GMail API)
+google-auth-oauthlib				# Required by emailsender (GMail API)
+scapy==2.5.0						# common requirement to work with pcaps and protocols

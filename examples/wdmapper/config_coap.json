@@ -1,0 +1,67 @@
+{
+    "config": {
+        "Name": "Bluetooth",
+        "Options": {
+            "DefaultProtocolEncapName": "encap:1",
+            "DefaultProtocolName": "encap:1",
+            "DefaultPrograms": [],
+            "Program": 0,
+            "CoreDump": true
+        },
+        "StateMapper": {
+            "PacketLayerOffset": 1,
+            "Mapping": [
+                {
+                    "Filter": "coap.type == 0",
+                    "LayerName": "CoAP Confirmable",
+                    "StateNameField": "coap.code",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "coap.type == 1",
+                    "LayerName": "CoAP Non-Confirmable",
+                    "StateNameField": "coap.code",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "coap.type == 2",
+                    "LayerName": "CoAP Acknowledgement",
+                    "StateNameField": "coap.code",
+                    "AppendSummary": false
+                },   
+                {
+                    "Filter": "coap.type == 3",
+                    "LayerName": "CoAP Reset",
+                    "StateNameField": "coap.code",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "coap.code == 64",
+                    "LayerName": "CoAP [Unknown]",
+                    "StateNameField": "coap.type",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "coap",
+                    "LayerName": "CoAP",
+                    "StateNameField": "coap.type",
+                    "AppendSummary": false
+                }
+            ],
+            "Overrides": {},
+            "SaveFolder": "configs/models/generic/",
+            "ShowAllStates": true
+        },
+        "Fuzzing": {
+            "Excludes": [{
+                "ApplyTo": "",
+                "Description": "",
+                "Filter": ""
+            }]
+        },
+        "Validation": {
+            "CommonRejections": [],
+            "InitialState": "Connect"
+        }
+    }
+}

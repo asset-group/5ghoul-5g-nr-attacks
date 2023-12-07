@@ -1,0 +1,227 @@
+{
+    "config": {
+        "ServerOptions": {
+            "Enable": true,
+            "Logging": false,
+            "Type": "SocketIO",
+            "ListenAddress": "0.0.0.0",
+            "Port": 3000
+        },
+        "Fuzzing": {
+            "DefaultDuplicationProbability": 0.7999999999999998,
+            "DefaultMutationProbability": 0.49999999999999994,
+            "DefaultMutators": [
+                "Random",
+                "RandomBit",
+                "RandomZeroByte",
+                "RandomFullByte",
+                "ToggleBit"
+            ],
+            "DefaultSelectors": [
+                "Random",
+                "Sequential",
+                "Overlap"
+            ],
+            "MaxDuplicationTime": 50,
+            "Mutator": 0,
+            "Selector": 0,
+            "enable_duplication": false,
+            "enable_mutation": false,
+            "Excludes": [{
+                "ApplyTo": "",
+                "Description": "",
+                "Filter": ""
+            }]
+        },
+        "LTE": {
+            "Band": "b7",
+            "DefaultTestFields": [
+                "mac-lte.dlsch.lcid",
+                "mac-lte.sch.length",
+                "lte-rrc.rrc_TransactionIdentifier",
+                "lte-rrc.logicalChannelGroup",
+                "lte-rrc.t_PollRetransmit",
+                "lte-rrc.integrityProtAlgorithm",
+                "nas_eps.security_header_type"
+            ],
+            "TestField": 1,
+            "TestFieldEnable": false
+        },
+        "Name": "LTE",
+        "Options": {
+            "AutoRestart": false,
+            "DefaultProtocolEncapName": "encap:1",
+            "DefaultPrograms": [
+                "/home/matheus/5g/open5gs-core/run.sh",
+                "/home/matheus/5g/oai_lte_network/openair-ran/cmake_targets/lte_build_oai/build/lte-softmodem"
+            ],
+            "DefaultProtocolName": "proto:mac-lte-framed",
+            "LiveCapture": false,
+            "Program": 0,
+            "SaveCapture": true,
+            "CoreDump": true
+        },
+        "StateMapper": {
+            "PacketLayerOffset": 1,
+            "Mapping": [{
+                    "Filter": "nas-eps",
+                    "LayerName": "NAS",
+                    "StateNameField": [
+                        "nas_eps.nas_msg_esm_type",
+                        "nas_eps.nas_msg_emm_type"
+                    ],
+                    "AppendSummary" :false
+                },
+                {
+                    "Filter": "lte_rrc",
+                    "LayerName": "RRC",
+                    "StateNameField": [
+                        "lte-rrc.c1_15",
+                        "lte-rrc.c1_14",
+                        "lte-rrc.c1_13",
+                        "lte-rrc.c1_12",
+                        "lte-rrc.c1"
+                    ],
+                    "AppendSummary" :false
+                },
+                {
+                    "Filter": "pdcp-lte",
+                    "LayerName": "PDCP",
+                    "StateNameField": "pdcp-lte.pdu-type",
+                    "AppendSummary" :false
+                },
+                {
+                    "Filter": "rlc-lte",
+                    "LayerName": "RLC",
+                    "StateNameField": [
+                        "rlc-lte.am.cpt",
+                        "rlc-lte.am.frame-type",
+                        "rlc-lte.channel-type"
+                    ],
+                    "AppendSummary" :false
+                },
+                {
+                    "Filter": "mac-lte",
+                    "LayerName": "MAC",
+                    "StateNameField": "mac-lte.ulsch.lcid",
+                    "AppendSummary" :false
+                },
+                {
+                    "Filter": "mac-lte",
+                    "LayerName": "MAC",
+                    "StateNameField": "mac-lte.rnti-type",
+                    "AppendSummary" :false
+                }
+            ],
+            "Overrides": {},
+            "SaveFolder": "configs/models/lte_enb/",
+            "ShowAllStates": true
+        },
+        "Validation": {
+            "DefaultFragmentsLayer": "rlc-lte",
+            "DefaultPacketLayer": "pdcp-lte",
+            "InitialState": "IDLE",
+            "CommonRejections": [
+                {
+                    "Description": "",
+                    "Filter": ""
+                }
+            ]
+        },
+        "enable_epc": true,
+        "enable_epc_duplication": true,
+        "enable_epc_fuzzing": true,
+        "enb_config_path": "configs/oai_b28.conf",
+        "enb_exec_path": "/home/matheus/5g/openairinterface5g/cmake_targets/lte_build_oai/build/lte-softmodem",
+        "zmq_address_cmd": "tcp://127.0.0.1:5561",
+        "zmq_address_events": "tcp://127.0.0.1:5562",
+        "zmq_server": false,
+        "zmq_topic_commands": "",
+        "zmq_topic_events": ""
+    },
+    "states": [{
+            "Fields": [
+                "mac-lte.rar.ul-grant",
+                "mac-lte.rar.ta",
+                "mac-lte.rar.reserved2",
+                "mac-lte.rar.temporary-crnti"
+            ],
+            "Mutators": null,
+            "Name": "RACH",
+            "Probabilities": null,
+            "RejectionRules": null,
+            "Rules": [
+                "mac-lte.preamble-sent"
+            ],
+            "Selector": null
+        },
+        {
+            "Fields": [
+                "mac-lte.sch.length"
+            ],
+            "Mutators": null,
+            "Name": "RRCConnection",
+            "Probabilities": [
+                0.1
+            ],
+            "RejectionRules": null,
+            "Rules": [
+                "lte-rrc.rrcConnectionRequest_element"
+            ],
+            "Selector": null
+        },
+        {
+            "Fields": null,
+            "Mutators": null,
+            "Name": "RRCConnectionReestablishment",
+            "Probabilities": null,
+            "RejectionRules": null,
+            "Rules": [
+                "lte-rrc.rrcConnectionReestablishmentRequest_element"
+            ],
+            "Selector": null
+        },
+        {
+            "Fields": null,
+            "Mutators": null,
+            "Name": "RRCSetupComplete",
+            "Probabilities": null,
+            "RejectionRules": null,
+            "Rules": [
+                "lte-rrc.rrcConnectionSetupComplete_element"
+            ],
+            "Selector": null
+        },
+        {
+            "Fields": null,
+            "Mutators": null,
+            "Name": "RRCSecurityModeComplete",
+            "Probabilities": null,
+            "RejectionRules": null,
+            "Rules": [
+                "lte-rrc.securityModeComplete_element"
+            ],
+            "Selector": null
+        },
+        {
+            "Fields": [
+                ""
+            ],
+            "Mutators": [
+                ""
+            ],
+            "Name": "RRCConnectionReconfiguration",
+            "Probabilities": null,
+            "RejectionRules": [
+                ""
+            ],
+            "Rules": null,
+            "Selector": ""
+        }
+    ],
+    "transitions": [{
+        "dest": "RRCConnection",
+        "source": "RACH",
+        "trigger": "update"
+    }]
+}

@@ -1,0 +1,668 @@
+diff --git a/.vscode/settings.json b/.vscode/settings.json
+new file mode 100644
+index 0000000..829eb23
+--- /dev/null
++++ b/.vscode/settings.json
+@@ -0,0 +1,4 @@
++{
++    "python.pythonPath": "/usr/bin/python3",
++    "workbench.editor.enablePreview": false
++}
+\ No newline at end of file
+diff --git a/inputs/_base_input.py b/inputs/_base_input.py
+index d38ffb9..557d69b 100644
+--- a/inputs/_base_input.py
++++ b/inputs/_base_input.py
+@@ -15,6 +15,7 @@ from protocol.messages import *
+ 
+ LOG_CONFIG_DISABLE_OP = 0
+ 
++MSG_EXT_SUBCMD_SET_RT_MASK = 4
+ MSG_EXT_SUBCMD_SET_ALL_RT_MASKS = 5
+ MSG_LVL_NONE = 0
+ 
+@@ -302,11 +303,11 @@ class BaseInput:
+                         repr(req_payload)
+                     ))
+                     
+-                    with self.shutdown_event:
++                    # with self.shutdown_event:
+                     
+-                        self.shutdown_event.notify()
++                    #     self.shutdown_event.notify()
+                     
+-                    exit()
++                    # exit()
+                 
+                 if resp_opcode in OPCODE_ERRORS and not accept_error:
+                     
+@@ -319,11 +320,11 @@ class BaseInput:
+                         repr(req_payload)
+                     ))
+                     
+-                    with self.shutdown_event:
++                    # with self.shutdown_event:
+                     
+-                        self.shutdown_event.notify()
++                    #     self.shutdown_event.notify()
+                     
+-                    exit()
++                    # exit()
+                 
+                 return resp_opcode, resp_payload
+     
+diff --git a/modules/_enable_log_mixin.py b/modules/_enable_log_mixin.py
+index 077b831..e77e384 100644
+--- a/modules/_enable_log_mixin.py
++++ b/modules/_enable_log_mixin.py
+@@ -4,6 +4,7 @@ from struct import pack, unpack_from, calcsize
+ from logging import warning, info
+ from protocol.log_types import *
+ from protocol.messages import *
++from protocol.subsystems import ENABLED_SUBSYSTEMS
+ from time import sleep
+ 
+ """
+@@ -50,6 +51,8 @@ TYPES_FOR_RAW_PACKET_LOGGING = [
+     # Layer 2:
+     
+     LOG_GPRS_MAC_SIGNALLING_MESSAGE_C, # 0x5226
++    # LOG_LTE_MAC_DL_TRANSPORT_BLOCK_C,  # 0xb063
++    # LOG_LTE_MAC_UL_TRANSPORT_BLOCK_C,  # 0xb064
+ 
+     # Layer 3:
+     
+@@ -73,6 +76,8 @@ TYPES_FOR_RAW_PACKET_LOGGING = [
+ ]
+ 
+ class EnableLogMixin:
++
++    log_messages = False
+     
+     def on_init(self):
+         
+@@ -103,11 +108,12 @@ class EnableLogMixin:
+             0x6: 'LBS',
+             0x7: 'UMTS',
+             0x8: 'TDMA',
++            0x9: 'Reserved09',
+             0xA: 'DTV',
+             0xB: 'APPS/LTE/WIMAX',
+             0xC: 'DSP',
+             0xD: 'TDSCDMA',
+-            0xF: 'TOOLS'
++            0xF: 'TOOLS',
+         }
+         
+         information_string = '[+] Enabled logging for: '
+@@ -120,7 +126,7 @@ class EnableLogMixin:
+                 
+                 self.log_type_to_mask_bitsize[log_type] = log_mask_bitsize
+                 
+-                log_mask = self._fill_log_mask(log_type, log_mask_bitsize)
++                log_mask, logs_count = self._fill_log_mask(log_type, log_mask_bitsize)
+                 
+                 opcode, payload = self.diag_input.send_recv(DIAG_LOG_CONFIG_F, pack('<3xIII',
+                     LOG_CONFIG_SET_MASK_OP,
+@@ -136,13 +142,34 @@ class EnableLogMixin:
+                     
+                     warning('Warning: log operation %d resulted in status %d' % (operation, status))
+                 
+-                information_string += '%s (%d), ' % (log_types.get(log_type, 'UNKNOWN'), log_type)
++                information_string += '(%d) %s - Count=%d,\n' % (log_type, log_types.get(log_type, 'UNKNOWN'), logs_count)
+         
+-        info('\n' + information_string.strip(', ') + '\n')
+-    
++        info('\n' + information_string.strip(',\n') + '\n')
++
++        if self.log_messages:
++            info('Enabling messages for enabled subsystems')
++            for ssid_start, ssid_end in ENABLED_SUBSYSTEMS:
++                # enable/disable messages for known subsystem
++                self.send_msg_config_set_rt_mask(ssid_start, ssid_end, on = True)
++
++    def send_msg_config_set_rt_mask(self, ssid_start, ssid_end, on = True):
++
++        data = b''
++
++        # create masks list for specified subsystems
++        for i in range(0, ssid_end - ssid_start + 1):
++            data += pack('<I', 0xffffffff if on else 0)
++
++        # send request
++        opcode, payload = self.diag_input.send_recv(DIAG_EXT_MSG_CONFIG_F,
++                   pack('<BHHH', 0x04, ssid_start, ssid_end, 0) + data)
++
++        # Opcode should return DIAG_EXT_MSG_CONFIG_F here
++
+     def _fill_log_mask(self, log_type, num_bits, bit_value = 1):
+         
+         log_mask = b''
++        logs_count = 0
+         
+         current_byte = 0
+         num_bits_written = 0
+@@ -170,15 +197,21 @@ class EnableLogMixin:
+                 
+                 current_byte = 0
+                 num_bits_written = 0
+-        
+-        return log_mask
++            
++            if enable_this_log_type:
++                logs_count += 1
++
++        return log_mask, logs_count
+     
+     def on_deinit(self):
+         
+         for log_type, log_mask_bitsize in getattr(self, 'log_type_to_mask_bitsize', {}).items():
+             
+             log_mask = self._fill_log_mask(log_type, log_mask_bitsize, bit_value = 0)
+-            
++
++            if type(log_mask) == tuple:
++                log_mask = log_mask[0]
++
+             self.diag_input.send_recv(DIAG_LOG_CONFIG_F, pack('<3xIII',
+                 LOG_CONFIG_SET_MASK_OP,
+                 log_type,
+diff --git a/modules/pcap_dump.py b/modules/pcap_dump.py
+index 0b80df6..844cca9 100644
+--- a/modules/pcap_dump.py
++++ b/modules/pcap_dump.py
+@@ -2,11 +2,16 @@
+ #-*- encoding: Utf-8 -*-
+ from modules._enable_log_mixin import EnableLogMixin, TYPES_FOR_RAW_PACKET_LOGGING
+ from modules.decoded_sibs_dump import DecodedSibsDumper
++from protocol.messages import DIAG_EXT_MSG_F
+ from struct import pack, unpack, unpack_from, calcsize
+ from subprocess import Popen, PIPE, DEVNULL, STDOUT
+-from logging import warning
++from logging import warning, info
+ from shutil import which
++from colorama import Fore
+ import gzip
++import time
++import colorama
++from binascii import hexlify
+ 
+ try:
+     from os import setpgrp, getenv, setresgid, setresuid, setgroups, getgrouplist
+@@ -18,6 +23,7 @@ except Exception:
+ 
+ from protocol.log_types import *
+ from protocol.gsmtap import *
++from protocol.rlc_nr import *
+ 
+ """
+     This module registers various diag LOG events, and tries to generate a
+@@ -26,7 +32,7 @@ from protocol.gsmtap import *
+ 
+ class PcapDumper(DecodedSibsDumper):
+     
+-    def __init__(self, diag_input, pcap_file, reassemble_sibs, decrypt_nas, include_ip_traffic):
++    def __init__(self, diag_input, pcap_file, reassemble_sibs, decrypt_nas, include_ip_traffic, show_messages):
+         
+         self.pcap_file = pcap_file
+         
+@@ -47,13 +53,54 @@ class PcapDumper(DecodedSibsDumper):
+         self.diag_input = diag_input
+         
+         self.limit_registered_logs = TYPES_FOR_RAW_PACKET_LOGGING
++        self.log_messages = show_messages          
+         
+         self.current_rat = None # Radio access technology: "2g", "3g", "4g"
+         
+         self.reassemble_sibs = reassemble_sibs
+         self.decrypt_nas = decrypt_nas
+         self.include_ip_traffic = include_ip_traffic
+-    
++
++        colorama.init(autoreset=True)  
++
++
++    def on_message(self, opcode, payload):
++        """
++        Process a single log message containing debug information
++        """
++        # Parse EXT_MSG_F
++        if opcode is DIAG_EXT_MSG_F:
++            args_list = []
++            # parse EXT_MSG_F header
++            _, num_args, _, timestamp, line, ssid, _ = unpack('<BBBQHHL', payload[: 19])
++            args = payload[19:]
++            message = args[(num_args * 4) :]
++            message, file_name, _ = message.split(b'\0')
++
++            for i in range(0, num_args):
++                # get argument value
++                args_list.append(unpack('<I', args[(i * 4) : (i * 4) + 4])[0])
++            
++            message = message.strip()
++            file_name = file_name.strip()
++
++            try:
++                message = message.replace(b'%p', b'%x')
++                message = message % tuple(args_list[: message.count(b'%')])
++            except:
++                info('[!] EXT_MSG_F format string error for "%s" (%d args)' % \
++                              (message, num_args))
++                return
++            
++            bin_to_str = lambda x: x.decode('utf-8',errors='ignore')
++
++            # Print formatted message
++            location = (' : ' + Fore.BLUE + '%s(%d)' + Fore.RESET) % (file_name, line)
++            timestamp = Fore.YELLOW + ('[%s] ' % time.strftime('%H:%M:%S', time.localtime(time.time()))) + Fore.RESET
++            message = '%s0x%.4x%s : %s' % (timestamp, ssid, location, bin_to_str(message))
++            info(message)
++        
++
+     """
+         Process a single log packet containing raw signalling or data traffic,
+         to be encapsulated into GSMTAP and append to the PCAP
+@@ -62,6 +109,7 @@ class PcapDumper(DecodedSibsDumper):
+     def on_log(self, log_type, log_payload, log_header, timestamp = 0):
+         
+         packet = None
++        # print('log_type: %s' % hex(log_type))
+         
+         if log_type == WCDMA_SIGNALLING_MESSAGE: # 0x412f
+             
+@@ -185,6 +233,16 @@ class PcapDumper(DecodedSibsDumper):
+             
+             packet = build_gsmtap_ip(GSMTAP_TYPE_UM, gsmtap_channel_type, packet, is_uplink)
+         
++        elif log_type == LOG_LTE_MAC_DL_TRANSPORT_BLOCK_C:
++            
++            self.current_rat = '4g'
++            print("LOG_LTE_MAC_DL_TRANSPORT_BLOCK_C")
++        
++        elif log_type == LOG_LTE_MAC_UL_TRANSPORT_BLOCK_C:
++            
++            self.current_rat = '4g'
++            print("LOG_LTE_MAC_UL_TRANSPORT_BLOCK_C")
++        
+         elif log_type == LOG_LTE_RRC_OTA_MSG_LOG_C: # 0xb0c0
+             
+             self.current_rat = '4g'
+@@ -194,12 +252,11 @@ class PcapDumper(DecodedSibsDumper):
+             # - By Moiji diag-parser here: https://github.com/moiji-mobile/diag-parser/blob/master/diag_input.c#L206
+             
+             # Parse base header
+-            
+             (ext_header_ver, rrc_rel, rrc_ver, bearer_id, phy_cellid), ext_header = unpack('<BBBBH', log_payload[:6]), log_payload[6:]
+-            
+-            if ext_header_ver >= 25: # Handle post-NR releases
+-                (ext_header_ver, rrc_rel, rrc_ver, nc_rrc_rel, bearer_id, phy_cellid), ext_header = unpack('<BBBHBH', log_payload[:8]), log_payload[8:]
+-            
++            if ext_header_ver >= 25:
++                # Handle post-NR releases ext_header_ver >= 25
++                (ext_header_ver, rrc_rel, rrc_ver, nr_rrc_rel, bearer_id, phy_cellid), ext_header = unpack('<BBBHBH', log_payload[:8]), log_payload[8:]
++
+             # Parse extended header
+             
+             freq_type = 'H' if ext_header_ver < 8 else 'I'
+@@ -308,6 +365,69 @@ class PcapDumper(DecodedSibsDumper):
+             
+             packet = build_gsmtap_ip(GSMTAP_TYPE_LTE_RRC, gsmtap_channel_type, packet, is_uplink)
+         
++        elif log_type == LOG_NR_RRC_OTA_MSG_LOG_C: # 0xb821
++
++            self.current_rat = '5g'
++
++            ext_header_ver = log_payload[0]
++            ext_header = log_payload[4:]
++            # print(hexlify(log_payload))
++
++            print('LOG_NR_RRC_OTA_MSG_LOG_C version %d' % ext_header_ver)
++            
++            if ext_header_ver < 12: # this may be wrong, adjust the format accroding to pkt version
++                ext_header_fmt = "<BBBHLLBBxxxH"
++            else:
++                ext_header_fmt = "<BBBHL3sBBxxxH" # Instead of LL (4 bytes), we have 3s (3 bytes)
++            # print('before unpack')
++            (rrc_rel_number, rrc_ver, bearer_id, cell_id, freq, sys_sub_frame_number, pdu_type, sib_mask, msg_len) = unpack(ext_header_fmt, ext_header[:calcsize(ext_header_fmt)])
++            # print('after unpack')
++
++            if type(freq)is bytes:
++                freq = int.from_bytes(freq, byteorder='little')
++            
++            # This is the nr-rrc message
++            packet = ext_header[calcsize(ext_header_fmt):]
++
++            # Print message parameters
++            # print("NR RRC OTA PKT:")
++            # print("  RRC Release Number: %d" % rrc_rel_number)
++            # print("  RRC Version: %d" % rrc_ver)
++            # print("  Bearer ID: %d" % bearer_id)
++            # print("  Cell ID: %d" % cell_id)
++            # print("  Freq: %d" % freq)
++            # print("  System Frame Number: %d" % sys_sub_frame_number)
++            # print("  PDU Type: %d" % pdu_type)
++            # print("  SIB Mask: %d" % sib_mask)
++            # print("  Message Length: %d" % msg_len)
++
++            # # Print message content using hexlify
++            # print("  Message Content:")
++            # print(hexlify(packet))
++            # print('-----------------------------------------------------')
++
++            # Map common bearer types
++            bearer_type_lookup_table = {
++                NR_DL_BCCH_BCH_v9: (BEARER_TYPE_BCCH_BCH, DIRECTION_DOWNLINK),     # BCCH, DL
++                NR_DL_BCCH_SCH_v9: (BEARER_TYPE_BCCH_DL_SCH, DIRECTION_DOWNLINK),  # SCH,  DL
++                NR_DL_CCCH_v9: (BEARER_TYPE_CCCH, DIRECTION_DOWNLINK),             # CCCH, DL
++                NR_DL_DCCH_v9: (BEARER_TYPE_SRB, DIRECTION_DOWNLINK),              # SRB1, DL
++                NR_DL_PCCH_v9: (BEARER_TYPE_PCCH, DIRECTION_DOWNLINK),             # PCCH, DL
++                NR_UL_CCCH_v9: (BEARER_TYPE_CCCH, DIRECTION_UPLINK),               # CCCH, UL
++                NR_UL_DCCH_v9: (BEARER_TYPE_SRB, DIRECTION_UPLINK),                # SRB1, UL
++                NR_UL_DCCH_RECONF_v9: (BEARER_TYPE_SRB, DIRECTION_UPLINK),         # SRB1, UL
++            }
++
++            if pdu_type == NR_UL_DCCH_RECONF_v9:
++                # Handle special case of reconfiguration message
++                print('NR_UL_DCCH_RECONF_v9')
++                pass
++
++            # So far we don't check ext_header_ver and update mappings,
++            # however, this may be needed in the future depending on the ext_header_ver
++            bearer_type, dir = bearer_type_lookup_table.get(pdu_type)
++            packet = build_rlc_nr_ip(dir, bearer_type, bearer_id, packet)
++        
+         elif self.decrypt_nas and log_type in (
+             LOG_LTE_NAS_ESM_OTA_IN_MSG_LOG_C,
+             LOG_LTE_NAS_ESM_OTA_OUT_MSG_LOG_C,
+@@ -344,9 +464,8 @@ class PcapDumper(DecodedSibsDumper):
+             packet = build_gsmtap_ip(GSMTAP_TYPE_ABIS, GSMTAP_CHANNEL_SDCCH, signalling_message, is_uplink)
+         
+         if packet:
+-            
+             try:
+-                
++                # print('log type: %s' % hex(log_type))
+                 self.pcap_file.write(pack('<IIII',
+                     int(timestamp),
+                     int((timestamp * 1000000) % 1000000),
+@@ -455,7 +574,7 @@ class PcapDumper(DecodedSibsDumper):
+ 
+ class WiresharkLive(PcapDumper):
+ 
+-    def __init__(self, diag_input, reassemble_sibs, decrypt_nas, include_ip_traffic):
++    def __init__(self, diag_input, reassemble_sibs, decrypt_nas, include_ip_traffic, enable_tshark, show_messages):
+         
+         wireshark = (
+             which('C:\Program Files\Wireshark\Wireshark.exe') or
+@@ -463,24 +582,43 @@ class WiresharkLive(PcapDumper):
+             which('wireshark') or
+             which('wireshark-gtk')
+         )
++
++        tshark = (
++            which('C:\Program Files\Wireshark\Tshark.exe') or
++            which('C:\Program Files (x86)\Wireshark\Tshark.exe') or
++            which('tshark')
++        )
+         
+         if not wireshark:
+             
+             raise Exception('Could not find Wireshark in $PATH')
+         
++        if enable_tshark and not tshark:
++
++            raise Exception('Could not find tshark in $PATH')
++
+         if not IS_UNIX:
+             
+             self.detach_process = None
+         
+-        wireshark_pipe = Popen([wireshark, '-k', '-i', '-'],
+-            stdin = PIPE, stdout = DEVNULL, stderr = STDOUT,
++        p_args = [wireshark if not enable_tshark else tshark]
++    
++        if not enable_tshark:
++            p_args.append('-k') # Auto start capture if starting wireshark        
++        p_args.append('-i')     # Define capture interface
++        p_args.append('-')      # Pipe STDIN to capture interface
++
++        info("Starting " + p_args[0])
++
++        wireshark_pipe = Popen(p_args,
++            stdin = PIPE, stderr = STDOUT,
+             preexec_fn = self.detach_process,
+             bufsize = 0
+         ).stdin
+         
+         wireshark_pipe.appending_to_file = False
+         
+-        super().__init__(diag_input, wireshark_pipe, reassemble_sibs, decrypt_nas, include_ip_traffic)
++        super().__init__(diag_input, wireshark_pipe, reassemble_sibs, decrypt_nas, include_ip_traffic, show_messages)
+     
+     """
+         Executed when we launch a Wireshark process, after fork()
+diff --git a/protocol/log_types.py b/protocol/log_types.py
+index 0f90b91..dd86811 100644
+--- a/protocol/log_types.py
++++ b/protocol/log_types.py
+@@ -43,6 +43,8 @@ LOG_NR_RRC_OTA_MSG_LOG_C = 0xb821
+     These are 4G-related log types.
+ """
+ 
++LOG_LTE_MAC_DL_TRANSPORT_BLOCK_C = 0xb063
++LOG_LTE_MAC_UL_TRANSPORT_BLOCK_C = 0xb064
+ LOG_LTE_RRC_OTA_MSG_LOG_C = 0xb0c0
+ LOG_LTE_NAS_ESM_OTA_IN_MSG_LOG_C = 0xb0e2
+ LOG_LTE_NAS_ESM_OTA_OUT_MSG_LOG_C = 0xb0e3
+@@ -93,6 +95,20 @@ LTE_DL_DCCH_NB = 49
+ LTE_UL_CCCH_NB = 50
+ LTE_UL_DCCH_NB = 52
+ 
++"""
++    These are 5G-related log types.
++"""
++
++# common to v1-v14 so far
++NR_DL_BCCH_BCH_v9 = 0x01
++NR_DL_BCCH_SCH_v9 = 0x02
++NR_DL_CCCH_v9 = 0x03
++NR_DL_DCCH_v9 = 0x04
++NR_DL_PCCH_v9 = 0x05
++NR_UL_CCCH_v9 = 0x06
++NR_UL_DCCH_v9 = 0x08
++NR_UL_DCCH_RECONF_v9 = 0x0a
++
+ """
+     These are 3G-related log types.
+ """
+diff --git a/protocol/rlc_nr.py b/protocol/rlc_nr.py
+new file mode 100644
+index 0000000..5947c04
+--- /dev/null
++++ b/protocol/rlc_nr.py
+@@ -0,0 +1,126 @@
++#!/usr/bin/python3
++#-*- encoding: utf-8 -*-
++
++# rlc-nr-udp definition:
++# - https://github.com/wireshark/wireshark/blob/wireshark-3.6.0/epan/dissectors/packet-gsmtap.h
++
++
++# rlcMode
++RLC_TM_MODE = 1
++RLC_UM_MODE = 2
++RLC_AM_MODE = 4
++
++# direction 
++DIRECTION_UPLINK = 0
++DIRECTION_DOWNLINK = 1
++
++# bearerType 
++BEARER_TYPE_CCCH = 1
++BEARER_TYPE_BCCH_BCH = 2
++BEARER_TYPE_PCCH = 3
++BEARER_TYPE_SRB = 4
++BEARER_TYPE_DRB = 5
++BEARER_TYPE_BCCH_DL_SCH = 6
++
++# sequenceNumberLength
++TM_SN_LENGTH_0_BITS = 0
++UM_SN_LENGTH_6_BITS = 6
++UM_SN_LENGTH_12_BITS = 12
++AM_SN_LENGTH_12_BITS = 12
++AM_SN_LENGTH_18_BITS = 18
++
++# 1 byte */
++RLC_NR_DIRECTION_TAG = 0x02
++
++# 2 bytes, network order */
++RLC_NR_UEID_TAG = 0x03
++
++# 1 byte */
++RLC_NR_BEARER_TYPE_TAG = 0x04
++
++# 1 byte */
++RLC_NR_BEARER_ID_TAG = 0x05
++
++# RLC PDU. Following this tag comes the actual RLC PDU (there is no length, the PDU
++#   continues until the end of the frame) */
++RLC_NR_PAYLOAD_TAG = 0x01
++
++# RLC AM counters
++AM_SEQ_NUM = 0
++UL_AM_SEQ_NUM = 0
++DL_AM_SEQ_NUM = 0
++
++# Reference ipv4 payload with udp magic string (rlc-nr)
++pcap_rlc_nr_ip_ref = bytearray(\
++    [0x45, 0x0, 0x0, 0x9b, 0x2d, 0x73, 0x40, 0x0, 
++    0x40, 0x11, 0x00, 0x00, 0x7f, 0x0, 0x0, 0x1, 
++    0x7f, 0x0, 0x0, 0x1, 0xe7, 0xa6, 0x27, 0xf, 
++    0x0, 0x87, 0xfe, 0x9a, ord('r'), ord('l'), 
++    ord('c'), ord('-'), ord('n'), ord('r')])
++
++def build_rlc_nr_ip(dir, bearer_type, bearer_id, payload):
++    global DL_AM_SEQ_NUM, UL_AM_SEQ_NUM
++    global AM_SEQ_NUM
++    # Create pcap rlc-nr-udp dissector
++    # print('bearer type:', rrc_channel)
++    # Main rlc dissector meta headers
++    seq_number_length = TM_SN_LENGTH_0_BITS 
++    rlc_mode = RLC_TM_MODE # Transparent mode
++
++    if (bearer_type == BEARER_TYPE_SRB) or (bearer_type == BEARER_TYPE_DRB):
++        # Wireshark cannot directly decode dcch rrc without proper rlc AM headers,
++        # so we add a fake rlc + pdcp headers before the actual rrc payload
++        rlc_mode = RLC_AM_MODE    # AM
++        seq_number_length = AM_SN_LENGTH_12_BITS # always 12 for srb
++        # create fake rlc header (2) + pdcp header (2)
++        fake_rlc_pdcp_hdrs = b'\xC0\x00'
++        # fake_rlc_pdcp_hdrs += AM_SEQ_NUM.to_bytes(2, 'big')
++        # AM_SEQ_NUM = (AM_SEQ_NUM + 1) % (2**seq_number_length)
++        if dir == DIRECTION_DOWNLINK: # DL sequence number
++            fake_rlc_pdcp_hdrs += DL_AM_SEQ_NUM.to_bytes(2, 'big')
++            DL_AM_SEQ_NUM = (DL_AM_SEQ_NUM + 1) % (2**seq_number_length)
++        else: # UL sequence number
++            fake_rlc_pdcp_hdrs += UL_AM_SEQ_NUM.to_bytes(2, 'big')
++            UL_AM_SEQ_NUM = (UL_AM_SEQ_NUM + 1) % (2**seq_number_length)
++
++        # add fake rlc header and fake MAC-I bytes
++        payload = fake_rlc_pdcp_hdrs + payload + b'\x00\x00\x00\x00'
++
++    if bearer_type > BEARER_TYPE_BCCH_DL_SCH:
++        print('Unknown bearer type:', bearer_type)
++        return None
++        
++
++    # Update reference eth payload with correct lengths for ip and udp
++    # so wireshark can correctly decode via rlc-nr-udp dissector
++    pcap_buf = pcap_rlc_nr_ip_ref.copy()
++
++    # rlc mode (RLC_TM_MODE)
++    pcap_buf += bytearray([rlc_mode])
++    # sequence number length
++    pcap_buf += bytearray([seq_number_length])
++    # RLC_NR_DIRECTION_TAG
++    pcap_buf += bytearray([RLC_NR_DIRECTION_TAG, dir])
++    # RLC_NR_UEID_TAG
++    pcap_buf += bytearray([RLC_NR_UEID_TAG, 0, 0])
++    # RLC_NR_BEARER_TYPE_TAG
++    pcap_buf += bytearray([RLC_NR_BEARER_TYPE_TAG, bearer_type])
++    # RLC_NR_BEARER_ID_TAG
++    pcap_buf += bytearray([RLC_NR_BEARER_ID_TAG, bearer_id]) # only relevant for SRB
++    # RLC_NR_PAYLOAD_TAG
++    pcap_buf += bytearray([RLC_NR_PAYLOAD_TAG])
++    pcap_buf += payload
++
++    # Update ip and udp length fields
++    # We do this after because the msg length can increase due to fake headers
++    rlc_meta_hdrs_length = 12
++    udp_len = 8 + len('rlc-nr') + len(payload) + rlc_meta_hdrs_length
++    b_udp_len = udp_len.to_bytes(2, byteorder='big')
++    ip_len = 20 + udp_len
++    b_ip_len = ip_len.to_bytes(2, byteorder='big')
++    pcap_buf[2] = b_ip_len[0]
++    pcap_buf[3] = b_ip_len[1]
++    pcap_buf[24] = b_udp_len[0]
++    pcap_buf[25] = b_udp_len[1]
++
++    return bytes(pcap_buf)
+\ No newline at end of file
+diff --git a/protocol/subsystems.py b/protocol/subsystems.py
+index 447edbd..5c087ad 100644
+--- a/protocol/subsystems.py
++++ b/protocol/subsystems.py
+@@ -149,3 +149,25 @@ DIAG_SUBSYS_RESERVED_OEM_2 = 252
+ DIAG_SUBSYS_RESERVED_OEM_3 = 253
+ DIAG_SUBSYS_RESERVED_OEM_4 = 254
+ DIAG_SUBSYS_LEGACY = 255
++
++ENABLED_SUBSYSTEMS = [
++    # ( 0x0000, 0x00c8 ), 
++    # ( 0x01f4, 0x02bc ),
++    # ( 0x03e8, 0x04b0 ), 
++    # ( 0x07d0, 0x0898 ),
++    # ( 0x0bb8, 0x0c80 ), 
++    # ( 0x0fa0, 0x1068 ),
++    # ( 0x1194, 0x12c0 ), 
++    # ( 0x1388, 0x1450 ),
++    # ( 0x157c, 0x1644 ), 
++    # ( 0x1770, 0x1838 ),
++    # ( 0x1964, 0x1a2c ), 
++    # ( 0x1b58, 0x1ce8 ),
++    # ( 0x1f40, 0x2008 ), 
++    # ( 0x2134, 0x21fc ),
++    # ( 0x2328, 0x23f0 ), 
++    ( 0x251c, 0x25e4 ), # lte
++    # ( 0x2527, 0x252F),
++    # ( 0x2530, 0x2531)
++    ( 0x27d8, 0x2968 ) 
++]
+\ No newline at end of file
+diff --git a/qcsuper.py b/qcsuper.py
+index 40b86ae..125d969 100755
+--- a/qcsuper.py
++++ b/qcsuper.py
+@@ -39,6 +39,8 @@ modules = parser.add_argument_group(title = 'Modules', description = 'Modules wr
+ modules.add_argument('--info', action = 'store_true', help = 'Read generic information about the baseband device.')
+ modules.add_argument('--pcap-dump', metavar = 'PCAP_FILE', type = FileType('ab'), help = 'Generate a PCAP file containing GSMTAP frames for 2G/3G/4G, to be loaded using Wireshark.')
+ modules.add_argument('--wireshark-live', action = 'store_true', help = 'Same as --pcap-dump, but directly spawn a Wireshark instance.')
++modules.add_argument('--tshark', action = 'store_true', help = 'Same as --pcap-dump, but directly spawn a tshark instance.')
++modules.add_argument('--diag-messages', action = 'store_true', help = 'Print LTE message logs to stdout. Useful to debug connectivity issues')
+ # modules.add_argument('--efs-dump', metavar = 'OUTPUT_DIR', help = 'Dump the internal EFS filesystem of the device.')
+ modules.add_argument('--memory-dump', metavar = 'OUTPUT_DIR', help = 'Dump the memory of the device (may not or partially work with recent devices).')
+ modules.add_argument('--dlf-dump', metavar = 'DLF_FILE', type = FileType('ab'), help = 'Generate a DLF file to be loaded using QCSuper or QXDM, with network protocols logging.')
+@@ -82,10 +84,10 @@ def parse_modules_args(args):
+         diag_input.add_module(MemoryDumper(diag_input, expanduser(args.memory_dump), int(args.start, 16), int(args.stop, 16)))
+     if args.pcap_dump:
+         from modules.pcap_dump import PcapDumper
+-        diag_input.add_module(PcapDumper(diag_input, args.pcap_dump, args.reassemble_sibs, args.decrypt_nas, args.include_ip_traffic))
+-    if args.wireshark_live:
++        diag_input.add_module(PcapDumper(diag_input, args.pcap_dump, args.reassemble_sibs, args.decrypt_nas, args.include_ip_traffic, args.diag_messages))
++    if args.wireshark_live or args.tshark:
+         from modules.pcap_dump import WiresharkLive
+-        diag_input.add_module(WiresharkLive(diag_input, args.reassemble_sibs, args.decrypt_nas, args.include_ip_traffic))
++        diag_input.add_module(WiresharkLive(diag_input, args.reassemble_sibs, args.decrypt_nas, args.include_ip_traffic, args.tshark, args.diag_messages))
+     if args.json_geo_dump:
+         diag_input.add_module(JsonGeoDumper(diag_input, args.json_geo_dump))
+     if args.decoded_sibs_dump:

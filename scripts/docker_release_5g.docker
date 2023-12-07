@@ -1,0 +1,26 @@
+ARG ARCH=x86_64
+FROM registry.gitlab.com/asset-sutd/software/wireless-deep-fuzzer:release-$ARCH as base
+
+USER user
+
+ADD --chown=user:user 3rd-party/ModemManager/ 3rd-party/ModemManager/
+ADD --chown=user:user 3rd-party/open5gs-core/ 3rd-party/open5gs-core/
+ADD --chown=user:user 3rd-party/oai_5g_sa/ 3rd-party/oai_5g_sa/
+ADD --chown=user:user 3rd-party/*.patch 3rd-party/
+
+RUN --mount=type=secret,id=cred,mode=0666 source /run/secrets/cred && \
+	sudo chown user:user . && sudo chown user:user 3rd-party && \
+	./requirements.sh 5g && sudo find . -type f -name '*.o' -delete && \
+	sudo find . -type f -name '*.a' -delete && \
+    sudo rm -rf \
+            ~/.git-credentials
+            /tmp/* \
+            /var/lib/apt/lists/* \
+            /var/tmp/*
+
+# Fix permissions
+RUN sudo groupadd -r plugdev &> /dev/null || true && \
+	sudo groupadd -r dialout &> /dev/null || true && \
+	sudo usermod -a -G plugdev,sudo,dialout user
+
+CMD sleep infinity

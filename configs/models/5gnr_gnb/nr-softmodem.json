@@ -1,0 +1,3769 @@
+{
+    "StatesNodes": {
+        "IDLE": {
+            "direction": 0,
+            "layers_count": 0,
+            "node_number": 0,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682528532,
+                "tv_usec": 545796
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "RX / MAC-NR / C-RNTI": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 28,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 323451
+            },
+            "timeout": 0,
+            "type_value": 58
+        },
+        "RX / MAC-NR / Long BSR": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 6,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 58725
+            },
+            "timeout": 0,
+            "type_value": 62
+        },
+        "RX / MAC-NR / Short BSR": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 14,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 62793
+            },
+            "timeout": 0,
+            "type_value": 61
+        },
+        "RX / NAS / Authentication failure": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 12,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 60483
+            },
+            "timeout": 0,
+            "type_value": 89
+        },
+        "RX / NAS / Authentication response": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 13,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 62728
+            },
+            "timeout": 0,
+            "type_value": 87
+        },
+        "RX / NAS / Deregistration request (UE originating)": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 26,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 97052
+            },
+            "timeout": 0,
+            "type_value": 69
+        },
+        "RX / NAS / Identity response": {
+            "direction": 1,
+            "layers_count": 9,
+            "node_number": 8,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 59016
+            },
+            "timeout": 0,
+            "type_value": 92
+        },
+        "RX / NAS / PDU session establishment request": {
+            "direction": 1,
+            "layers_count": 9,
+            "node_number": 24,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 84757
+            },
+            "timeout": 0,
+            "type_value": 193
+        },
+        "RX / NAS / PDU session release complete": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 35,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513700,
+                "tv_usec": 727567
+            },
+            "timeout": 0,
+            "type_value": 212
+        },
+        "RX / NAS / PDU session release request": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 33,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513700,
+                "tv_usec": 727176
+            },
+            "timeout": 0,
+            "type_value": 209
+        },
+        "RX / NAS / Registration complete": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 22,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 64083
+            },
+            "timeout": 0,
+            "type_value": 67
+        },
+        "RX / NAS / Registration request": {
+            "direction": 1,
+            "layers_count": 9,
+            "node_number": 32,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513141,
+                "tv_usec": 196412
+            },
+            "timeout": 0,
+            "type_value": 65
+        },
+        "RX / NAS / Security mode complete": {
+            "direction": 1,
+            "layers_count": 10,
+            "node_number": 16,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 63167
+            },
+            "timeout": 0,
+            "type_value": 94
+        },
+        "RX / RLC / Data PDU": {
+            "direction": 1,
+            "layers_count": 5,
+            "node_number": 4,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 58625
+            },
+            "timeout": 0,
+            "type_value": 1
+        },
+        "RX / RLC / STATUS PDU": {
+            "direction": 1,
+            "layers_count": 5,
+            "node_number": 10,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 59159
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "RX / RRC / measurementReport": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 31,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513140,
+                "tv_usec": 39889
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "RX / RRC / rrcReconfigurationComplete": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 21,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 64038
+            },
+            "timeout": 0,
+            "type_value": 1
+        },
+        "RX / RRC / rrcReestablishmentRequest": {
+            "direction": 1,
+            "layers_count": 5,
+            "node_number": 36,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513794,
+                "tv_usec": 893902
+            },
+            "timeout": 0,
+            "type_value": 2
+        },
+        "RX / RRC / rrcSetupRequest": {
+            "direction": 1,
+            "layers_count": 5,
+            "node_number": 2,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 58249
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "RX / RRC / securityModeComplete": {
+            "direction": 1,
+            "layers_count": 8,
+            "node_number": 18,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 63448
+            },
+            "timeout": 0,
+            "type_value": 5
+        },
+        "TX / MAC-NR / Padding": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 29,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 323488
+            },
+            "timeout": 0,
+            "type_value": 63
+        },
+        "TX / MAC-NR / RA-RNTI": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 1,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 58191
+            },
+            "timeout": 0,
+            "type_value": 2
+        },
+        "TX / MAC-NR / Timing Advance Command": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 11,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 59570
+            },
+            "timeout": 0,
+            "type_value": 61
+        },
+        "TX / NAS / Authentication request": {
+            "direction": 0,
+            "layers_count": 8,
+            "node_number": 9,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 59098
+            },
+            "timeout": 0,
+            "type_value": 86
+        },
+        "TX / NAS / Configuration update command": {
+            "direction": 0,
+            "layers_count": 8,
+            "node_number": 23,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 65743
+            },
+            "timeout": 0,
+            "type_value": 84
+        },
+        "TX / NAS / Identity request": {
+            "direction": 0,
+            "layers_count": 8,
+            "node_number": 7,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 58784
+            },
+            "timeout": 0,
+            "type_value": 91
+        },
+        "TX / NAS / PDU session establishment accept": {
+            "direction": 0,
+            "layers_count": 9,
+            "node_number": 25,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 84974
+            },
+            "timeout": 0,
+            "type_value": 194
+        },
+        "TX / NAS / PDU session release command": {
+            "direction": 0,
+            "layers_count": 8,
+            "node_number": 34,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513700,
+                "tv_usec": 727316
+            },
+            "timeout": 0,
+            "type_value": 211
+        },
+        "TX / NAS / Registration accept": {
+            "direction": 0,
+            "layers_count": 8,
+            "node_number": 20,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 63967
+            },
+            "timeout": 0,
+            "type_value": 66
+        },
+        "TX / NAS / Security mode command": {
+            "direction": 0,
+            "layers_count": 8,
+            "node_number": 15,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 62841
+            },
+            "timeout": 0,
+            "type_value": 93
+        },
+        "TX / NAS / Service accept": {
+            "direction": 0,
+            "layers_count": 8,
+            "node_number": 32,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513914,
+                "tv_usec": 448114
+            },
+            "timeout": 0,
+            "type_value": 78
+        },
+        "TX / RLC / STATUS PDU": {
+            "direction": 0,
+            "layers_count": 5,
+            "node_number": 5,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 58693
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "TX / RRC / rrcReconfiguration": {
+            "direction": 0,
+            "layers_count": 7,
+            "node_number": 30,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 323635
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "TX / RRC / rrcRelease": {
+            "direction": 0,
+            "layers_count": 7,
+            "node_number": 27,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 97123
+            },
+            "timeout": 0,
+            "type_value": 2
+        },
+        "TX / RRC / rrcSetup": {
+            "direction": 0,
+            "layers_count": 5,
+            "node_number": 3,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 58565
+            },
+            "timeout": 0,
+            "type_value": 1
+        },
+        "TX / RRC / securityModeCommand": {
+            "direction": 0,
+            "layers_count": 7,
+            "node_number": 17,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 63238
+            },
+            "timeout": 0,
+            "type_value": 4
+        },
+        "TX / RRC / ueCapabilityEnquiry": {
+            "direction": 0,
+            "layers_count": 7,
+            "node_number": 19,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1682513139,
+                "tv_usec": 63546
+            },
+            "timeout": 0,
+            "type_value": 6
+        }
+    },
+    "StatesTransitions": {
+        "IDLE": {
+            "from_state": null,
+            "to_state": {
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "IDLE",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58198
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / C-RNTI": {
+            "from_state": [
+                "TX / NAS / Configuration update command",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / NAS / PDU session establishment accept",
+                "RX / MAC-NR / C-RNTI",
+                "TX / MAC-NR / Padding"
+            ],
+            "to_state": {
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 29552
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 860826
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Padding": {
+                    "dst_state_name": "TX / MAC-NR / Padding",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 323490
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513801,
+                        "tv_usec": 335079
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 113599
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 39667
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513146,
+                        "tv_usec": 545833
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513254,
+                        "tv_usec": 332915
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / securityModeCommand": {
+                    "dst_state_name": "TX / RRC / securityModeCommand",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 655986
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / ueCapabilityEnquiry": {
+                    "dst_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "src_state_name": "RX / MAC-NR / C-RNTI",
+                    "time": {
+                        "tv_sec": 1682513755,
+                        "tv_usec": 854983
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / Long BSR": {
+            "from_state": [
+                "TX / RRC / rrcSetup",
+                "RX / RRC / securityModeComplete",
+                "TX / NAS / Configuration update command",
+                "RX / NAS / Registration complete",
+                "RX / NAS / Deregistration request (UE originating)",
+                "RX / NAS / Authentication response",
+                "TX / NAS / PDU session establishment accept",
+                "TX / RRC / rrcReconfiguration",
+                "RX / MAC-NR / Short BSR",
+                "RX / NAS / Registration request",
+                "RX / RLC / Data PDU",
+                "RX / RRC / measurementReport",
+                "TX / RRC / rrcRelease",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RRC / ueCapabilityEnquiry",
+                "TX / MAC-NR / Timing Advance Command",
+                "TX / NAS / Authentication request",
+                "TX / NAS / Identity request",
+                "RX / NAS / PDU session establishment request",
+                "RX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR",
+                "TX / NAS / Registration accept",
+                "RX / RRC / rrcReconfigurationComplete",
+                "TX / RRC / securityModeCommand",
+                "TX / NAS / Security mode command",
+                "TX / RLC / STATUS PDU",
+                "RX / NAS / Identity response",
+                "TX / NAS / PDU session release command",
+                "RX / NAS / Security mode complete",
+                "RX / NAS / PDU session release complete"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59211
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 130604
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Authentication failure": {
+                    "dst_state_name": "RX / NAS / Authentication failure",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 60485
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Authentication response": {
+                    "dst_state_name": "RX / NAS / Authentication response",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 62731
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 123113
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Identity response": {
+                    "dst_state_name": "RX / NAS / Identity response",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513661,
+                        "tv_usec": 79102
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / PDU session establishment request": {
+                    "dst_state_name": "RX / NAS / PDU session establishment request",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 121901
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / PDU session release request": {
+                    "dst_state_name": "RX / NAS / PDU session release request",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513700,
+                        "tv_usec": 727180
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration complete": {
+                    "dst_state_name": "RX / NAS / Registration complete",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 400030
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration request": {
+                    "dst_state_name": "RX / NAS / Registration request",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 420207
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Security mode complete": {
+                    "dst_state_name": "RX / NAS / Security mode complete",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513609,
+                        "tv_usec": 952762
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 64410
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59161
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / measurementReport": {
+                    "dst_state_name": "RX / RRC / measurementReport",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 400318
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 122232
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63451
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 105733
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59572
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Authentication request": {
+                    "dst_state_name": "TX / NAS / Authentication request",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59100
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 65745
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Identity request": {
+                    "dst_state_name": "TX / NAS / Identity request",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58786
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 84977
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session release command": {
+                    "dst_state_name": "TX / NAS / PDU session release command",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513700,
+                        "tv_usec": 727319
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Registration accept": {
+                    "dst_state_name": "TX / NAS / Registration accept",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 64205
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Security mode command": {
+                    "dst_state_name": "TX / NAS / Security mode command",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513148,
+                        "tv_usec": 836303
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58953
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513641,
+                        "tv_usec": 279854
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 97126
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / securityModeCommand": {
+                    "dst_state_name": "TX / RRC / securityModeCommand",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63240
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / ueCapabilityEnquiry": {
+                    "dst_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "src_state_name": "RX / MAC-NR / Long BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63549
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / MAC-NR / Short BSR": {
+            "from_state": [
+                "TX / RRC / securityModeCommand",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RRC / ueCapabilityEnquiry",
+                "TX / NAS / Registration accept",
+                "TX / RRC / rrcRelease",
+                "RX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / rrcReconfigurationComplete",
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / NAS / PDU session establishment request",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / Short BSR",
+                "RX / RRC / measurementReport",
+                "RX / RLC / Data PDU",
+                "TX / NAS / PDU session establishment accept",
+                "TX / NAS / Configuration update command",
+                "RX / NAS / Deregistration request (UE originating)",
+                "RX / NAS / Registration complete"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 130635
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 527009
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513229,
+                        "tv_usec": 417505
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / PDU session establishment request": {
+                    "dst_state_name": "RX / NAS / PDU session establishment request",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513839,
+                        "tv_usec": 777896
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513739,
+                        "tv_usec": 286219
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 672753
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / measurementReport": {
+                    "dst_state_name": "RX / RRC / measurementReport",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513635,
+                        "tv_usec": 761426
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513161,
+                        "tv_usec": 469099
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513813,
+                        "tv_usec": 421121
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 200617
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 526766
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513716,
+                        "tv_usec": 161431
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 602101
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Registration accept": {
+                    "dst_state_name": "TX / NAS / Registration accept",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513720,
+                        "tv_usec": 636890
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Security mode command": {
+                    "dst_state_name": "TX / NAS / Security mode command",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 62843
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513205,
+                        "tv_usec": 684645
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513180,
+                        "tv_usec": 414688
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / securityModeCommand": {
+                    "dst_state_name": "TX / RRC / securityModeCommand",
+                    "src_state_name": "RX / MAC-NR / Short BSR",
+                    "time": {
+                        "tv_sec": 1682513166,
+                        "tv_usec": 56271
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / Authentication failure": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / Authentication failure",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 60520
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / Authentication response": {
+            "from_state": [
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / MAC-NR / Long BSR",
+                "TX / RLC / STATUS PDU"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / NAS / Authentication response",
+                    "time": {
+                        "tv_sec": 1682513148,
+                        "tv_usec": 836256
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Security mode command": {
+                    "dst_state_name": "TX / NAS / Security mode command",
+                    "src_state_name": "RX / NAS / Authentication response",
+                    "time": {
+                        "tv_sec": 1682513156,
+                        "tv_usec": 692532
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / Authentication response",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 62767
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / Deregistration request (UE originating)": {
+            "from_state": [
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / RLC / STATUS PDU",
+                "TX / RRC / rrcReconfiguration",
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / MAC-NR / Short BSR",
+                "RX / RLC / Data PDU",
+                "RX / RRC / measurementReport"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 97085
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 200575
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "time": {
+                        "tv_sec": 1682513610,
+                        "tv_usec": 105443
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 123153
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "time": {
+                        "tv_sec": 1682513231,
+                        "tv_usec": 586547
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / Identity response": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR",
+                "TX / RLC / STATUS PDU"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / NAS / Identity response",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59048
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Authentication request": {
+                    "dst_state_name": "TX / NAS / Authentication request",
+                    "src_state_name": "RX / NAS / Identity response",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 37172
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / Identity response",
+                    "time": {
+                        "tv_sec": 1682513661,
+                        "tv_usec": 79137
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / PDU session establishment request": {
+            "from_state": [
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / MAC-NR / Short BSR",
+                "RX / RLC / Data PDU",
+                "TX / NAS / PDU session establishment accept",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / NAS / PDU session establishment request",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 84868
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / NAS / PDU session establishment request",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 308805
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / NAS / PDU session establishment request",
+                    "time": {
+                        "tv_sec": 1682513202,
+                        "tv_usec": 24116
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "RX / NAS / PDU session establishment request",
+                    "time": {
+                        "tv_sec": 1682513611,
+                        "tv_usec": 194012
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "RX / NAS / PDU session establishment request",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 123134
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / PDU session establishment request",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 121951
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / PDU session release complete": {
+            "from_state": [
+                "TX / RLC / STATUS PDU"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / NAS / PDU session release complete",
+                    "time": {
+                        "tv_sec": 1682513700,
+                        "tv_usec": 727612
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / PDU session release complete",
+                    "time": {
+                        "tv_sec": 1682513903,
+                        "tv_usec": 87051
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / PDU session release request": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / PDU session release request",
+                    "time": {
+                        "tv_sec": 1682513700,
+                        "tv_usec": 727224
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / Registration complete": {
+            "from_state": [
+                "TX / NAS / Registration accept",
+                "RX / NAS / Registration complete",
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / RRC / rrcReconfigurationComplete",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / NAS / Registration complete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 107073
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / NAS / Registration complete",
+                    "time": {
+                        "tv_sec": 1682513148,
+                        "tv_usec": 493940
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration complete": {
+                    "dst_state_name": "RX / NAS / Registration complete",
+                    "src_state_name": "RX / NAS / Registration complete",
+                    "time": {
+                        "tv_sec": 1682513866,
+                        "tv_usec": 388000
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "RX / NAS / Registration complete",
+                    "time": {
+                        "tv_sec": 1682513181,
+                        "tv_usec": 47304
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / Registration complete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 64115
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / Registration request": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR",
+                "TX / RRC / rrcSetup",
+                "TX / RLC / STATUS PDU"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / NAS / Registration request",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 196448
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / Registration request",
+                    "time": {
+                        "tv_sec": 1682513619,
+                        "tv_usec": 486623
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / NAS / Security mode complete": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR",
+                "TX / RLC / STATUS PDU"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / NAS / Security mode complete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63200
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / NAS / Security mode complete",
+                    "time": {
+                        "tv_sec": 1682513609,
+                        "tv_usec": 952796
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RLC / Data PDU": {
+            "from_state": [
+                "RX / RRC / rrcSetupRequest",
+                "TX / NAS / Registration accept",
+                "RX / RRC / measurementReport",
+                "TX / RRC / rrcRelease",
+                "TX / RRC / rrcReconfiguration",
+                "TX / NAS / Configuration update command",
+                "RX / RRC / securityModeComplete",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RRC / ueCapabilityEnquiry",
+                "TX / RRC / rrcSetup",
+                "RX / MAC-NR / Short BSR",
+                "TX / RLC / STATUS PDU",
+                "RX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / RLC / Data PDU",
+                "TX / MAC-NR / Timing Advance Command"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 88775
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513183,
+                        "tv_usec": 791507
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513155,
+                        "tv_usec": 955955
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / PDU session establishment request": {
+                    "dst_state_name": "RX / NAS / PDU session establishment request",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 519421
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58662
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513162,
+                        "tv_usec": 856027
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / measurementReport": {
+                    "dst_state_name": "RX / RRC / measurementReport",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 39892
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513719,
+                        "tv_usec": 145810
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513245,
+                        "tv_usec": 35138
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 72750
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 402262
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513757,
+                        "tv_usec": 513217
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Registration accept": {
+                    "dst_state_name": "TX / NAS / Registration accept",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 268305
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58695
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513612,
+                        "tv_usec": 562126
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / ueCapabilityEnquiry": {
+                    "dst_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "src_state_name": "RX / RLC / Data PDU",
+                    "time": {
+                        "tv_sec": 1682513774,
+                        "tv_usec": 826205
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RLC / STATUS PDU": {
+            "from_state": [
+                "TX / NAS / Registration accept",
+                "RX / RRC / measurementReport",
+                "RX / RLC / Data PDU",
+                "TX / NAS / PDU session establishment accept",
+                "RX / MAC-NR / Short BSR",
+                "TX / RLC / STATUS PDU",
+                "TX / MAC-NR / Timing Advance Command",
+                "TX / RRC / rrcReconfiguration",
+                "TX / NAS / Configuration update command",
+                "RX / RLC / STATUS PDU",
+                "TX / RRC / securityModeCommand",
+                "RX / MAC-NR / Long BSR",
+                "TX / RRC / rrcRelease",
+                "TX / RRC / ueCapabilityEnquiry",
+                "TX / MAC-NR / RA-RNTI"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59189
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513153,
+                        "tv_usec": 968769
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 932755
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63634
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513150,
+                        "tv_usec": 371664
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / measurementReport": {
+                    "dst_state_name": "RX / RRC / measurementReport",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513210,
+                        "tv_usec": 700348
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 233119
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513627,
+                        "tv_usec": 109534
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513763,
+                        "tv_usec": 858272
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 235371
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513208,
+                        "tv_usec": 584108
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513241,
+                        "tv_usec": 396654
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 226868
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / ueCapabilityEnquiry": {
+                    "dst_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "src_state_name": "RX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513755,
+                        "tv_usec": 855423
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / measurementReport": {
+            "from_state": [
+                "TX / RRC / rrcReconfiguration",
+                "TX / MAC-NR / RA-RNTI",
+                "RX / MAC-NR / Short BSR",
+                "RX / RLC / Data PDU",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR",
+                "TX / RRC / rrcRelease",
+                "RX / RLC / STATUS PDU"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513142,
+                        "tv_usec": 515229
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 64658
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513253,
+                        "tv_usec": 879461
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513609,
+                        "tv_usec": 960085
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513915,
+                        "tv_usec": 372326
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513170,
+                        "tv_usec": 207290
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 757904
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 39927
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "RX / RRC / measurementReport",
+                    "time": {
+                        "tv_sec": 1682513673,
+                        "tv_usec": 477245
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / rrcReconfigurationComplete": {
+            "from_state": [
+                "TX / NAS / Configuration update command",
+                "RX / RLC / STATUS PDU",
+                "TX / NAS / PDU session establishment accept",
+                "RX / RLC / Data PDU",
+                "TX / NAS / Service accept",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RRC / rrcReconfiguration",
+                "TX / MAC-NR / Timing Advance Command",
+                "TX / RRC / rrcRelease",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / MAC-NR / Long BSR",
+                "RX / MAC-NR / Short BSR",
+                "TX / RLC / STATUS PDU",
+                "TX / NAS / Registration accept"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 85081
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513144,
+                        "tv_usec": 243391
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513611,
+                        "tv_usec": 228580
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration complete": {
+                    "dst_state_name": "RX / NAS / Registration complete",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 64085
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513152,
+                        "tv_usec": 364718
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 873316
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513915,
+                        "tv_usec": 33546
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 683076
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 113793
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Registration accept": {
+                    "dst_state_name": "TX / NAS / Registration accept",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513181,
+                        "tv_usec": 899853
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 106954
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / rrcReestablishmentRequest": {
+            "from_state": [
+                "TX / MAC-NR / RA-RNTI"
+            ],
+            "to_state": {
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "RX / RRC / rrcReestablishmentRequest",
+                    "time": {
+                        "tv_sec": 1682513794,
+                        "tv_usec": 893991
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / rrcSetupRequest": {
+            "from_state": [
+                "TX / RRC / rrcSetup",
+                "TX / MAC-NR / RA-RNTI",
+                "RX / MAC-NR / C-RNTI",
+                "RX / RRC / rrcSetupRequest"
+            ],
+            "to_state": {
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1682513661,
+                        "tv_usec": 806222
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 655115
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Padding": {
+                    "dst_state_name": "TX / MAC-NR / Padding",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 860852
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1682513626,
+                        "tv_usec": 798643
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1682513202,
+                        "tv_usec": 545454
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcSetup": {
+                    "dst_state_name": "TX / RRC / rrcSetup",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58568
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / ueCapabilityEnquiry": {
+                    "dst_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "src_state_name": "RX / RRC / rrcSetupRequest",
+                    "time": {
+                        "tv_sec": 1682513774,
+                        "tv_usec": 825865
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / RRC / securityModeComplete": {
+            "from_state": [
+                "TX / RRC / securityModeCommand",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / RLC / STATUS PDU",
+                "TX / RRC / rrcReconfiguration",
+                "RX / MAC-NR / Short BSR",
+                "RX / MAC-NR / Long BSR",
+                "TX / RLC / STATUS PDU"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "RX / RRC / securityModeComplete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 97725
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "RX / RRC / securityModeComplete",
+                    "time": {
+                        "tv_sec": 1682513239,
+                        "tv_usec": 966010
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "RX / RRC / securityModeComplete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63483
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / ueCapabilityEnquiry": {
+                    "dst_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "src_state_name": "RX / RRC / securityModeComplete",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 149747
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / MAC-NR / Padding": {
+            "from_state": [
+                "TX / NAS / Configuration update command",
+                "TX / RRC / rrcReconfiguration",
+                "RX / MAC-NR / C-RNTI",
+                "TX / MAC-NR / RA-RNTI",
+                "RX / RRC / rrcSetupRequest",
+                "TX / MAC-NR / Padding"
+            ],
+            "to_state": {
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "TX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1682513146,
+                        "tv_usec": 545710
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Padding": {
+                    "dst_state_name": "TX / MAC-NR / Padding",
+                    "src_state_name": "TX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 438659
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1682513794,
+                        "tv_usec": 287366
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "TX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 129734
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "TX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 751255
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "TX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 323638
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "TX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 860897
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcSetup": {
+                    "dst_state_name": "TX / RRC / rrcSetup",
+                    "src_state_name": "TX / MAC-NR / Padding",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 438762
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / MAC-NR / RA-RNTI": {
+            "from_state": [
+                "TX / RRC / securityModeCommand",
+                "RX / NAS / Deregistration request (UE originating)",
+                "TX / NAS / Configuration update command",
+                "RX / RLC / STATUS PDU",
+                "TX / MAC-NR / Padding",
+                "RX / RRC / rrcReestablishmentRequest",
+                "TX / NAS / Registration accept",
+                "TX / NAS / PDU session establishment accept",
+                "RX / RLC / Data PDU",
+                "RX / RRC / measurementReport",
+                "RX / NAS / PDU session establishment request",
+                "TX / RRC / rrcSetup",
+                "RX / MAC-NR / C-RNTI",
+                "IDLE",
+                "RX / MAC-NR / Short BSR",
+                "TX / RLC / STATUS PDU",
+                "TX / RRC / rrcRelease",
+                "TX / RRC / ueCapabilityEnquiry",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RRC / rrcReconfiguration",
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / rrcReconfigurationComplete"
+            ],
+            "to_state": {
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 323454
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513196,
+                        "tv_usec": 984244
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513655,
+                        "tv_usec": 92014
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513793,
+                        "tv_usec": 239064
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513302,
+                        "tv_usec": 811321
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513678,
+                        "tv_usec": 183438
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / measurementReport": {
+                    "dst_state_name": "RX / RRC / measurementReport",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513719,
+                        "tv_usec": 243029
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513221,
+                        "tv_usec": 241108
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReestablishmentRequest": {
+                    "dst_state_name": "RX / RRC / rrcReestablishmentRequest",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513794,
+                        "tv_usec": 893905
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58252
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Padding": {
+                    "dst_state_name": "TX / MAC-NR / Padding",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513146,
+                        "tv_usec": 545684
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 217330
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513219,
+                        "tv_usec": 547596
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513713,
+                        "tv_usec": 588141
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513621,
+                        "tv_usec": 362480
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513236,
+                        "tv_usec": 105520
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513610,
+                        "tv_usec": 105479
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcSetup": {
+                    "dst_state_name": "TX / RRC / rrcSetup",
+                    "src_state_name": "TX / MAC-NR / RA-RNTI",
+                    "time": {
+                        "tv_sec": 1682513661,
+                        "tv_usec": 806156
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / MAC-NR / Timing Advance Command": {
+            "from_state": [
+                "TX / NAS / Service accept",
+                "RX / NAS / PDU session establishment request",
+                "TX / RRC / securityModeCommand",
+                "TX / MAC-NR / Timing Advance Command",
+                "TX / RRC / ueCapabilityEnquiry",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RRC / rrcRelease",
+                "RX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / RLC / Data PDU",
+                "TX / NAS / PDU session establishment accept",
+                "RX / RRC / measurementReport",
+                "TX / NAS / Registration accept",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / Short BSR",
+                "RX / NAS / Registration complete",
+                "TX / NAS / Configuration update command"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59597
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 393011
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Authentication response": {
+                    "dst_state_name": "RX / NAS / Authentication response",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513699,
+                        "tv_usec": 721992
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 175518
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / PDU session establishment request": {
+                    "dst_state_name": "RX / NAS / PDU session establishment request",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513612,
+                        "tv_usec": 365150
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration complete": {
+                    "dst_state_name": "RX / NAS / Registration complete",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513653,
+                        "tv_usec": 721953
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 72776
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 818195
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 268403
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 97215
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513165,
+                        "tv_usec": 184727
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 269875
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513146,
+                        "tv_usec": 323352
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Registration accept": {
+                    "dst_state_name": "TX / NAS / Registration accept",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513148,
+                        "tv_usec": 821076
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63104
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 484541
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / NAS / Authentication request": {
+            "from_state": [
+                "RX / NAS / Identity response",
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / NAS / Authentication request",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59128
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / NAS / Configuration update command": {
+            "from_state": [
+                "TX / RRC / rrcReconfiguration",
+                "TX / MAC-NR / RA-RNTI",
+                "RX / MAC-NR / Short BSR",
+                "TX / RLC / STATUS PDU",
+                "TX / NAS / Configuration update command",
+                "RX / MAC-NR / Long BSR",
+                "TX / MAC-NR / Padding",
+                "RX / RLC / STATUS PDU",
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / MAC-NR / C-RNTI",
+                "TX / NAS / PDU session establishment accept",
+                "RX / RLC / Data PDU"
+            ],
+            "to_state": {
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513915,
+                        "tv_usec": 450665
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 99947
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513793,
+                        "tv_usec": 665652
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 402302
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 65795
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 293771
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Padding": {
+                    "dst_state_name": "TX / MAC-NR / Padding",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513915,
+                        "tv_usec": 36723
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513799,
+                        "tv_usec": 246814
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 860974
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513834,
+                        "tv_usec": 526951
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513150,
+                        "tv_usec": 966218
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "TX / NAS / Configuration update command",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 113725
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / NAS / Identity request": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / NAS / Identity request",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58918
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / NAS / PDU session establishment accept": {
+            "from_state": [
+                "TX / RLC / STATUS PDU",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RRC / rrcReconfiguration",
+                "RX / RRC / rrcSetupRequest",
+                "RX / MAC-NR / Long BSR",
+                "RX / RLC / STATUS PDU",
+                "TX / MAC-NR / Padding",
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / MAC-NR / Short BSR",
+                "RX / NAS / PDU session establishment request",
+                "RX / RLC / Data PDU",
+                "RX / MAC-NR / C-RNTI",
+                "TX / NAS / PDU session establishment accept"
+            ],
+            "to_state": {
+                "RX / MAC-NR / C-RNTI": {
+                    "dst_state_name": "RX / MAC-NR / C-RNTI",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513769,
+                        "tv_usec": 382968
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 104402
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 123166
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / PDU session establishment request": {
+                    "dst_state_name": "RX / NAS / PDU session establishment request",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513842,
+                        "tv_usec": 575364
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 731314
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 386187
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 751146
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 476202
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 259270
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513192,
+                        "tv_usec": 640063
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 85016
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 39797
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcSetup": {
+                    "dst_state_name": "TX / RRC / rrcSetup",
+                    "src_state_name": "TX / NAS / PDU session establishment accept",
+                    "time": {
+                        "tv_sec": 1682513626,
+                        "tv_usec": 798758
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / NAS / PDU session release command": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / NAS / PDU session release command",
+                    "time": {
+                        "tv_sec": 1682513700,
+                        "tv_usec": 727357
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / NAS / Registration accept": {
+            "from_state": [
+                "RX / MAC-NR / Short BSR",
+                "TX / RLC / STATUS PDU",
+                "RX / RLC / Data PDU",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / MAC-NR / Long BSR",
+                "TX / MAC-NR / Timing Advance Command"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 64241
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513148,
+                        "tv_usec": 795475
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration complete": {
+                    "dst_state_name": "RX / NAS / Registration complete",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 674391
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513758,
+                        "tv_usec": 756746
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 684596
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 64040
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513152,
+                        "tv_usec": 573
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 268354
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / NAS / Registration accept",
+                    "time": {
+                        "tv_sec": 1682513176,
+                        "tv_usec": 295585
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / NAS / Security mode command": {
+            "from_state": [
+                "RX / MAC-NR / Short BSR",
+                "RX / MAC-NR / Long BSR",
+                "RX / NAS / Authentication response"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / NAS / Security mode command",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 62953
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / NAS / Service accept": {
+            "from_state": [
+                "TX / RLC / STATUS PDU"
+            ],
+            "to_state": {
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / NAS / Service accept",
+                    "time": {
+                        "tv_sec": 1682513915,
+                        "tv_usec": 378223
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / NAS / Service accept",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 448155
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / RLC / STATUS PDU": {
+            "from_state": [
+                "RX / NAS / Security mode complete",
+                "RX / NAS / Identity response",
+                "RX / NAS / Registration request",
+                "RX / NAS / PDU session release request",
+                "RX / NAS / PDU session release complete",
+                "TX / RRC / securityModeCommand",
+                "RX / NAS / PDU session establishment request",
+                "TX / NAS / Registration accept",
+                "TX / RRC / rrcSetup",
+                "TX / MAC-NR / Timing Advance Command",
+                "TX / MAC-NR / RA-RNTI",
+                "TX / RRC / rrcRelease",
+                "RX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR",
+                "RX / NAS / Authentication failure",
+                "RX / RRC / rrcReconfigurationComplete",
+                "RX / RRC / measurementReport",
+                "RX / RLC / Data PDU",
+                "TX / RRC / rrcReconfiguration",
+                "RX / NAS / Deregistration request (UE originating)",
+                "RX / NAS / Registration complete",
+                "TX / NAS / Configuration update command",
+                "RX / RRC / securityModeComplete",
+                "TX / NAS / PDU session establishment accept",
+                "RX / NAS / Authentication response",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / Short BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58727
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 62795
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Authentication response": {
+                    "dst_state_name": "RX / NAS / Authentication response",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513148,
+                        "tv_usec": 836229
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 97055
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Identity response": {
+                    "dst_state_name": "RX / NAS / Identity response",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 59019
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / PDU session establishment request": {
+                    "dst_state_name": "RX / NAS / PDU session establishment request",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 84760
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / PDU session release complete": {
+                    "dst_state_name": "RX / NAS / PDU session release complete",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513700,
+                        "tv_usec": 727570
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration complete": {
+                    "dst_state_name": "RX / NAS / Registration complete",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 107035
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration request": {
+                    "dst_state_name": "RX / NAS / Registration request",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 196415
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Security mode complete": {
+                    "dst_state_name": "RX / NAS / Security mode complete",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63170
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 88752
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513155,
+                        "tv_usec": 930743
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / measurementReport": {
+                    "dst_state_name": "RX / RRC / measurementReport",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 64631
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 85056
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 97695
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 715682
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 216366
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513726,
+                        "tv_usec": 529845
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513663,
+                        "tv_usec": 130109
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Registration accept": {
+                    "dst_state_name": "TX / NAS / Registration accept",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63969
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Service accept": {
+                    "dst_state_name": "TX / NAS / Service accept",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 448117
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 281910
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 816163
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / securityModeCommand": {
+                    "dst_state_name": "TX / RRC / securityModeCommand",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 861270
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / ueCapabilityEnquiry": {
+                    "dst_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "src_state_name": "TX / RLC / STATUS PDU",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 977959
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / RRC / rrcReconfiguration": {
+            "from_state": [
+                "TX / NAS / Configuration update command",
+                "TX / RRC / rrcReconfiguration",
+                "TX / MAC-NR / Padding",
+                "TX / NAS / PDU session establishment accept",
+                "RX / MAC-NR / C-RNTI",
+                "TX / RRC / ueCapabilityEnquiry",
+                "TX / RRC / rrcSetup",
+                "TX / RRC / securityModeCommand",
+                "RX / MAC-NR / Long BSR",
+                "TX / RRC / rrcRelease"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513211,
+                        "tv_usec": 339102
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Deregistration request (UE originating)": {
+                    "dst_state_name": "RX / NAS / Deregistration request (UE originating)",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 414777
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513140,
+                        "tv_usec": 39835
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 932696
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / measurementReport": {
+                    "dst_state_name": "RX / RRC / measurementReport",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513612,
+                        "tv_usec": 562019
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 323700
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513755,
+                        "tv_usec": 855161
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Padding": {
+                    "dst_state_name": "TX / MAC-NR / Padding",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513794,
+                        "tv_usec": 287266
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 438530
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / Configuration update command": {
+                    "dst_state_name": "TX / NAS / Configuration update command",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 205064
+                    },
+                    "trigger": ""
+                },
+                "TX / NAS / PDU session establishment accept": {
+                    "dst_state_name": "TX / NAS / PDU session establishment accept",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513720,
+                        "tv_usec": 646408
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 344502
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513661,
+                        "tv_usec": 165041
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcSetup": {
+                    "dst_state_name": "TX / RRC / rrcSetup",
+                    "src_state_name": "TX / RRC / rrcReconfiguration",
+                    "time": {
+                        "tv_sec": 1682513231,
+                        "tv_usec": 580399
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / RRC / rrcRelease": {
+            "from_state": [
+                "TX / MAC-NR / RA-RNTI",
+                "TX / MAC-NR / Padding",
+                "RX / MAC-NR / Short BSR",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / Long BSR",
+                "TX / RRC / rrcRelease",
+                "RX / RRC / rrcSetupRequest",
+                "TX / MAC-NR / Timing Advance Command",
+                "RX / NAS / Deregistration request (UE originating)",
+                "RX / RRC / measurementReport",
+                "RX / RLC / Data PDU",
+                "RX / MAC-NR / C-RNTI"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 97153
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513254,
+                        "tv_usec": 357485
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513708,
+                        "tv_usec": 429892
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513763,
+                        "tv_usec": 858240
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / measurementReport": {
+                    "dst_state_name": "RX / RRC / measurementReport",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513150,
+                        "tv_usec": 783860
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcReconfigurationComplete": {
+                    "dst_state_name": "RX / RRC / rrcReconfigurationComplete",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513144,
+                        "tv_usec": 188411
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 132186
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 584803
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513170,
+                        "tv_usec": 207214
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 728744
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcRelease": {
+                    "dst_state_name": "TX / RRC / rrcRelease",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513254,
+                        "tv_usec": 332952
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcSetup": {
+                    "dst_state_name": "TX / RRC / rrcSetup",
+                    "src_state_name": "TX / RRC / rrcRelease",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 861005
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / RRC / rrcSetup": {
+            "from_state": [
+                "TX / NAS / PDU session establishment accept",
+                "TX / MAC-NR / RA-RNTI",
+                "RX / RRC / rrcSetupRequest",
+                "TX / RRC / rrcRelease",
+                "TX / MAC-NR / Padding",
+                "TX / RRC / rrcSetup",
+                "TX / RRC / rrcReconfiguration"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / RRC / rrcSetup",
+                    "time": {
+                        "tv_sec": 1682513655,
+                        "tv_usec": 368038
+                    },
+                    "trigger": ""
+                },
+                "RX / NAS / Registration request": {
+                    "dst_state_name": "RX / NAS / Registration request",
+                    "src_state_name": "TX / RRC / rrcSetup",
+                    "time": {
+                        "tv_sec": 1682513619,
+                        "tv_usec": 486589
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / RRC / rrcSetup",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 58627
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / rrcSetupRequest": {
+                    "dst_state_name": "RX / RRC / rrcSetupRequest",
+                    "src_state_name": "TX / RRC / rrcSetup",
+                    "time": {
+                        "tv_sec": 1682513661,
+                        "tv_usec": 806194
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / RRC / rrcSetup",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 439024
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RRC / rrcSetup",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 295762
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "TX / RRC / rrcSetup",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 861142
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcSetup": {
+                    "dst_state_name": "TX / RRC / rrcSetup",
+                    "src_state_name": "TX / RRC / rrcSetup",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 438880
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / RRC / securityModeCommand": {
+            "from_state": [
+                "RX / MAC-NR / Long BSR",
+                "TX / RLC / STATUS PDU",
+                "RX / MAC-NR / C-RNTI",
+                "RX / MAC-NR / Short BSR"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / RRC / securityModeCommand",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63294
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / RRC / securityModeCommand",
+                    "time": {
+                        "tv_sec": 1682513739,
+                        "tv_usec": 428757
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RRC / securityModeCommand",
+                    "time": {
+                        "tv_sec": 1682513141,
+                        "tv_usec": 63742
+                    },
+                    "trigger": ""
+                },
+                "RX / RRC / securityModeComplete": {
+                    "dst_state_name": "RX / RRC / securityModeComplete",
+                    "src_state_name": "TX / RRC / securityModeCommand",
+                    "time": {
+                        "tv_sec": 1682513914,
+                        "tv_usec": 717693
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / RRC / securityModeCommand",
+                    "time": {
+                        "tv_sec": 1682513915,
+                        "tv_usec": 730868
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / RRC / securityModeCommand",
+                    "time": {
+                        "tv_sec": 1682513609,
+                        "tv_usec": 952908
+                    },
+                    "trigger": ""
+                },
+                "TX / RLC / STATUS PDU": {
+                    "dst_state_name": "TX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RRC / securityModeCommand",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 861302
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "TX / RRC / securityModeCommand",
+                    "time": {
+                        "tv_sec": 1682513151,
+                        "tv_usec": 656105
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / RRC / ueCapabilityEnquiry": {
+            "from_state": [
+                "RX / RLC / STATUS PDU",
+                "RX / MAC-NR / C-RNTI",
+                "RX / RLC / Data PDU",
+                "RX / RRC / rrcSetupRequest",
+                "RX / MAC-NR / Long BSR",
+                "RX / RRC / securityModeComplete",
+                "TX / RLC / STATUS PDU",
+                "TX / RRC / ueCapabilityEnquiry"
+            ],
+            "to_state": {
+                "RX / MAC-NR / Long BSR": {
+                    "dst_state_name": "RX / MAC-NR / Long BSR",
+                    "src_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "time": {
+                        "tv_sec": 1682513139,
+                        "tv_usec": 63576
+                    },
+                    "trigger": ""
+                },
+                "RX / MAC-NR / Short BSR": {
+                    "dst_state_name": "RX / MAC-NR / Short BSR",
+                    "src_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "time": {
+                        "tv_sec": 1682513764,
+                        "tv_usec": 457262
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / Data PDU": {
+                    "dst_state_name": "RX / RLC / Data PDU",
+                    "src_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "time": {
+                        "tv_sec": 1682513295,
+                        "tv_usec": 853945
+                    },
+                    "trigger": ""
+                },
+                "RX / RLC / STATUS PDU": {
+                    "dst_state_name": "RX / RLC / STATUS PDU",
+                    "src_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "time": {
+                        "tv_sec": 1682513149,
+                        "tv_usec": 861450
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / RA-RNTI": {
+                    "dst_state_name": "TX / MAC-NR / RA-RNTI",
+                    "src_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "time": {
+                        "tv_sec": 1682513699,
+                        "tv_usec": 720502
+                    },
+                    "trigger": ""
+                },
+                "TX / MAC-NR / Timing Advance Command": {
+                    "dst_state_name": "TX / MAC-NR / Timing Advance Command",
+                    "src_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "time": {
+                        "tv_sec": 1682513685,
+                        "tv_usec": 351065
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / rrcReconfiguration": {
+                    "dst_state_name": "TX / RRC / rrcReconfiguration",
+                    "src_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "time": {
+                        "tv_sec": 1682513755,
+                        "tv_usec": 855098
+                    },
+                    "trigger": ""
+                },
+                "TX / RRC / ueCapabilityEnquiry": {
+                    "dst_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "src_state_name": "TX / RRC / ueCapabilityEnquiry",
+                    "time": {
+                        "tv_sec": 1682513142,
+                        "tv_usec": 537453
+                    },
+                    "trigger": ""
+                }
+            }
+        }
+    }
+}

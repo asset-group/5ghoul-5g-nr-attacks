@@ -1,0 +1,51 @@
+FROM ubuntu:18.04 as base
+
+ENV HOME /root/
+ENV TERM xterm-256color
+
+WORKDIR $HOME
+
+SHELL ["/bin/bash", "-c"]
+
+# Fix timezone for tzdata
+RUN ln -snf /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime && echo $CONTAINER_TIMEZONE > /etc/timezone
+
+# Create default non-root user
+RUN apt-get update && apt-get install -y sudo x11-xserver-utils tar zstd python3 git systemd && \
+    sudo rm -rf \
+            /tmp/* \
+            /var/lib/apt/lists/* \
+            /var/tmp/*
+
+# Workaround for CVE-2022-24765
+RUN git config --system --add safe.directory '*'
+RUN groupadd -r user &> /dev/null || true && \
+	groupadd -r plugdev &> /dev/null || true && \
+	groupadd -r dialout &> /dev/null || true && \
+	useradd -m -r -g user user && \
+	usermod -a -G plugdev,sudo,dialout user && \
+	echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER user
+ENV HOME /home/user
+WORKDIR $HOME
+
+ADD ./requirements.sh $HOME
+RUN --mount=type=secret,id=cred,mode=0666 source /run/secrets/cred && \
+	./requirements.sh && rm ./requirements.sh && sudo systemctl mask console-getty.service && \
+	sudo systemctl mask system-getty.slice && sudo systemctl mask getty@tty1.service && \
+	sudo systemctl mask getty@tty2.service && sudo systemctl mask getty@tty3.service && \
+	sudo systemctl mask getty@tty4.service && sudo systemctl mask getty@tty5.service && \
+	sudo systemctl mask getty@tty6.service && sudo systemctl mask unattended-upgrades.service && \
+    sudo rm -rf \
+            ~/.git-credentials \
+            /tmp/* \
+            /var/lib/apt/lists/* \
+            /var/tmp/*
+
+# add wdissector release
+ADD --chown=user:user release/wdissector.tar.zst $HOME
+
+WORKDIR $HOME/wdissector/
+
+CMD sleep infinity

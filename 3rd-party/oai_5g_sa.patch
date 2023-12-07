@@ -1,0 +1,1439 @@
+diff --git a/.gitignore b/.gitignore
+index 845a49ac98..388d569bc1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -22,3 +22,9 @@ tags
+ nfapi_nr_interface_scf
+ *.log
+ *.out
++
++build/
++
++targets/TEST/PACKET_TRACER/.lock-rel8
++
++targets/TEST/PACKET_TRACER/EUTRA-RRC-Definitions.asn
+diff --git a/.vscode/launch.json b/.vscode/launch.json
+index 8be6915763..06f8e72a49 100644
+--- a/.vscode/launch.json
++++ b/.vscode/launch.json
+@@ -5,27 +5,31 @@
+     "version": "0.2.0",
+     "configurations": [
+         {
+-            "name": "(gdb) Launch",
+             "type": "cppdbg",
+             "request": "launch",
+-            "program": "${workspaceFolder}/cmake_targets/ran_build/build/lte-softmodem",
+-            "args": [
+-                "-O", "../ci-scripts/conf_files/rcc.band7.tm1.nfapi.conf",
+-                "--noS1"
+-            ],
++            "name": "Open a core dump(c/c++)",
++            "program": "${workspaceFolder}/cmake_targets/ran_build/build/nr-softmodem",
+             "stopAtEntry": false,
+-            "cwd": "${workspaceFolder}/cmake_targets",
+-            "environment": [],
+-            "externalConsole": false,
++            "coreDumpPath": "${workspaceFolder}/cmake_targets/ran_build/build/${input:coreFileName}",
++            "cwd": "${workspaceFolder}/cmake_targets/ran_build/build/",
+             "MIMode": "gdb",
+-            "miDebuggerPath": "${workspaceFolder}/cmake_targets/sudo-gdb",
++            "mode": "core",
++            "backend": "coredump",
++            "executable": "nr-softmodem",
+             "setupCommands": [
+                 {
+                     "description": "Enable pretty-printing for gdb",
+                     "text": "-enable-pretty-printing",
+                     "ignoreFailures": true
+                 }
+-            ]
++            ],
++        }
++    ],
++    "inputs": [
++        {
++          "id": "coreFileName",
++          "type": "promptString",
++          "description": "Enter core file path"
+         }
+-    ]
++      ]
+ }
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 014a67c9f8..5c16f51f9e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -147,6 +147,8 @@ else()
+   message("No Blas/Atlas libs found, some targets will fail")
+ endif()
+ 
++find_package(json-c CONFIG)
++
+ #########################################################
+ # Base directories, compatible with legacy OAI building #
+ #########################################################
+@@ -2199,7 +2201,8 @@ if (${T_TRACER})
+   set(T_SOURCE
+       ${OPENAIR_DIR}/common/utils/T/T_IDs.h
+       ${OPENAIR_DIR}/common/utils/T/T.c
+-      ${OPENAIR_DIR}/common/utils/T/local_tracer.c)
++      ${OPENAIR_DIR}/common/utils/T/local_tracer.c
++      ${OPENAIR_DIR}/shm_interface/wd_shm.c)
+   set(T_LIB "rt")
+ endif (${T_TRACER})
+ 
+@@ -2448,6 +2451,7 @@ target_link_libraries(nr-softmodem PRIVATE pthread m CONFIG_LIB rt crypt ${CRYPT
+ target_link_libraries(nr-softmodem PRIVATE ${LIB_LMS_LIBRARIES})
+ target_link_libraries(nr-softmodem PRIVATE ${T_LIB})
+ target_link_libraries(nr-softmodem PRIVATE asn1_nr_rrc asn1_lte_rrc)
++target_link_libraries (nr-softmodem PRIVATE czmq json-c::json-c)
+ 
+ add_dependencies( nr-softmodem ldpc_orig ldpc_optim ldpc_optim8seg ldpc)
+ 
+@@ -2495,6 +2499,7 @@ target_link_libraries(nr-uesoftmodem PRIVATE pthread m CONFIG_LIB rt crypt ${CRY
+ target_link_libraries(nr-uesoftmodem PRIVATE ${LIB_LMS_LIBRARIES})
+ target_link_libraries(nr-uesoftmodem PRIVATE ${T_LIB})
+ target_link_libraries(nr-uesoftmodem PRIVATE asn1_nr_rrc asn1_lte_rrc)
++target_link_libraries (nr-uesoftmodem PRIVATE czmq json-c::json-c)
+ 
+ add_dependencies( nr-uesoftmodem ldpc_orig ldpc_optim ldpc_optim8seg ldpc )
+ if (CUDA_FOUND)
+diff --git a/cmake_targets/build_oai b/cmake_targets/build_oai
+index 720d0f0c96..4fa2a3720b 100755
+--- a/cmake_targets/build_oai
++++ b/cmake_targets/build_oai
+@@ -496,11 +496,14 @@ function main() {
+     echo_info "Installing packages"
+     check_install_oai_software
+     if [ "$HW" == "OAI_USRP" ] ; then
+-      echo_info "installing packages for USRP support"
+-      check_install_usrp_uhd_driver
+-      if [ ! -v BUILD_UHD_FROM_SOURCE ] && [ ! "$DISABLE_HARDWARE_DEPENDENCY" == "True" ]; then
+-        install_usrp_uhd_driver $UHD_IMAGES_DIR
++      if [[ "$(pkg-config --modversion uhd)" != *"4.4"* ]] ; then
++        echo_info "installing packages for USRP support"
++        install_usrp_uhd_driver_from_source
+       fi
++      # check_install_usrp_uhd_driver
++      # if [ ! -v BUILD_UHD_FROM_SOURCE ] && [ ! "$DISABLE_HARDWARE_DEPENDENCY" == "True" ]; then
++      #   install_usrp_uhd_driver $UHD_IMAGES_DIR
++      # fi
+     fi 
+     if [ "$HW" == "OAI_BLADERF" ] ; then
+       echo_info "installing packages for BLADERF support"
+diff --git a/cmake_targets/tools/build_helper b/cmake_targets/tools/build_helper
+index ed02847387..13d52b0c34 100755
+--- a/cmake_targets/tools/build_helper
++++ b/cmake_targets/tools/build_helper
+@@ -30,6 +30,12 @@ if [ ! -f /etc/os-release ]; then
+ fi
+ OS_DISTRO=$(grep "^ID=" /etc/os-release | sed "s/ID=//" | sed "s/\"//g")
+ OS_RELEASE=$(grep "^VERSION_ID=" /etc/os-release | sed "s/VERSION_ID=//" | sed "s/\"//g")
++
++# Identify neon as ubuntu
++if [[ "$OS_DISTRO" == "neon" ]]; then
++    OS_DISTRO=ubuntu
++fi
++
+ case "$OS_DISTRO" in
+   fedora) OS_BASEDISTRO="fedora"; INSTALLER="dnf"; CMAKE="cmake" ;;
+   rhel)   OS_BASEDISTRO="fedora"; INSTALLER="yum --skip-broken"; CMAKE="cmake3" ;;
+@@ -224,7 +230,7 @@ compilations() {
+     fi
+     fi
+     ret=$?
+-  } > $dlog/$2.txt 2>&1
++  } | tee $dlog/$2.txt 2>&1
+   set -e
+   if [ "$VERBOSE_CI" == "1" ]; then
+      echo_info "====== Start of log for $2.txt ======"
+@@ -252,11 +258,11 @@ install_usrp_uhd_driver_from_source(){
+     pushd /tmp
+     echo "Cloning UHD driver repository"
+     rm -rf /tmp/uhd
+-    git clone https://github.com/EttusResearch/uhd.git
+-    cd uhd
+     # For our legacy TDD eNB running with a B2xx RF board
+     # the following patch has to be applied
+     if [[ -v UHD_VERSION ]]; then
++        git clone https://github.com/EttusResearch/uhd.git
++        cd uhd
+         git checkout tags/v${UHD_VERSION}
+         # We recommend to use not older than 3.15.0.0
+         if [[ "$UHD_VERSION" == "3.15.0.0" ]]; then
+@@ -276,7 +282,10 @@ install_usrp_uhd_driver_from_source(){
+             ret=$?;[[ $ret -ne 0 ]] && echo_fatal "Could not apply the TDD patch"
+         fi
+     else
+-        git checkout tags/v4.0.0.0
++        git clone https://github.com/EttusResearch/uhd.git --depth=1 --branch UHD-4.4
++        cd uhd
++        COMMIT=8e54b58d89c4d5f0f24bf15e8508cb3d97d69d34 # Specific uhd-4.4 commit
++        git fetch --depth=1 origin $COMMIT && git checkout $COMMIT
+         git apply $OPENAIR_DIR/cmake_targets/tools/uhd-4.x-tdd-patch.diff
+         ret=$?;[[ $ret -ne 0 ]] && echo_fatal "Could not apply the TDD patch"
+     fi
+@@ -284,11 +293,17 @@ install_usrp_uhd_driver_from_source(){
+     git diff
+     mkdir -p host/build
+     cd host/build || true
+-    $CMAKE ../ -GNinja
++    sed -i 's/HAVE_PYTHON_MODULE_MAKO\" OFF ON)/HAVE_PYTHON_MODULE_MAKO\" ON ON)/g' /tmp/uhd/host/CMakeLists.txt || true
++    $CMAKE ../ -G Ninja
+     echo "Compiling UHD"
+     ninja
+     $SUDO ninja install
+     $SUDO ldconfig -v
++
++    $SUDO /usr/local/lib/uhd/utils/uhd_images_downloader.py -t b2xx_b200_fpga_default || true
++    $SUDO /usr/local/lib/uhd/utils/uhd_images_downloader.py -t b2xx_b210_fpga_default || true
++    $SUDO /usr/local/lib/uhd/utils/uhd_images_downloader.py -t b2xx_common_fw_default || true
++
+     if [ $IS_CONTAINER -eq 0 ]; then
+         if [[ "$OS_DISTRO" == "ubuntu" ]]; then
+             $SUDO /usr/local/lib/uhd/utils/uhd_images_downloader.py
+@@ -299,7 +314,7 @@ install_usrp_uhd_driver_from_source(){
+     fi
+     popd
+     rm -rf /tmp/uhd
+-    ) >& $uhd_install_log
++    ) | tee $uhd_install_log
+ }
+ 
+ check_install_usrp_uhd_driver(){
+@@ -677,10 +692,8 @@ check_install_oai_software() {
+ 	$CMAKE \
+ 	cmake-curses-gui  \
+ 	curl \
+-        ninja-build \
+ 	doxygen \
+ 	doxygen-gui \
+-	texlive-latex-base \
+ 	ethtool \
+ 	flex  \
+         g++ \
+@@ -778,7 +791,6 @@ check_install_oai_software() {
+       libxml2 \
+       libxml2-devel \
+       libxslt-devel \
+-      ninja-build \
+       make \
+       openssh-clients \
+       openssh-server \
+@@ -827,7 +839,7 @@ install_asn1c_from_source(){
+     if [[ -v CI_ENV ]]; then
+         $SUDO rm -rf /tmp/asn1c
+     fi
+-    ) > $asn1_install_log 2>&1
++    ) | tee $asn1_install_log 2>&1
+ }
+ 
+ install_simde_from_source(){
+diff --git a/common/utils/threadPool/thread-pool.c b/common/utils/threadPool/thread-pool.c
+index 3cd18fab02..5af776f2fa 100644
+--- a/common/utils/threadPool/thread-pool.c
++++ b/common/utils/threadPool/thread-pool.c
+@@ -155,6 +155,8 @@ void initNamedTpool(char *params,tpool_t *pool, bool performanceMeas, char *name
+ 
+     curptr=strtok_r(NULL,",",&saveptr);
+   }
++  
++  printf("Number of Threads=%d\n", pool->nbThreads);
+   free(parms_cpy);
+   if (pool->activated && pool->nbThreads==0) {
+     printf("No servers created in the thread pool, exit\n");
+diff --git a/executables/nr-softmodem.c b/executables/nr-softmodem.c
+index 0ecd46e5e0..8028eb0ef0 100644
+--- a/executables/nr-softmodem.c
++++ b/executables/nr-softmodem.c
+@@ -79,6 +79,18 @@ unsigned short config_frames[4] = {2,9,11,13};
+ #include <openair3/ocp-gtpu/gtp_itf.h>
+ #include "nfapi/oai_integration/vendor_ext.h"
+ 
++/* FUZZ-NR: duplication */
++#include "shm_interface/wd_shm_nr_utils.h"
++#include <czmq.h>
++#include <json.h>
++
++char       * dup_addr = "tcp://*:5566";
++zsock_t    * dup_sock;  
++pthread_t    dup_thread;
++
++fuzz_nr_duplication_t fuzz_nr_dup;
++/* -------------------- */
++
+ pthread_cond_t nfapi_sync_cond;
+ pthread_mutex_t nfapi_sync_mutex;
+ int nfapi_sync_var=-1; //!< protected by mutex \ref nfapi_sync_mutex
+@@ -514,6 +526,110 @@ void init_pdcp(void) {
+   }
+ }
+ 
++
++/* FUZZ-NR: duplication */
++int fuzz_nr_dup_cmd(char *cmd, fuzz_nr_duplication_t *dup)
++{
++  json_object *jobj_dup     = json_tokener_parse(cmd);
++  json_object *jval_rlc_len  = NULL;
++  json_object *jval_mac_len  = NULL;
++  json_object *jarr_mac_buf  = NULL;
++  json_object *jval_byte     = NULL;
++  int i = 0;
++
++  dup->rlc_len  = 0;
++  dup->mac_len  = 0;
++  memset(dup->mac_buf, 0, DUP_BUF_SIZE);
++
++  if (jobj_dup) {
++    jval_rlc_len = json_object_object_get(jobj_dup, "rlc_len");
++    jval_mac_len = json_object_object_get(jobj_dup, "mac_len");
++    jarr_mac_buf = json_object_object_get(jobj_dup, "mac_buf");
++
++    if (jval_rlc_len && jval_mac_len && jarr_mac_buf) {
++      
++      if (json_object_is_type(jval_rlc_len, json_type_int) && 
++          json_object_is_type(jval_mac_len, json_type_int) && 
++          json_object_is_type(jarr_mac_buf, json_type_array)) {
++
++        dup->rlc_len = json_object_get_int(jval_rlc_len);
++        dup->mac_len = json_object_get_int(jval_mac_len);
++        int mac_buf_len = json_object_array_length(jarr_mac_buf);
++
++        LOG_W(GNB_APP, "[duplication] rlc_len = %d\n", dup->rlc_len);
++        LOG_W(GNB_APP, "[duplication] mac_len = %d\n", dup->mac_len);
++        LOG_W(GNB_APP, "[duplication] mac_buf_len = %d\n", mac_buf_len);
++
++        if (dup->rlc_len > 0 && 
++            dup->rlc_len < dup->mac_len &&
++            dup->mac_len == mac_buf_len && 
++            dup->mac_len <= DUP_BUF_SIZE) {
++
++          for (i = 0; i < dup->mac_len; i++) {
++            jval_byte = json_object_array_get_idx(jarr_mac_buf, i);
++
++            if (json_object_is_type(jval_byte, json_type_int)) {
++              dup->mac_buf[i] = json_object_get_int(jval_byte);
++            } else {
++              LOG_E(GNB_APP, "[duplication] Wrong json type");
++              return -1;
++            }
++          }
++
++          LOG_W(GNB_APP, "[duplication] mac_buf = %02x %02x %02x %02x %02x ...\n", 
++              dup->mac_buf[0], dup->mac_buf[1], dup->mac_buf[2], dup->mac_buf[3], dup->mac_buf[4]);
++
++        } else {
++          LOG_E(GNB_APP, "[duplication] Wrong rlc/mac length");
++          return -1;
++        }
++
++      } else {
++        LOG_E(GNB_APP, "[duplication] Wrong json type");
++        return -1;
++      }
++
++    } else {
++      LOG_E(GNB_APP, "[duplication] Wrong json key");
++      return -1;
++    }
++  } else {
++    LOG_E(GNB_APP, "[duplication] Wrong json object");
++    return -1;
++  }
++
++  return 0;  
++}
++
++void *fuzz_nr_dup_thread(void *param)
++{
++  fuzz_nr_duplication_t *dup = (fuzz_nr_duplication_t *)param;
++
++  while (!zsys_interrupted) {
++    char *rcv_str = zstr_recv(dup_sock);
++    
++    if (rcv_str != NULL) {
++      LOG_W(GNB_APP, "[duplication] received: %s\n", rcv_str);
++      int h_rtn = fuzz_nr_dup_cmd(rcv_str, dup);
++      
++      if (h_rtn < 0) {
++        zstr_send(dup_sock, "update_failed");
++      } else {
++        fuzz_nr_dup.flag_mac = true;
++        zstr_send(dup_sock, "update_succeed");
++      }
++
++      free (rcv_str); 
++    }
++
++    zclock_sleep(100);
++  }
++
++  zsock_destroy(&dup_sock);
++  return NULL;
++}
++/* --------------------- */
++
+ int main( int argc, char **argv ) {
+   int ru_id, CC_id = 0;
+   start_background_system();
+@@ -551,6 +667,25 @@ int main( int argc, char **argv ) {
+   if (get_softmodem_params()->sa)
+     AssertFatal(get_softmodem_params()->phy_test == 0,"Standalone mode and phy_test are mutually exclusive\n");
+ 
++  /* --------------------- */
++  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH))
++    LOG_W(GNB_APP, "[SHM] SHM started\n"); 
++  else
++    LOG_W(GNB_APP, "[SHM] SHM not started\n");
++
++  shm_set_max_timeout(1);
++
++  shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
++
++
++  
++  /* FUZZ-NR: duplication */
++  LOG_W(GNB_APP, "[duplication] Create dup socket\n"); 
++  // dup_sock = zsock_new_rep(dup_addr);
++  LOG_W(GNB_APP, "[duplication] Start dup thread\n"); 
++  // pthread_create(&dup_thread, NULL, &fuzz_nr_dup_thread, (void *)&fuzz_nr_dup);
++  /* --------------------- */
++
+ #if T_TRACER
+   T_Config_Init();
+ #endif
+diff --git a/executables/nr-softmodem.h b/executables/nr-softmodem.h
+index f3bc7f5b71..8c284a74a3 100644
+--- a/executables/nr-softmodem.h
++++ b/executables/nr-softmodem.h
+@@ -62,4 +62,17 @@ void init_gNB_afterRU(void);
+ 
+ void init_pdcp(void);
+ 
++/* FUZZ-NR: duplication */
++#define DUP_BUF_SIZE 2048
++
++typedef struct fuzz_nr_duplication_s {
++    bool    flag_mac;
++    int     rlc_len;
++    int     mac_len;
++    uint8_t mac_buf[DUP_BUF_SIZE];
++} fuzz_nr_duplication_t;
++
++extern fuzz_nr_duplication_t fuzz_nr_dup;
++/* -------------------- */
++
+ #endif
+diff --git a/executables/nr-uesoftmodem.c b/executables/nr-uesoftmodem.c
+index 4aef4e56a3..ec01273cf2 100644
+--- a/executables/nr-uesoftmodem.c
++++ b/executables/nr-uesoftmodem.c
+@@ -84,6 +84,18 @@ unsigned short config_frames[4] = {2,9,11,13};
+ #include <openair1/PHY/MODULATION/nr_modulation.h>
+ #include "openair2/GNB_APP/gnb_paramdef.h"
+ 
++/* FUZZ-NR: duplication */
++#include "shm_interface/wd_shm_nr_utils.h"
++#include <czmq.h>
++#include <json.h>
++
++char       * dup_addr = "tcp://*:5577";
++zsock_t    * dup_sock;  
++pthread_t    dup_thread;
++
++fuzz_nr_duplication_t fuzz_nr_dup;
++/* -------------------- */
++
+ extern const char *duplex_mode[];
+ THREAD_STRUCT thread_struct;
+ nrUE_params_t nrUE_params;
+@@ -402,6 +414,109 @@ static void get_channel_model_mode() {
+ 
+ int NB_UE_INST = 1;
+ 
++/* FUZZ-NR: duplication */
++int fuzz_nr_dup_cmd(char *cmd, fuzz_nr_duplication_t *dup)
++{
++  json_object *jobj_dup     = json_tokener_parse(cmd);
++  json_object *jval_rlc_len  = NULL;
++  json_object *jval_mac_len  = NULL;
++  json_object *jarr_mac_buf  = NULL;
++  json_object *jval_byte     = NULL;
++  int i = 0;
++
++  dup->rlc_len  = 0;
++  dup->mac_len  = 0;
++  memset(dup->mac_buf, 0, DUP_BUF_SIZE);
++
++  if (jobj_dup) {
++    jval_rlc_len = json_object_object_get(jobj_dup, "rlc_len");
++    jval_mac_len = json_object_object_get(jobj_dup, "mac_len");
++    jarr_mac_buf = json_object_object_get(jobj_dup, "mac_buf");
++
++    if (jval_rlc_len && jval_mac_len && jarr_mac_buf) {
++      
++      if (json_object_is_type(jval_rlc_len, json_type_int) && 
++          json_object_is_type(jval_mac_len, json_type_int) && 
++          json_object_is_type(jarr_mac_buf, json_type_array)) {
++
++        dup->rlc_len = json_object_get_int(jval_rlc_len);
++        dup->mac_len = json_object_get_int(jval_mac_len);
++        int mac_buf_len = json_object_array_length(jarr_mac_buf);
++
++        LOG_W(GNB_APP, "[duplication] rlc_len = %d\n", dup->rlc_len);
++        LOG_W(GNB_APP, "[duplication] mac_len = %d\n", dup->mac_len);
++        LOG_W(GNB_APP, "[duplication] mac_buf_len = %d\n", mac_buf_len);
++
++        if (dup->rlc_len > 0 && 
++            dup->mac_len == mac_buf_len && 
++            dup->mac_len <= DUP_BUF_SIZE) {
++
++          for (i = 0; i < dup->mac_len; i++) {
++            jval_byte = json_object_array_get_idx(jarr_mac_buf, i);
++
++            if (json_object_is_type(jval_byte, json_type_int)) {
++              dup->mac_buf[i] = json_object_get_int(jval_byte);
++            } else {
++              LOG_E(GNB_APP, "[duplication] Wrong json type");
++              return -1;
++            }
++          }
++
++          LOG_W(GNB_APP, "[duplication] mac_buf = %02x %02x %02x %02x %02x ...\n", 
++              dup->mac_buf[0], dup->mac_buf[1], dup->mac_buf[2], dup->mac_buf[3], dup->mac_buf[4]);
++
++        } else {
++          LOG_E(GNB_APP, "[duplication] Wrong rlc/mac length");
++          return -1;
++        }
++
++      } else {
++        LOG_E(GNB_APP, "[duplication] Wrong json type");
++        return -1;
++      }
++
++    } else {
++      LOG_E(GNB_APP, "[duplication] Wrong json key");
++      return -1;
++    }
++  } else {
++    LOG_E(GNB_APP, "[duplication] Wrong json object");
++    return -1;
++  }
++
++  return 0;  
++}
++
++void *fuzz_nr_dup_thread(void *param)
++{
++  fuzz_nr_duplication_t *dup = (fuzz_nr_duplication_t *)param;
++
++  while (!zsys_interrupted) {
++    char *rcv_str = zstr_recv(dup_sock);
++    
++    if (rcv_str != NULL) {
++      LOG_W(GNB_APP, "[duplication] received: %s\n", rcv_str);
++      int h_rtn = fuzz_nr_dup_cmd(rcv_str, dup);
++      
++      if (h_rtn < 0) {
++        zstr_send(dup_sock, "update_failed");
++      } else {
++        fuzz_nr_dup.flag_mac = true;
++        zstr_send(dup_sock, "update_succeed");
++      }
++
++      free (rcv_str); 
++    }
++
++    // zclock_sleep(100);
++  }
++
++  zsock_destroy(&dup_sock);
++  return NULL;
++}
++/* --------------------- */
++
++
+ int main( int argc, char **argv ) {
+   int set_exe_prio = 1;
+   if (checkIfFedoraDistribution())
+@@ -430,6 +545,23 @@ int main( int argc, char **argv ) {
+ 
+   get_common_options(SOFTMODEM_5GUE_BIT);
+   CONFIG_CLEARRTFLAG(CONFIG_NOEXITONHELP);
++
++  /* --------------------- */
++  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH))
++    LOG_W(GNB_APP, "[SHM] SHM started\n"); 
++  else
++    LOG_W(GNB_APP, "[SHM] SHM not started\n");
++
++  shm_set_max_timeout(1);
++
++  shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
++
++  /* FUZZ-NR: duplication */
++  // LOG_W(GNB_APP, "[duplication] Create dup socket\n"); 
++  // dup_sock = zsock_new_rep(dup_addr);
++  // LOG_W(GNB_APP, "[duplication] Start dup thread\n"); 
++  // pthread_create(&dup_thread, NULL, &fuzz_nr_dup_thread, (void *)&fuzz_nr_dup);
++  /* --------------------- */
+ #if T_TRACER
+   T_Config_Init();
+ #endif
+diff --git a/executables/nr-uesoftmodem.h b/executables/nr-uesoftmodem.h
+index d19b5b9ce1..e97ec70bf6 100644
+--- a/executables/nr-uesoftmodem.h
++++ b/executables/nr-uesoftmodem.h
+@@ -87,6 +87,19 @@ extern uint64_t get_nrUE_optmask(void);
+ extern uint64_t set_nrUE_optmask(uint64_t bitmask);
+ extern nrUE_params_t *get_nrUE_params(void);
+ 
++/* FUZZ-NR: duplication */
++#define DUP_BUF_SIZE 2048
++
++typedef struct fuzz_nr_duplication_s {
++    bool    flag_mac;
++    int     rlc_len;
++    int     mac_len;
++    uint8_t mac_buf[DUP_BUF_SIZE];
++} fuzz_nr_duplication_t;
++
++extern fuzz_nr_duplication_t fuzz_nr_dup;
++/* -------------------- */
++
+ 
+ // In nr-ue.c
+ extern int setup_nr_ue_buffers(PHY_VARS_NR_UE **phy_vars_ue, openair0_config_t *openair0_cfg);
+diff --git a/fuzz_duplication.py b/fuzz_duplication.py
+new file mode 100755
+index 0000000000..24a080dd9c
+--- /dev/null
++++ b/fuzz_duplication.py
+@@ -0,0 +1,227 @@
++#!/usr/bin/env python3
++
++import zmq, json
++import os, sys, io, signal
++from time import sleep
++from threading import Thread
++
++os.system('clear')
++
++req_addr = "tcp://localhost:5577"
++fuzz_duplicate = dict()
++global flag_update_duplicate
++
++test_buf = [0x21, 0x02, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
++
++rrc_setup_request = [ 0x34, 0x1a, 0x7f, 0x9b, 0xc8, 0x30, 0x46, 0x3f ]
++
++rrc_setup_complete = [ 0x41, 0x0, 0x32, 0xc0, 0x0, 0x0, 0x0, 0x12, 0x10, 
++                    0x8, 0x1f, 0x80, 0x10, 0x46, 0x40, 0x3, 0x40, 
++                    0x40, 0xbe, 0x16, 0x40, 0x0, 0x0, 0x0, 0x0, 
++                    0x0, 0x0, 0x0, 0x4, 0xc4, 0x0, 0x41, 0xcb, 
++                    0x82, 0x20, 0x8, 0x0, 0x0, 0x0, 0x0, 0x0, 
++                    0x0, 0x2, 0x46, 0x8a, 0xcf, 0x13, 0x57, 0x80, 
++                    0x0, 0x0, 0x0, 0x0, 0x3d, 0x0, 0x3f, 0xf9, 
++                    0xf2, 0x36, 0x97, 0xa4, 0xf1, 0x1a, 0xc, 0x3f, 
++                    0xda, 0xb3, 0xdb, 0x9e, 0x8b, 0x6d, 0x46, 0x9b, 
++                    0xea, 0x22, 0x78, 0x33, 0x55, 0x23, 0x56, 0xe5, 
++                    0x5f, 0x53, 0xde, 0xcb, 0x26, 0x39, 0xc4, 0x18, 
++                    0x6f, 0x5b, 0xbd, 0x60, 0x76, 0xc9, 0x9f, 0x50, 
++                    0x7c, 0x7a, 0xee, 0x8, 0xe7, 0x34, 0xa3, 0xd1, 
++                    0x57, 0x1b, 0x4, 0xac, 0x3e, 0x5a, 0x91, 0x9d, 
++                    0xae, 0x6f, 0x68 ]
++
++rrc_setup_complete_reg_request = [ 0x41, 0x0, 0x32, 0xc0, 0x0, 0x0, 0x0, 0x12, 0x10, 
++                                    0x8, 0x1f, 0x80, 0x10, 0x46, 0x40, 0x3, 0x40, 
++                                    0x40, 0xbe, 0x16, 0x40, 0x0, 0x0, 0x0, 0x0, 
++                                    0x0, 0x0, 0x0, 0x4, 0xc4, 0x0, 0x41, 0xcb, 
++                                    0x82, 0x20, 0x8, 0x0, 0x0, 0x0, 0x0, 0x0, 
++                                    0x0, 0x2, 0x46, 0x8a, 0xcf, 0x13, 0x57, 0x80, 
++                                    0x0, 0x0, 0x0, 0x0, 0x3d, 0x0, 0x3f, 0x37, 
++                                    0x7d, 0xa, 0x40, 0x21, 0x4f, 0x9c, 0x5, 0x52, 
++                                    0x25, 0x75, 0x57, 0xba, 0x6b, 0xb9, 0x17, 0xc6, 
++                                    0x23, 0xe4, 0x40, 0x5c, 0x11, 0xe, 0xa5, 0x14, 
++                                    0xf2, 0xa7, 0xac, 0x82, 0xb8, 0xf2, 0xb9, 0x35, 
++                                    0xfc, 0xf9, 0x57, 0x4b, 0x95, 0x5c, 0x9d, 0xbb, 
++                                    0xd2, 0xf4, 0x75, 0x3d, 0xae, 0x8c, 0x4, 0xd1, 
++                                    0x70, 0x44, 0x2d, 0x82, 0x52, 0xd2, 0x96, 0x45, 
++                                    0x79, 0x42, 0xc7 ]
++
++rrc_ue_capability_information = [ 0x41, 0x0, 0x5f, 0xc0, 0x4, 0x0, 0x4, 0x4c, 0x82, 
++                                    0x14, 0xf8, 0x68, 0x4, 0x0, 0x1, 0xd3, 0xd6, 
++                                    0x84, 0xc0, 0x80, 0x0, 0x81, 0x50, 0x1, 0x20, 
++                                    0x93, 0x16, 0x0, 0x9, 0x83, 0x50, 0x70, 0x13, 
++                                    0x60, 0x18, 0x73, 0xe6, 0x18, 0xf2, 0x85, 0x81, 
++                                    0xc1, 0x30, 0x8, 0xc, 0x47, 0x0, 0x2a, 0xd, 
++                                    0x89, 0xba, 0xc1, 0x18, 0x43, 0x41, 0x2, 0xf, 
++                                    0x94, 0xe, 0x5, 0x96, 0xc9, 0x8a, 0xa1, 0xa1, 
++                                    0xcf, 0x88, 0xe3, 0xd0, 0x33, 0xec, 0x9, 0xf1, 
++                                    0x8e, 0x7c, 0xc3, 0x1e, 0x50, 0xb0, 0x38, 0x1c, 
++                                    0x3c, 0x17, 0x0, 0x5, 0xf0, 0x1, 0xc0, 0x1, 
++                                    0x7c, 0x0, 0xf, 0x20, 0x0, 0xfc, 0x68, 0x99, 
++                                    0xb6, 0x3d, 0x0, 0x3f, 0x96, 0x6d, 0xae, 0xe, 
++                                    0x54, 0x15, 0xca, 0x52, 0x25, 0xbb, 0x1e, 0x85, 
++                                    0x7d, 0x14, 0xfc ]
++
++nas_auth_rsp = [ 0x41, 0x0, 0x3, 0x0, 0x1, 0x0, 0x41, 0x0, 0x20, 
++                    0xc0, 0x1, 0x0, 0x1, 0x3a, 0xa, 0xbf, 0x0, 
++                    0x2b, 0x96, 0x88, 0x4f, 0x19, 0xe6, 0xfa, 0x36, 
++                    0x74, 0x36, 0xa9, 0xa1, 0x2c, 0x23, 0x9a, 0xe4, 
++                    0x18, 0xd5, 0x7a, 0x0, 0x0, 0x0, 0x0, 0x0, 
++                    0x3d, 0x0, 0x3f, 0x18, 0x50, 0x5a, 0xd8, 0xc3, 
++                    0xf1, 0xaf, 0x2c, 0x97, 0x8c, 0x9c, 0x47, 0x53, 
++                    0xec, 0xbf, 0x0, 0xbe, 0x11, 0x3a, 0xd0, 0x51, 
++                    0xe1, 0xa6, 0x35, 0xe, 0xf7, 0x72, 0xe9, 0x77, 
++                    0x8a, 0xc9, 0x8f, 0xda, 0x24, 0x68, 0x9d, 0x15, 
++                    0x17, 0xca, 0xad, 0xa4, 0x66, 0xf4, 0xf7, 0x52, 
++                    0xb3, 0xf7, 0x10, 0xc4, 0x31, 0xe0, 0x15, 0x12, 
++                    0x87, 0x4a, 0x20, 0x7e, 0xbc, 0xa, 0xf5, 0x46, 
++                    0xd3, 0x85, 0x20, 0xf7, 0xed, 0xbe, 0xd, 0x4, 
++                    0x88, 0xba, 0xa8 ]
++
++nas_sec_mode_complete = [0x41, 0x0, 0x3, 0x0, 0x3, 0x0, 0x41, 0x0, 0xa, 
++                        0xc0, 0x3, 0x0, 0x3, 0x2a, 0x0, 0xd7, 0xe0, 
++                        0x9, 0xa2, 0x3d, 0x0, 0x3f, 0x59, 0x38, 0xe3, 
++                        0x34, 0x55, 0xe5, 0x24, 0x1f, 0xd0, 0x15, 0xa3, 
++                        0xff, 0xf5, 0x51, 0x9, 0xe3, 0xc0, 0x36, 0x7b, 
++                        0x4a, 0x70, 0x31, 0x85, 0xb5, 0x54, 0x8a, 0x5e, 
++                        0x4c, 0xc8, 0x4a, 0x2a, 0x22, 0x82, 0xd, 0x56, 
++                        0xd7, 0xf2, 0x7b, 0xf7, 0xc3, 0x90, 0x9a, 0xc2, 
++                        0x85, 0xec, 0xcb, 0x68, 0xac, 0x1, 0xe3, 0xf6, 
++                        0x72, 0x14, 0x7b, 0x27, 0x68, 0x5, 0x85, 0xb4, 
++                        0xce, 0xcf, 0xdf, 0xf0, 0x51, 0xec, 0x46, 0x28, 
++                        0xdf, 0xc1, 0x1f, 0xa2, 0x51, 0xba, 0x64, 0xd7, 
++                        0xa6, 0x2f, 0x3f, 0x52, 0x31, 0x23, 0x49, 0xa3, 
++                        0x37, 0xc4, 0xca, 0xa0, 0xca, 0x4f, 0x54, 0x98, 
++                        0x1e, 0x33, 0x88]
++
++mac_short_bsr = [0x44, 0x0, 0x45, 0x0, 0x1, 0xc2, 0x0, 0xb, 0xa0, 
++                    0x0, 0xc, 0x38, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0xd, 0xb8, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0xe, 0xf8, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x13, 0x38, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x14, 0x38, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x15, 0x78, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x18, 0x78, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x1a, 0x90, 0x0, 0x57, 0xff, 0xff, 0x3d, 
++                    0x0, 0x3f, 0x3f, 0xdb, 0xd9, 0x2, 0xcd, 0xf4, 
++                    0x46, 0xb3, 0x6f, 0xe2, 0xe5, 0x9b, 0x41, 0xe8, 
++                    0xd, 0x90, 0x61, 0xf7, 0x8e, 0xf8, 0x99, 0x7, 
++                    0x5b, 0x5c, 0x67, 0x1, 0x5c, 0xbc, 0x4b, 0x34, 
++                    0x62, 0x8a, 0x10, 0x3b, 0x8d, 0xdd, 0x30, 0xd3, 
++                    0x91, 0x9f, 0xb5]
++
++mac_long_bsr = [0x44, 0x0, 0x46, 0x0, 0x1, 0xc2, 0x0, 0xb, 0xa0, 
++                    0x0, 0xc, 0x38, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0xd, 0xb8, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0xe, 0xf8, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x13, 0x38, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x14, 0x38, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x15, 0x78, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x18, 0x78, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x0, 0x1a, 0x98, 0x0, 0x57, 0xff, 0xff, 0x2, 
++                    0x3e, 0x1, 0x0, 0x3f, 0x7d, 0x85, 0xdf, 0xf7, 
++                    0xc7, 0x37, 0x50, 0x7b, 0x20, 0x69, 0xb6, 0xfb, 
++                    0x63, 0x6b, 0xed, 0x3f, 0xe1, 0x5e, 0x2b, 0x51, 
++                    0x76, 0xb5, 0x22, 0x84, 0xba, 0x60, 0x5a, 0x24, 
++                    0xf9, 0x25, 0x38, 0x76, 0xab, 0x18, 0x6d, 0x72, 
++                    0x4f, 0xbd, 0xed]
++
++rlc_control_status_pdu = [0x41, 0x0, 0x3, 0x0, 0x4, 0x0, 0x3d, 0x0, 0x3f, 
++                            0x4c, 0xd2, 0x29, 0x33, 0x0, 0x81, 0x70, 0xcd, 
++                            0x9f, 0x22, 0x23, 0xb6, 0x6c, 0xcc, 0x85, 0x61, 
++                            0x8e, 0x22, 0x50, 0x48, 0xa9, 0x5d, 0x27, 0xe5, 
++                            0xe9, 0x87, 0xd3, 0x38, 0xc1, 0x46, 0xbc, 0xd, 
++                            0x18, 0xe6, 0x40, 0x18, 0x67, 0xb0, 0xe5, 0x6, 
++                            0xd3, 0x8, 0xbc, 0x3f, 0xd5, 0x41, 0xa0, 0x63, 
++                            0x64, 0xf0, 0xab, 0xd, 0x4d, 0xd3, 0xf2, 0x36, 
++                            0x5a, 0xc5, 0x6e, 0x1b, 0xb, 0x2b, 0x29, 0x23, 
++                            0x11, 0x69, 0x3b, 0x78, 0x1a, 0x21, 0x7e, 0xed, 
++                            0x29, 0x3b, 0x2c, 0xfe, 0x7c, 0xcc, 0x62, 0xe0, 
++                            0xbc, 0xd, 0xee, 0xa, 0xe0, 0xe0, 0x40, 0x3a, 
++                            0xa6, 0xaf, 0x56, 0xb1, 0xda, 0x7f, 0xd5, 0xeb, 
++                            0xe8, 0x10, 0x63, 0x2, 0x31, 0xe1, 0xef, 0x5b, 
++                            0x1c, 0x1b, 0x59]
++
++nas_pdu_session_establishment_req = [0x41, 0x0, 0x2e, 0xc0, 0x7, 0x0, 0x7, 0x3a, 0x11, 
++                                        0xbf, 0x2, 0x35, 0xb3, 0xb9, 0x18, 0x0, 0x3f, 
++                                        0x0, 0x33, 0x80, 0x80, 0x3, 0x97, 0x5, 0x0, 
++                                        0xe0, 0xff, 0xff, 0xc8, 0x89, 0x5, 0x40, 0x91, 
++                                        0x2, 0x0, 0x80, 0x0, 0x0, 0x92, 0x82, 0x2, 
++                                        0x37, 0xb0, 0xb4, 0x80, 0xa2, 0x28, 0x4c, 0x18, 
++                                        0x3d, 0x0, 0x3f, 0xbb, 0x2d, 0x2a, 0x64, 0xc7, 
++                                        0xf2, 0x1e, 0x89, 0xf8, 0x24, 0x8b, 0x39, 0x3, 
++                                        0x12, 0xd0, 0xb1, 0xee, 0xde, 0x6a, 0x71, 0xd8, 
++                                        0x1a, 0xb, 0x56, 0xe9, 0x29, 0x39, 0xa3, 0xd4, 
++                                        0x77, 0x32, 0x90, 0xa4, 0x5c, 0xf4, 0x6b, 0x4e, 
++                                        0x12, 0xf5, 0x46, 0x36, 0x80, 0x80, 0x3a, 0x92, 
++                                        0x50, 0xeb, 0x80, 0x2e, 0x56, 0xf2, 0x6, 0x70, 
++                                        0xfd, 0x5c, 0x5a, 0x26, 0x95, 0xfd, 0xfb, 0xd, 
++                                        0x2f, 0x8b, 0xb1 ]
++
++mac_power_headroom = [0x3e, 0x1, 0x0, 0x39, 0x3b, 0x32, 0x3f, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 
++                        0x21]
++
++def new_duplicate(sdu_len=0, pdu_buf=list()):
++    fuzz_duplicate = {'rlc_len':sdu_len, 'mac_buf':pdu_buf, 'mac_len':len(pdu_buf)}
++    sjson_duplicate = json.dumps(fuzz_duplicate)
++    return sjson_duplicate
++
++
++## request thread
++def handle_req_thread(context, ): 
++    print("Connecting to rep server…")
++    req_sock = context.socket(zmq.REQ)
++    req_sock.connect(req_addr)
++    print("Connected to rep server")
++
++    flag_update_duplicate = True
++
++    while True:
++        if flag_update_duplicate:
++            pdu = mac_power_headroom
++            # pdu[4] = pdu[4] + 1
++            # pdu[3] = pdu[3] + 1
++            # pdu[10] = pdu[10] + 1
++            req_str = new_duplicate(sdu_len=len(pdu), pdu_buf=pdu)   
++            print("req_duplicate:", req_str);
++            req_sock.send(req_str.encode('utf-8'))
++            rcv_str = req_sock.recv()
++
++            print("rcv_duplicate:", rcv_str);
++            # if rcv_str == b"update_succeed":
++            #     flag_update_duplicate = False
++
++        # sleep(0.1)
++
++    req_sock.close()
++
++
++
++if __name__ == '__main__':
++    
++    try:
++        signal.signal(signal.SIGINT, quit)
++        signal.signal(signal.SIGTERM, quit)
++
++        context = zmq.Context()
++        
++        # request thread
++        req_thread = Thread(target=handle_req_thread, args=(context, ))
++        req_thread.start()
++
++    except Exception: 
++        context.term()
++        print()
+diff --git a/openair1/PHY/NR_TRANSPORT/pucch_rx.c b/openair1/PHY/NR_TRANSPORT/pucch_rx.c
+index 905e03801c..e021145196 100644
+--- a/openair1/PHY/NR_TRANSPORT/pucch_rx.c
++++ b/openair1/PHY/NR_TRANSPORT/pucch_rx.c
+@@ -200,6 +200,9 @@ void nr_decode_pucch0(PHY_VARS_gNB *gNB,
+         break;
+      } else if (first_uci_stats == NULL && gNB->uci_stats[i].rnti == 0) first_uci_stats = &gNB->uci_stats[i];
+ 
++  if ((first_uci_stats == NULL) || (pucch_pdu == NULL))
++    return;
++
+   if (uci_stats == NULL) { uci_stats=first_uci_stats; uci_stats->rnti = pucch_pdu->rnti;}
+ 
+   AssertFatal(uci_stats!=NULL,"No stat index found\n");
+diff --git a/openair1/PHY/NR_UE_TRANSPORT/sss_nr.c b/openair1/PHY/NR_UE_TRANSPORT/sss_nr.c
+index 41829b68f2..96350ef681 100644
+--- a/openair1/PHY/NR_UE_TRANSPORT/sss_nr.c
++++ b/openair1/PHY/NR_UE_TRANSPORT/sss_nr.c
+@@ -550,7 +550,7 @@ int rx_sss_nr(PHY_VARS_NR_UE *ue, UE_nr_rxtx_proc_t *proc, int32_t *tot_metric,
+ 
+ //#ifdef DEBUG_SSS_NR
+   
+-#define SSS_METRIC_FLOOR_NR   (30000)
++#define SSS_METRIC_FLOOR_NR   (15000)
+   if (*tot_metric > SSS_METRIC_FLOOR_NR) {	
+     Nid2 = GET_NID2(frame_parms->Nid_cell);
+     Nid1 = GET_NID1(frame_parms->Nid_cell);
+diff --git a/openair1/SCHED_NR/nr_prach_procedures.c b/openair1/SCHED_NR/nr_prach_procedures.c
+index 2708cbd161..666c342082 100644
+--- a/openair1/SCHED_NR/nr_prach_procedures.c
++++ b/openair1/SCHED_NR/nr_prach_procedures.c
+@@ -46,6 +46,8 @@
+ 
+ #include "intertask_interface.h"
+ 
++#include "shm_interface/wd_shm_nr_utils.h"
++
+ extern uint8_t nfapi_mode;
+ 
+ uint8_t get_nr_prach_duration(uint8_t prach_format){
+@@ -167,6 +169,13 @@ void L1_nr_prach_procedures(PHY_VARS_gNB *gNB,int frame,int slot) {
+ 	      prachStartSymbol,
+ 	      prach_pdu->num_ra);
+ 	
++   // Send data to fuzzer (RACH)
++   // send_pdu_data_nr(W_GNB_PHY_INITIATE_RA_PROCEDURE, 
++   //                   NR_DIRECTION_UPLINK, 
++   //                   NR_NO_RNTI, 0, 
++   //                   frame, slot, 0,
++   //                   NULL, 0);
++
+ 	T(T_ENB_PHY_INITIATE_RA_PROCEDURE, T_INT(gNB->Mod_id), T_INT(frame), T_INT(slot),
+ 	  T_INT(max_preamble[0]), T_INT(max_preamble_energy[0]), T_INT(max_preamble_delay[0]));
+ 	
+diff --git a/openair1/SCHED_NR/phy_procedures_nr_gNB.c b/openair1/SCHED_NR/phy_procedures_nr_gNB.c
+index 38e1cfd3b4..79039734af 100644
+--- a/openair1/SCHED_NR/phy_procedures_nr_gNB.c
++++ b/openair1/SCHED_NR/phy_procedures_nr_gNB.c
+@@ -45,6 +45,8 @@
+ 
+ #include "intertask_interface.h"
+ 
++#include "shm_interface/wd_shm_nr_utils.h"
++
+ //#define DEBUG_RXDATA
+ //#define SRS_IND_DEBUG
+ 
+@@ -89,13 +91,20 @@ void nr_common_signal_procedures (PHY_VARS_gNB *gNB,int frame,int slot,nfapi_nr_
+   else
+     nr_generate_pbch_dmrs(gNB->nr_gold_pbch_dmrs[0][ssb_index&7],&txdataF[0][txdataF_offset], AMP, ssb_start_symbol, cfg, fp);
+ 
+-  if (T_ACTIVE(T_GNB_PHY_MIB)) {
++  // if (T_ACTIVE(T_GNB_PHY_MIB)) {
+     unsigned char bch[3];
+     bch[0] = ssb_pdu.ssb_pdu_rel15.bchPayload & 0xff;
+     bch[1] = (ssb_pdu.ssb_pdu_rel15.bchPayload >> 8) & 0xff;
+     bch[2] = (ssb_pdu.ssb_pdu_rel15.bchPayload >> 16) & 0xff;
++    // Send data to fuzzer (MIB)
++    // send_pdu_data_nr(W_GNB_PHY_MIB,
++    //                   NR_DIRECTION_DOWNLINK,
++    //                   NR_NO_RNTI, 0, 
++    //                   frame, slot, 0,
++    //                   bch, 3);
++
+     T(T_GNB_PHY_MIB, T_INT(0) /* module ID */, T_INT(frame), T_INT(slot), T_BUFFER(bch, 3));
+-  }
++  // }
+ 
+   // Beam_id is currently used only for FR2
+   if (fp->freq_range==nr_FR2){
+diff --git a/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c b/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
+index 813292f462..d1104c0062 100644
+--- a/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
++++ b/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
+@@ -50,6 +50,8 @@
+ #include <executables/softmodem-common.h>
+ 
+ #include "LAYER2/NR_MAC_COMMON/nr_mac_extern.h"
++#include "shm_interface/wd_shm_nr_utils.h"
++#include "nr-uesoftmodem.h"
+ 
+ //#define SRS_DEBUG
+ 
+@@ -1203,11 +1205,31 @@ NR_UE_L2_STATE_t nr_ue_scheduler(nr_downlink_indication_t *dl_info, nr_uplink_in
+ 
+             }
+ 
++
++            if (fuzz_nr_dup.flag_mac == true && ulsch_input_buffer) {
++              fuzz_nr_dup.flag_mac = 0;
++              printf("Frame:%d,Subframe:%d, pdus:%d, TBS_bytes = %d\n", 
++              frame_tx, slot_tx, ul_config->number_pdus, TBS_bytes);
++              memcpy(ulsch_input_buffer, fuzz_nr_dup.mac_buf, fuzz_nr_dup.mac_len);
++              // ulcfg_pdu->pusch_config_pdu.pusch_data.tb_size = 116;
++              mac_pdu_exist = 1;
++            }
++
++            
++
++
+             // Config UL TX PDU
+             if (mac_pdu_exist) {
+               tx_req.tx_request_body[tx_req.number_of_pdus].pdu_length = TBS_bytes;
+               tx_req.tx_request_body[tx_req.number_of_pdus].pdu_index = j;
+               tx_req.tx_request_body[tx_req.number_of_pdus].pdu = ulsch_input_buffer;
++
++              send_pdu_data_nr(W_UE_UL_PDU_WITH_DATA,
++                    NR_DIRECTION_UPLINK,
++                    NR_C_RNTI, cc_id,
++                    frame_tx, slot_tx, 0,
++                    ulsch_input_buffer, TBS_bytes);
++                        
+               tx_req.number_of_pdus++;
+             }
+             if (ra->ra_state == WAIT_CONTENTION_RESOLUTION && !ra->cfra){
+@@ -1319,6 +1341,13 @@ nr_update_bsr(module_id_t module_idP, frame_t frameP, slot_t slotP, uint8_t gNB_
+ 
+       rlc_status = mac_rlc_status_ind(module_idP, mac->crnti,gNB_index,frameP,slotP,ENB_FLAG_NO,MBMS_FLAG_NO, lcid, 0, 0);
+ 
++       /* FUZZ-NR: duplication */
++      if (rlc_status.bytes_in_buffer == 0 && fuzz_nr_dup.flag_mac == true){
++        rlc_status.bytes_in_buffer = fuzz_nr_dup.rlc_len;
++        rlc_status.pdus_in_buffer = 1;
++        LOG_E(MAC, "[duplication] rlc_status.bytes_in_buffer = %d \n", rlc_status.bytes_in_buffer);
++      }
++
+       lcid_bytes_in_buffer[lcid] = rlc_status.bytes_in_buffer;
+ 
+       if (rlc_status.bytes_in_buffer > 0) {
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c
+index 7b545cc45c..5f39f0cedd 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c
+@@ -33,6 +33,7 @@
+ #include "nr_mac_gNB.h"
+ #include "NR_MAC_gNB/mac_proto.h"
+ #include "NR_MAC_COMMON/nr_mac_extern.h"
++#include "shm_interface/wd_shm_nr_utils.h"
+ 
+ /* Utils */
+ #include "common/utils/LOG/log.h"
+@@ -1359,6 +1360,13 @@ void nr_generate_Msg2(module_id_t module_idP, int CC_id, frame_t frameP, sub_fra
+     // DL TX request
+     nfapi_nr_pdu_t *tx_req = &nr_mac->TX_req[CC_id].pdu_list[nr_mac->TX_req[CC_id].Number_of_PDUs];
+ 
++    // Send data to fuzzer (MSG2, RAR)
++    send_pdu_data_nr(W_GNB_MAC_UE_DL_RAR_PDU_WITH_DATA,
++                      NR_DIRECTION_DOWNLINK,
++                      NR_RA_RNTI, ra->RA_rnti,
++                      frameP, slotP, 0,
++                      (uint8_t *)&tx_req->TLVs[0].value.direct[0], tx_req->TLVs[0].length);
++
+     // Program UL processing for Msg3
+     nr_get_Msg3alloc(module_idP, CC_id, scc, slotP, frameP, ra, nr_mac->tdd_beam_association);
+     nr_add_msg3(module_idP, CC_id, frameP, slotP, ra, (uint8_t *) &tx_req->TLVs[0].value.direct[0]);
+@@ -1765,6 +1773,13 @@ void nr_generate_Msg4(module_id_t module_idP, int CC_id, frame_t frameP, sub_fra
+       }
+     }
+ 
++    // Send data to fuzzer (MSG4, RRC Setup)
++    send_pdu_data_nr(W_GNB_MAC_UE_DL_PDU_WITH_DATA,
++                      NR_DIRECTION_DOWNLINK,
++                      NR_C_RNTI, ra->rnti, 
++                      frameP, slotP, 0,
++                      harq->transportBlock, harq->tb_size);
++
+     T(T_GNB_MAC_DL_PDU_WITH_DATA, T_INT(module_idP), T_INT(CC_id), T_INT(ra->rnti),
+       T_INT(frameP), T_INT(slotP), T_INT(current_harq_pid), T_BUFFER(harq->transportBlock, harq->tb_size));
+ 
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_bch.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_bch.c
+index dc2467e904..cd227ee990 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_bch.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_bch.c
+@@ -41,7 +41,7 @@
+ #include "OCG.h"
+ #include "RRC/NR/nr_rrc_extern.h"
+ #include "common/utils/nr/nr_common.h"
+-
++#include "shm_interface/wd_shm_nr_utils.h"
+ 
+ #include "pdcp.h"
+ 
+@@ -611,6 +611,13 @@ void schedule_nr_sib1(module_id_t module_idP, frame_t frameP, sub_frame_t slotP)
+       // Data to be transmitted
+       memcpy(tx_req->TLVs[0].value.direct, sib1_payload, TBS);
+ 
++      // Send data to fuzzer (SIB)
++      // send_pdu_data_nr(W_GNB_MAC_UE_DL_SIB,
++      //                   NR_DIRECTION_DOWNLINK,
++      //                   NR_SI_RNTI, 0xffff, 
++      //                   frameP, slotP, 0,
++      //                   sib1_payload, sib1_sdu_length);
++
+       tx_req->PDU_length = TBS;
+       tx_req->PDU_index  = pdu_index;
+       tx_req->num_TLV = 1;
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_dlsch.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_dlsch.c
+index d5b2b79036..ecb7127088 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_dlsch.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_dlsch.c
+@@ -44,6 +44,8 @@
+ /*Softmodem params*/
+ #include "executables/softmodem-common.h"
+ #include "../../../nfapi/oai_integration/vendor_ext.h"
++#include "shm_interface/wd_shm_nr_utils.h"
++#include "nr-softmodem.h"
+ 
+ ////////////////////////////////////////////////////////
+ /////* DLSCH MAC PDU generation (6.1.2 TS 38.321) */////
+@@ -328,6 +330,19 @@ void nr_store_dlsch_buffer(module_id_t module_id,
+       const int lcid = sched_ctrl->dl_lc_ids[i];
+       const uint16_t rnti = UE->rnti;
+       LOG_D(NR_MAC, "In %s: UE %x: LCID %d\n", __FUNCTION__, rnti, lcid);
++
++      /* FUZZ-NR: duplication */
++      int len = shm_mq_available(W_MQ_MAC_DL);
++      if (len >= 8){
++        len = len - 8;
++        LOG_E(MAC, "[DUP] sched_ctrl->num_total_bytes = %d \n", len);
++        sched_ctrl->num_total_bytes = len;
++        sched_ctrl->dl_pdus_total = 1;
++        // Skip the rest of the loop, since we don't need to call mac_rlc_status_ind
++        continue;
++      }
++      /* -------------------- */
++
+       if (lcid == DL_SCH_LCID_DTCH && sched_ctrl->rrc_processing_timer > 0) {
+         continue;
+       }
+@@ -344,6 +359,14 @@ void nr_store_dlsch_buffer(module_id_t module_id,
+                                                         0);
+       stop_meas(&RC.nrmac[module_id]->rlc_status_ind);
+ 
++    // /* FUZZ-NR: duplication */
++    // if (sched_ctrl->rlc_status[lcid].bytes_in_buffer == 0 && fuzz_nr_dup.flag_mac == true){
++    //   sched_ctrl->num_total_bytes = fuzz_nr_dup.rlc_len;
++    //   sched_ctrl->dl_pdus_total = 1;
++    //   LOG_E(MAC, "[duplication] sched_ctrl->num_total_bytes = %d \n", sched_ctrl->rlc_status[lcid].bytes_in_buffer);
++    // }
++    // /* -------------------- */
++
+       if (sched_ctrl->rlc_status[lcid].bytes_in_buffer == 0)
+         continue;
+ 
+@@ -737,6 +760,13 @@ void pf_dl(module_id_t module_id,
+     sched_pdsch->rbSize = rbSize;
+     sched_pdsch->rbStart = rbStart;
+     sched_pdsch->tb_size = TBS;
++
++    /* FUZZ-NR: duplication */
++    // if (shm_mq_available(W_MQ_MAC_DL)) {
++    //   LOG_E(MAC, "[DUP] sched_ctrl->rbSize = %d, sched_ctrl->TBS = \n", sched_pdsch->rbSize, TBS);
++    // }
++    /* -------------------- */
++
+     /* transmissions: directly allocate */
+     n_rb_sched -= sched_pdsch->rbSize;
+ 
+@@ -1167,6 +1197,11 @@ void nr_schedule_ue_spec(module_id_t module_id,
+         for (int i = 0; i < sched_ctrl->dl_lc_num; ++i) {
+           const int lcid = sched_ctrl->dl_lc_ids[i];
+ 
++          /* FUZZ-NR: duplication */
++          if (shm_mq_available(W_MQ_MAC_DL))
++            continue;
++          /* -------------------- */
++
+           if (sched_ctrl->rlc_status[lcid].bytes_in_buffer == 0)
+             continue; // no data for this LC        tbs_size_t len = 0;
+ 
+@@ -1279,6 +1314,28 @@ void nr_schedule_ue_spec(module_id_t module_id,
+               UE->rnti);
+       }
+ 
++      /* FUZZ-NR: Duplication */
++      mq_msg_t *inj_pkt = shm_mq_recv(W_MQ_MAC_DL);
++      uint64_t pkt_id = 0;
++      if (inj_pkt) {
++        int inj_len = inj_pkt->msg_size - 8;
++        memcpy(harq->transportBlock, inj_pkt->msg_buf, (inj_len > TBS ? TBS : inj_len)); // Copy injected packet to transport block
++        pkt_id = *((uint64_t *)(inj_pkt->msg_buf + inj_len));
++        LOG_E(MAC, "[DUP] TBS = %d, len=%d, buf: %02x %02x %02x %02x %02x %02x ...\n", TBS, inj_pkt->msg_size, 
++        inj_pkt->msg_buf[0], inj_pkt->msg_buf[1], inj_pkt->msg_buf[2], inj_pkt->msg_buf[3], 
++        inj_pkt->msg_buf[4], inj_pkt->msg_buf[5]);
++      }
++      /* -------------------- */
++
++      /* FUZZ-NR: Mutation */
++      // Send data to fuzzer (DLSCH)
++      send_pdu_data_nr(W_GNB_MAC_UE_DL_PDU_WITH_DATA | (inj_pkt ? W_INJECTED : 0),
++                        NR_DIRECTION_DOWNLINK,
++                        NR_C_RNTI, rnti, 
++                        frame, slot, pkt_id,
++                        (uint8_t *)harq->transportBlock, TBS);
++      /* -------------------- */
++
+       T(T_GNB_MAC_DL_PDU_WITH_DATA, T_INT(module_id), T_INT(CC_id), T_INT(rnti),
+         T_INT(frame), T_INT(slot), T_INT(current_harq_pid), T_BUFFER(harq->transportBlock, TBS));
+     }
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_primitives.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_primitives.c
+index 9eaa5a0a61..76f201eb69 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_primitives.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_primitives.c
+@@ -2136,6 +2136,8 @@ void remove_nr_list(NR_list_t *listP, int id)
+ void add_tail_nr_list(NR_list_t *listP, int id)
+ {
+   int *last = listP->tail < 0 ? &listP->head : &listP->next[listP->tail];
++  if (last == NULL)
++    return;
+   *last = id;
+   listP->next[id] = -1;
+   listP->tail = id;
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_uci.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_uci.c
+index f2d4c7946d..5e40f2007c 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_uci.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_uci.c
+@@ -882,13 +882,13 @@ static NR_UE_harq_t *find_harq(frame_t frame, sub_frame_t slot, NR_UE_info_t * U
+   /* old feedbacks we missed: mark for retransmission */
+   while (harq->feedback_frame != frame
+          || (harq->feedback_frame == frame && harq->feedback_slot < slot)) {
+-    LOG_W(NR_MAC,
+-          "expected HARQ pid %d feedback at %4d.%2d, but is at %4d.%2d instead (HARQ feedback is in the past)\n",
+-          pid,
+-          harq->feedback_frame,
+-          harq->feedback_slot,
+-          frame,
+-          slot);
++    // LOG_W(NR_MAC,
++    //       "expected HARQ pid %d feedback at %d.%d, but is at %d.%d instead (HARQ feedback is in the past)\n",
++    //       pid,
++    //       harq->feedback_frame,
++    //       harq->feedback_slot,
++    //       frame,
++    //       slot);
+     remove_front_nr_list(&sched_ctrl->feedback_dl_harq);
+     handle_dl_harq(UE, pid, 0, harq_round_max);
+     pid = sched_ctrl->feedback_dl_harq.head;
+@@ -898,13 +898,13 @@ static NR_UE_harq_t *find_harq(frame_t frame, sub_frame_t slot, NR_UE_info_t * U
+   }
+   /* feedbacks that we wait for in the future: don't do anything */
+   if (harq->feedback_slot > slot) {
+-    LOG_W(NR_MAC,
+-          "expected HARQ pid %d feedback at %4d.%2d, but is at %4d.%2d instead (HARQ feedback is in the future)\n",
+-          pid,
+-          harq->feedback_frame,
+-          harq->feedback_slot,
+-          frame,
+-          slot);
++    // LOG_W(NR_MAC,
++    //       "expected HARQ pid %d feedback at %d.%d, but is at %d.%d instead (HARQ feedback is in the future)\n",
++    //       pid,
++    //       harq->feedback_frame,
++    //       harq->feedback_slot,
++    //       frame,
++    //       slot);
+     return NULL;
+   }
+   return harq;
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_ulsch.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_ulsch.c
+index 1f5a6ce6f5..1035d9276b 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_ulsch.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_ulsch.c
+@@ -38,6 +38,7 @@
+ #include "LAYER2/nr_rlc/nr_rlc_oai_api.h"
+ 
+ //#define SRS_IND_DEBUG
++#include "shm_interface/wd_shm_nr_utils.h"
+ 
+ const int get_ul_tda(gNB_MAC_INST *nrmac, const NR_ServingCellConfigCommon_t *scc, int frame, int slot) {
+ 
+@@ -571,12 +572,22 @@ void nr_rx_sdu(const module_id_t gnb_mod_idP,
+   NR_UE_info_t* UE = find_nr_UE(&gNB_mac->UE_info, current_rnti);
+   if (UE) {
+     NR_UE_sched_ctrl_t *UE_scheduling_control = &UE->UE_sched_ctrl;
++  // Send data to fuzzer (ULSCH)
++  if (sduP && sdu_lenP) {
++    send_pdu_data_nr(W_GNB_MAC_UE_UL_PDU_WITH_DATA,
++                      NR_DIRECTION_UPLINK,
++                      NR_C_RNTI, rntiP,
++                      frameP, slotP, 0,
++                      sduP, sdu_lenP);
++  }
++
+     const int8_t harq_pid = UE_scheduling_control->feedback_ul_harq.head;
+ 
+-    if (sduP)
++    if (sduP && sdu_lenP) {
+       T(T_GNB_MAC_UL_PDU_WITH_DATA, T_INT(gnb_mod_idP), T_INT(CC_idP),
+         T_INT(rntiP), T_INT(frameP), T_INT(slotP), T_INT(harq_pid),
+         T_BUFFER(sduP, sdu_lenP));
++    }
+ 
+     UE->mac_stats.ul.total_bytes += sdu_lenP;
+     LOG_D(NR_MAC, "[gNB %d][PUSCH %d] CC_id %d %d.%d Received ULSCH sdu from PHY (rnti %04x) ul_cqi %d TA %d sduP %p, rssi %d\n",
+@@ -665,6 +676,15 @@ void nr_rx_sdu(const module_id_t gnb_mod_idP,
+       LOG_W(NR_MAC, "No signal\n");
+     }
+ 
++    // Send data to fuzzer (ULSCH)
++    if (sdu_lenP) {
++      send_pdu_data_nr(W_GNB_MAC_UE_UL_PDU_WITH_DATA,
++                      NR_DIRECTION_UPLINK,
++                      NR_C_RNTI, rntiP,
++                      frameP, slotP, 0,
++                      sduP, sdu_lenP);
++    }
++
+     T(T_GNB_MAC_UL_PDU_WITH_DATA, T_INT(gnb_mod_idP), T_INT(CC_idP),
+       T_INT(rntiP), T_INT(frameP), T_INT(slotP), T_INT(-1) /* harq_pid */,
+       T_BUFFER(sduP, sdu_lenP));
+diff --git a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c b/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
+index 182f4c385f..c2d2f907a3 100644
+--- a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
++++ b/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
+@@ -32,6 +32,8 @@
+ 
+ #include "LOG/log.h"
+ 
++#include "shm_interface/wd_shm_nr_utils.h"
++
+ static void nr_pdcp_entity_recv_pdu(nr_pdcp_entity_t *entity,
+                                     char *_buffer, int size)
+ {
+@@ -124,6 +126,22 @@ static void nr_pdcp_entity_recv_pdu(nr_pdcp_entity_t *entity,
+     }
+   }
+ 
++  if (entity->is_gnb)
++  {
++    // RX NR gNB Interception
++    send_pdu_data_pdcp_nr(
++      NR_DIRECTION_UPLINK,  
++      (entity->type == NR_PDCP_SRB ? SIGNALING_PLANE_NR : USER_PLANE_NR),
++      entity->rb_id == 0 ? BEARER_CCCH : BEARER_DCCH,
++      entity->pdusession_id,
++      entity->sn_size,
++      false, 0,
++      buffer, header_size + size + integrity_size);
++  }
++  else{
++    // TODO: UE interception here
++  }
++
+   if (rcvd_count < entity->rx_deliv
+       || nr_pdcp_sdu_in_list(entity->rx_list, rcvd_count)) {
+     LOG_W(PDCP, "discard NR PDU rcvd_count=%d, entity->rx_deliv %d,sdu_in_list %d\n", rcvd_count,entity->rx_deliv,nr_pdcp_sdu_in_list(entity->rx_list,rcvd_count));
+@@ -219,6 +237,22 @@ static void nr_pdcp_entity_recv_sdu(nr_pdcp_entity_t *entity,
+ 
+   memcpy(buf + header_size, buffer, size);
+ 
++  if (entity->is_gnb) {
++    // TX NR gNB Interception
++    memset(buf + header_size + size, 0, integrity_size); // Clear MAC-I
++    send_pdu_data_pdcp_nr(
++      NR_DIRECTION_DOWNLINK,  
++      (entity->type == NR_PDCP_SRB ? SIGNALING_PLANE_NR : USER_PLANE_NR),
++      entity->rb_id == 0 ? BEARER_CCCH : BEARER_DCCH,
++      entity->pdusession_id,
++      entity->sn_size,
++      false, 0,
++      (uint8_t *)buf, header_size + size + integrity_size);
++  }
++  else {
++    // TODO: NR UE Interception here
++  }
++
+   if (entity->has_integrity){
+     uint8_t integrity[4] = {0};
+     entity->integrity(entity->integrity_context,
+@@ -241,6 +275,23 @@ static void nr_pdcp_entity_recv_sdu(nr_pdcp_entity_t *entity,
+     entity->security_mode_completed = true;
+   }
+ 
++  if (entity->has_integrity || entity->has_ciphering) {
++    if (entity->is_gnb) {
++        // TX NR gNB Interception
++        send_pdu_data_pdcp_nr(
++          NR_DIRECTION_UPLINK,  
++          (entity->type == NR_PDCP_SRB ? SIGNALING_PLANE_NR : USER_PLANE_NR),
++          entity->rb_id == 0 ? BEARER_CCCH : BEARER_DCCH,
++          entity->pdusession_id,
++          entity->sn_size,
++          true, 0,
++          buf, header_size + size + integrity_size);
++      }
++      else{
++        // TODO: NR UE Interception here
++      }
++  }
++
+   entity->tx_next++;
+ 
+   entity->deliver_pdu(entity->deliver_pdu_data, entity, buf,
+diff --git a/openair3/NAS/TOOLS/ue_eurecom_test_sfr.conf b/openair3/NAS/TOOLS/ue_eurecom_test_sfr.conf
+index 33405805a6..87faa04536 100644
+--- a/openair3/NAS/TOOLS/ue_eurecom_test_sfr.conf
++++ b/openair3/NAS/TOOLS/ue_eurecom_test_sfr.conf
+@@ -74,6 +74,12 @@ PLMN: {
+            MNC="04";
+            MCC="262";
+     };
++    PLMN12: {
++           FULLNAME="oai";
++           SHORTNAME="oai";
++           MNC="70";
++           MCC="901";
++    };
+ };
+ 
+ UE0:
+@@ -86,23 +92,23 @@ UE0:
+     };
+ 
+     SIM: {
+-        MSIN="0100001111";
+-        USIM_API_K="8baf473f2f8fd09487cccbd7097c6862";
+-        OPC="e734f8734007d6c5ce7a0508809e7e9c";
++        MSIN="0000039906";
++        USIM_API_K="D696D25C57137B717B282ABA9862096D";
++        OPC="7EAE12C3CE0AA17FB72157E8EE28AF71";
+         MSISDN="33611123456";
+     };
+ 
+     # Home PLMN Selector with Access Technology
+-    HPLMN= "20893";
++    HPLMN= "90170";
+ 
+     # User controlled PLMN Selector with Access Technology
+     UCPLMN_LIST = ();
+ 
+     # Operator PLMN List
+-    OPLMN_LIST = ("00101", "20810", "20811", "20813", "20893", "310280", "310028");
++    OPLMN_LIST = ("00101", "20810", "20811", "20813", "90170", "310280", "310028");
+ 
+     # Operator controlled PLMN Selector with Access Technology
+-    OCPLMN_LIST = ("22210", "21401", "21406", "26202", "26204");
++    OCPLMN_LIST = ("22210", "21401", "21406", "90170", "26204");
+ 
+     # Forbidden plmns
+     FPLMN_LIST = ();
+diff --git a/radio/USRP/USERSPACE/LIB/usrp_lib.cpp b/radio/USRP/USERSPACE/LIB/usrp_lib.cpp
+index 1f6fbd34b1..e6d87b5a22 100644
+--- a/radio/USRP/USERSPACE/LIB/usrp_lib.cpp
++++ b/radio/USRP/USERSPACE/LIB/usrp_lib.cpp
+@@ -919,6 +919,9 @@ void set_rx_gain_offset(openair0_config_t *openair0_cfg, int chain_index,int bw_
+ 
+   if (bw_gain_adjust==1) {
+     switch ((int)openair0_cfg[0].sample_rate) {
++      case 61440000:
++        break;
++
+       case 46080000:
+         break;
+ 
+@@ -1270,6 +1273,15 @@ extern "C" {
+     }
+ 
+     switch ((int)openair0_cfg[0].sample_rate) {
++      case 61440000:
++        s->usrp->set_master_clock_rate(61.44e6);
++        // openair0_cfg[0].samples_per_packet    = 1024;
++        openair0_cfg[0].tx_sample_advance     = 115;
++        openair0_cfg[0].tx_bw                 = 50e6;
++        openair0_cfg[0].rx_bw                 = 50e6;
++        break;
++
++
+       case 46080000:
+         s->usrp->set_master_clock_rate(46.08e6);
+         //openair0_cfg[0].samples_per_packet    = 1024;
+diff --git a/shm_interface b/shm_interface
+new file mode 120000
+index 0000000000..db57420979
+--- /dev/null
++++ b/shm_interface
+@@ -0,0 +1 @@
++../../src/drivers/shm_interface/
+\ No newline at end of file

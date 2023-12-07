@@ -1,0 +1,211 @@
+{
+    "config": {
+        "Fuzzing": {
+            "DefaultDuplicationProbability": 0.049999999999999684,
+            "DefaultMutationFieldProbability": 0.10000000000000002,
+            "DefaultMutationProbability": 0.9000000000000002,
+            "DefaultMutators": [
+                "Random",
+                "RandomBit",
+                "RandomZeroByte",
+                "RandomFullByte",
+                "ToggleBit"
+            ],
+            "DefaultSelectors": [
+                "Random",
+                "Sequential",
+                "Overlap"
+            ],
+            "Excludes": [
+                {
+                    "ApplyTo": "",
+                    "Description": "",
+                    "Filter": ""
+                }
+            ],
+            "MaxDuplicationTime": 6000,
+            "Mutator": 1,
+            "PacketRetry": false,
+            "PacketRetryTimeoutMS": 2500,
+            "Selector": 0,
+            "enable_duplication": false,
+            "enable_mutation": true,
+            "enable_optimization": false
+        },
+        "LTE": {
+            "AutoStartBaseStation": true,
+            "AutoStartCoreNetwork": true,
+            "Band": "b7",
+            "DefaultTestFields": [
+                "mac-lte.dlsch.lcid",
+                "mac-lte.sch.length",
+                "lte-rrc.rrc_TransactionIdentifier",
+                "lte-rrc.logicalChannelGroup",
+                "lte-rrc.t_PollRetransmit",
+                "lte-rrc.integrityProtAlgorithm",
+                "nas_eps.security_header_type"
+            ],
+            "EnableSimulator": false,
+            "SimulatorDelayUS": 2000,
+            "SimulatorUEArguments": "-r 25 --ue-rxgain 140 --basicsim",
+            "TestField": 1,
+            "TestFieldEnable": false,
+            "enable_epc": true,
+            "enable_epc_duplication": true,
+            "enable_epc_fuzzing": true,
+            "zmq_address_cmd": "tcp://127.0.0.1:5561",
+            "zmq_address_duplication": "tcp://127.0.0.1:5563",
+            "zmq_address_events": "tcp://127.0.0.1:5562",
+            "zmq_server": false,
+            "zmq_topic_commands": "",
+            "zmq_topic_events": ""
+        },
+        "Monitor": {
+            "ADB": {
+                "ADBDevice": "",
+                "ADBFilter": "bt",
+                "ADBMagicWords": [
+                    "TCC BT"
+                ],
+                "ADBProgram": "logcat"
+            },
+            "Enable": true,
+            "Microphone": {
+                "MicrophoneDetectionSensitivity": 0.5,
+                "MicrophoneDeviceId": -1
+            },
+            "MonitorType": 0,
+            "MonitorTypeList": [
+                "Serial",
+                "SSH",
+                "Microphone",
+                "ADB"
+            ],
+            "PrintToStdout": true,
+            "SSH": {
+                "SSHCommand": "sudo dmesg -C && sudo dmesg -e -w",
+                "SSHEnablePreCommands": true,
+                "SSHHostAddress": "127.0.0.1",
+                "SSHMagicWords": [
+                    "Oops:",
+                    "BUG:",
+                    "RIP:",
+                    "Call Trace:"
+                ],
+                "SSHPassword": "megaman500",
+                "SSHPort": 22,
+                "SSHPreCommands": [
+                    "sudo sh -c \"echo 'module btusb +p' > /sys/kernel/debug/dynamic_debug/control\"",
+                    "sudo sh -c \"echo 'module btintel +p' > /sys/kernel/debug/dynamic_debug/control\"",
+                    "sudo sh -c \"echo 'module bluetooth +p' > /sys/kernel/debug/dynamic_debug/control\"",
+                    "sudo sh -c \"echo 'module rfcomm +p' > /sys/kernel/debug/dynamic_debug/control\"",
+                    "sudo hciconfig hci0 inqparms 18:18",
+                    "sudo hciconfig hci0 pageparms 18:18"
+                ],
+                "SSHUsername": "matheus"
+            },
+            "SerialUART": {
+                "SerialBaudRate": 115200,
+                "SerialMagicWords": [
+                    "Guru Meditation Error",
+                    "Abort()"
+                ],
+                "SerialPortName": "/dev/ttyUSB2"
+            }
+        },
+        "Name": "LTE",
+        "Options": {
+            "AutoRestart": false,
+            "CoreDump": true,
+            "DefaultPCAPProtocol": "proto:mac-lte-framed",
+            "DefaultPrograms": [
+                "/home/matheus/5g/open5gs-core/run.sh",
+                "/home/matheus/5g/oai_lte_network/openair-ran/cmake_targets/lte_build_oai/build/lte-softmodem",
+                "/home/matheus/5g/oai_lte_network/openair-ran/cmake_targets/lte_build_oai/build/lte-uesoftmodem"
+            ],
+            "DefaultProtocol": "proto:mac-lte-framed",
+            "FileLogger": true,
+            "LaunchProgramWithGDB": false,
+            "LiveCapture": false,
+            "MainThreadCore": -1,
+            "Program": 0,
+            "SaveCapture": true
+        },
+        "ServerOptions": {
+            "Enable": true,
+            "ListenAddress": "0.0.0.0",
+            "Logging": false,
+            "Port": 3000,
+            "Type": "SocketIO"
+        },
+        "StateMapper": {
+            "Enable": false,
+            "Mapping": [
+                {
+                    "AppendSummary": false,
+                    "Filter": "nas-eps",
+                    "LayerName": "NAS",
+                    "StateNameField": [
+                        "nas_eps.nas_msg_esm_type",
+                        "nas_eps.nas_msg_emm_type"
+                    ]
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "lte_rrc",
+                    "LayerName": "RRC",
+                    "StateNameField": [
+                        "lte-rrc.c1_15",
+                        "lte-rrc.c1_14",
+                        "lte-rrc.c1_13",
+                        "lte-rrc.c1_12",
+                        "lte-rrc.c1"
+                    ]
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "pdcp-lte",
+                    "LayerName": "PDCP",
+                    "StateNameField": "pdcp-lte.pdu-type"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "rlc-lte",
+                    "LayerName": "RLC",
+                    "StateNameField": [
+                        "rlc-lte.am.cpt",
+                        "rlc-lte.am.frame-type",
+                        "rlc-lte.channel-type"
+                    ]
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "mac-lte",
+                    "LayerName": "MAC",
+                    "StateNameField": "mac-lte.ulsch.lcid"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "mac-lte",
+                    "LayerName": "MAC",
+                    "StateNameField": "mac-lte.rnti-type"
+                }
+            ],
+            "Overrides": {},
+            "PacketLayerOffset": 1,
+            "SaveFolder": "configs/models/lte_enb/",
+            "ShowAllStates": true
+        },
+        "Validation": {
+            "CommonRejections": [
+                {
+                    "Description": "",
+                    "Filter": ""
+                }
+            ],
+            "DefaultFragmentsLayer": "rlc-lte",
+            "DefaultPacketLayer": "pdcp-lte",
+            "InitialState": "IDLE"
+        }
+    }
+}

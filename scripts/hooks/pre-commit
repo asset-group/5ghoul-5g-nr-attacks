@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+echo "{\"version\":$(git show -s --date=format:'%Y%m%d%H%M' --format=%cd),\"repo\":\"$(git config --get remote.origin.url)\"}" > version.json
+
+git add -f version.json

@@ -1,0 +1,418 @@
+{
+    "config": {
+        "Name": "Bluetooth",
+        "Options": {
+            "DefaultProtocolName": "encap:1",
+            "DefaultProtocolEncapName": "encap:1",
+            "SaveProtocolCapture": true,
+            "LiveProtocolCapture": false,
+            "SaveLogsToFile": true,
+            "SaveLatencyMetrics": false,
+            "SkipPacketProcessing": false,
+            "Program": 1,
+            "AutoStartProgram": true,
+            "AutoRestartProgram": false,
+            "LaunchProgramWithGDB": false,
+            "ProgramsList": [
+                ""
+            ],
+            "MainThreadCore": -1,
+            "SaveCoreDump": false
+        },
+        "Bluetooth": {
+            "AuthReq": 3,
+            "BridgeHCI": true,
+            "DisableRoleSwitch": false,
+            "EnableBounding": true,
+            "IOCap": 3,
+            "InterceptTX": true,
+            "LMPSniffing": true,
+            "OwnBDAddress": "bc:bb:b1:8c:dd:4e",
+            "Pin": "0000",
+            "RXBypass": false,
+            "RXBypassOnDemand": false,
+            "RandomizeOwnBTAddress": true,
+            "SaveHCIPackets": false,
+            "SerialAutoDiscovery": false,
+            "SerialBaudRate": 4000000,
+            "SerialEnableDebug": false,
+            "SerialEnableDebugHCI": false,
+            "SerialPort": "/dev/ttyUSB1",
+            "ShowNullPollPackets": false,
+            "TargetBDAddress": "3c:61:05:4c:34:56",
+            "TargetBDAddressList": [
+                ""
+            ]
+        },
+        "Wifi": {
+            "WifiInterface": "wlan1",
+            "WifiSSID": "TEST_KRA",
+            "WifiPassword": "testtest",
+            "WifiChannel": 9,
+            "WifiKeyAuth": 0,
+            "WifiKeyAuthList": [
+                "WPA-EAP",
+                "WPA-PSK",
+                "SAE"
+            ],
+            "WifiRSNCrypto": 0,
+            "WifiRSNCryptoList": [
+                "CCMP",
+                "TKIP"
+            ],
+            "WifiUsername": "matheus_garbelini",
+            "WifiEAPMethod": 0,
+            "WifiEAPMethodList": [
+                "PEAP",
+                "PWD",
+                "TTLS",
+                "TLS"
+            ],
+            "WifiAllowInternet": true,
+            "WifiDHCP": true,
+            "WifiDHCPGatewayAddress": "192.172.42.1",
+            "Wifi802.11w": false,
+            "WifiCountryCode": "US"
+        },
+        "NR5G": {
+            "MCC": "208",
+            "MNC": "95",
+            "AutoStartBaseStation": false,
+            "AutoStartCoreNetwork": false,
+            "BaseStationConfigFile": "n78.106.conf",
+            "BaseStationArguments": "--sa --continuous-tx -E",
+            "CoreNetworkConfigFile": "open5gs.yaml",
+            "EnableSimulator": false,
+            "SimulatorDelayUS": 2000,
+            "SimulationConnectionTimeoutMS": 4000,
+            "SimulatorUEArguments": "-r 25 --ue-rxgain 140 --basicsim",
+            "Subscribers": [
+                {
+                    "IMSI": "001010000000001",
+                    "K": "00112233445566778899AABBCCDDEEFF",
+                    "OPC": "00112233445566778899AABBCCDDEEFF",
+                    "APN": "default"
+                },
+                {
+                    "IMSI": "001010000000001",
+                    "K": "00112233445566778899AABBCCDDEEFF",
+                    "OP": "00112233445566778899AABBCCDDEEFF",
+                    "APN": "default"
+                }
+            ]
+        },
+        "Fuzzing": {
+            "EnableDuplication": false,
+            "EnableMutation": false,
+            "EnableOptimization": false,
+            "DefaultDuplicationProbability": 0.1,
+            "DefaultMutationProbability": 0.1,
+            "DefaultMutationFieldProbability": 0.1,
+            "FieldMutationBackoffMultipler": 0.5,
+            "MaxFieldsMutation": 6,
+            "NormalizeProtocolLayersMutation": false,
+            "MaxDuplicationTimeMS": 6000,
+            "PacketRetry": true,
+            "PacketRetryTimeoutMS": 2000,
+            "GlobalTimeout": true,
+            "GlobalTimeoutSeconds": 45,
+            "StateLoopDetection": false,
+            "StateLoopDetectionThreshold": 5,
+            "RandomSeed": 123456789,
+            "SeedIncrementEveryIteration": false,
+            "RestoreSessionOnStartup": false,
+            "SaveSessionOnExit": false,
+            "StopCondition": {
+                "MaxIterations": 1000,
+                "MaxTimeMinutes": 240,
+                "StopOnMaxIterations": true,
+                "StopOnMaxTimeMinutes": true
+            },
+            "Selector": 0,
+            "Mutator": 1,
+            "DefaultMutators": [
+                "Random",
+                "RandomBit",
+                "RandomZeroByte",
+                "RandomFullByte",
+                "ToggleBit"
+            ],
+            "DefaultSelectors": [
+                "Random",
+                "Sequential",
+                "Overlap"
+            ],
+            "Excludes": [
+                {
+                    "ApplyTo": "A",
+                    "Description": "LMP_set_AFH",
+                    "Filter": "btbrlmp.op == 60"
+                },
+                {
+                    "ApplyTo": "A",
+                    "Description": "LMP_detach",
+                    "Filter": "btbrlmp.op == 7"
+                },
+                {
+                    "ApplyTo": "A",
+                    "Description": "FHS",
+                    "Filter": "fhs"
+                },
+                {
+                    "ApplyTo": "D",
+                    "Description": "L2CAP",
+                    "Filter": "btl2cap"
+                }
+            ]
+        },
+        "StateMapper": {
+            "Enable": false,
+            "PacketLayerOffset": 1,
+            "SaveFolder": "configs/models/",
+            "ShowAllStates": false,
+            "PcapPseudoHeaderDirectionOffset": 50,
+            "IgnoreMalformedPackets": true,
+            "Mapping": [
+                {
+                    "AppendSummary": false,
+                    "Filter": "",
+                    "LayerName": "",
+                    "StateNameField": ""
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "",
+                    "LayerName": "",
+                    "StateNameField": [
+                        ""
+                    ]
+                }
+            ],
+            "Overrides": {}
+        },
+        "Validation": {
+            "CommonRejections": [
+                {
+                    "Description": "",
+                    "Filter": ""
+                }
+            ],
+            "DefaultFragmentsLayer": "",
+            "DefaultPacketLayer": "",
+            "InitialState": "IDLE"
+        },
+        "Monitor": {
+            "Enable": true,
+            "PrintToStdout": true,
+            "WaitExternalEvent": false,
+            "ActiveMonitorTypes": [
+                0
+            ],
+            "MonitorsTypeList": [
+                "Serial",
+                "SSH",
+                "Microphone",
+                "ADB",
+                "QCDM"
+            ],
+            "SerialUART": {
+                "SerialBaudRate": 115200,
+                "SerialMagicWords": [
+                    "DBFW_ASSERT_TYPE_FATAL!!!",
+                    "WRAP THOR AI",
+                    "BT Started!",
+                    "Guru Meditation Error",
+                    "abort()"
+                ],
+                "SerialPortName": "/dev/ttyUSB3"
+            },
+            "ADB": {
+                "ADBDevice": "",
+                "ADBFilter": "",
+                "ADBMagicWords": [
+                    "ModemEvent: modem_failure",
+                    "ModemRestartStats",
+                    "SOC crashed",
+                    "Unable to wake SOC"
+                ],
+                "ADBProgram": "logcat",
+                "ADBSubSystem": "radio,crash,system,kernel"
+            },
+            "Microphone": {
+                "MicrophoneDetectionSensitivity": 0.7,
+                "MicrophoneDeviceId": -1
+            },
+            "SSH": {
+                "SSHCommand": "sudo dmesg -C && sudo dmesg -e -w",
+                "SSHEnablePreCommands": true,
+                "SSHHostAddress": "127.0.0.1",
+                "SSHMagicWords": [
+                    "Backtrace:",
+                    "Oops:",
+                    "BUG:",
+                    "RIP:",
+                    "Call Trace:"
+                ],
+                "SSHPassword": "",
+                "SSHPort": 22,
+                "SSHPreCommands": [
+                    "sudo sh -c \"echo 'module btusb +p' > /sys/kernel/debug/dynamic_debug/control\"",
+                    "sudo sh -c \"echo 'module btintel +p' > /sys/kernel/debug/dynamic_debug/control\"",
+                    "sudo sh -c \"echo 'module bluetooth +p' > /sys/kernel/debug/dynamic_debug/control\"",
+                    "sudo sh -c \"echo 'module rfcomm +p' > /sys/kernel/debug/dynamic_debug/control\"",
+                    "sudo hciconfig hci0 inqparms 18:18",
+                    "sudo hciconfig hci0 pageparms 18:18"
+                ],
+                "SSHUsername": "matheus"
+            },
+            "QCDM": {
+                "QCDMADB": false,
+                "QCDMDevice": "/dev/ttyUSB0",
+                "QCDMMagicWords": [
+                    "testtest"
+                ]
+            }
+        },
+        "Services": {
+            "PythonAPIServer": {
+                "Enable": true,
+                "ListenAddress": "127.0.0.1",
+                "Port": 3000,
+                "APINamespace": "/",
+                "EnableEvents": false,
+                "Logging": false,
+                "ServerModule": 1,
+                "ServerModulesList": [
+                    "SocketIOServer",
+                    "RESTServer"
+                ]
+            },
+            "ReportsSender": {
+                "Enable": true,
+                "ReportModules": [
+                    {
+                        "Enabled": true,
+                        "Type": "Email",
+                        "Script": "gmail.py",
+                        "CredentialsFile": "modules/reportsender/credentials.json",
+                        "OnlyErrors": true,
+                        "To": [
+                            "mgarbelix@gmail.com"
+                        ],
+                        "MagicWords": [
+                            "[Crash]",
+                            "[Hang]",
+                            "[Reset]"
+                        ]
+                    }
+                ]
+            },
+            "TShark": {
+                "Enable": false,
+                "InterfacesName": [
+                    "usbmon2"
+                ],
+                "EnableDisplayFilter": true,
+                "DisplayFilter": "usb.transfer_type==0x02",
+                "UseTCPDumpForCapture": false
+            },
+            "UEModemManager": {
+                "Enable": false,
+                "APN": "internet",
+                "AllowedModes": "4g|5g",
+                "PreferredMode": "5g",
+                "Bands": "ngran-78",
+                "DisableFuzzingOnFirstConnection": true,
+                "AutoConnectModem": true,
+                "ConnectionTimeoutMS": 4000,
+                "UseOnlyATConnections": false,
+                "AutoConnectToAPN": true,
+                "ManualAPNConnection": false,
+                "ManualAPNConnectionDelayMS": 0,
+                "AutoReconnectModem": true,
+                "ResetModemOnGlobalTimeout": false,
+                "GlobalTimeoutsCount": 3,
+                "DefaultModemInterfacePath": "/dev/cdc-wdm1",
+                "AutoSearchModemInterfacePath": true,
+                "UseInUSBIPHostSSH": false,
+                "EnableADB": true,
+                "ADBDevice": "UWEUW4XG8XCA8PWS",
+                "ADBPIN": "110125"
+            },
+            "USBHubControl": {
+                "Enable": false,
+                "USBDevices": [
+                    {
+                        "Enabled": false,
+                        "Name": "Fibocom",
+                        "VIDPID": "2cb7:0104",
+                        "ResetOnProgramStartup": false
+                    },
+                    {
+                        "Enabled": false,
+                        "Name": "SIMCOM SIM8202G",
+                        "VIDPID": "1e0e:9001",
+                        "ResetOnProgramStartup": false
+                    },
+                    {
+                        "Enabled": true,
+                        "Name": "Quectel RM500Q-GL",
+                        "VIDPID": "2c7c:0800",
+                        "ResetOnProgramStartup": false
+                    },
+                    {
+                        "Enabled": false,
+                        "Name": "Telit FT980",
+                        "VIDPID": "1bc7:1050",
+                        "ResetOnProgramStartup": false
+                    },
+                    {
+                        "Enabled": false,
+                        "Name": "GOSN GM800",
+                        "VIDPID": "305a:1406",
+                        "ResetOnProgramStartup": false
+                    }
+                ],
+                "GlobalTimeoutsCount": 4,
+                "TogglePowerDelayMS": 2000,
+                "UseInUSBIPHostSSH": false
+            },
+            "USBIP": {
+                "Enable": false,
+                "ServerAddress": "172.18.37.220",
+                "Port": 3240,
+                "USBDevices": [
+                    {
+                        "Enabled": false,
+                        "Name": "Fibocom FM150-AE",
+                        "VIDPID": "2cb7:0104"
+                    },
+                    {
+                        "Enabled": false,
+                        "Name": "SIMCOM SIM8202G",
+                        "VIDPID": "1e0e:9001"
+                    },
+                    {
+                        "Enabled": false,
+                        "Name": "Quectel RM500Q-GL",
+                        "VIDPID": "2c7c:0800"
+                    },
+                    {
+                        "Enabled": false,
+                        "Name": "GOSN GM800",
+                        "VIDPID": "305a:1406",
+                        "ResetOnProgramStartup": false
+                    }
+                ],
+                "HostSSH": {
+                    "Enable": true,
+                    "Username": "deck",
+                    "Password": "deck",
+                    "Port": 22,
+                    "UnbindOnExit": true,
+                    "UploadFolder": "/tmp/wd_tools"
+                }
+            }
+        }
+    }
+}

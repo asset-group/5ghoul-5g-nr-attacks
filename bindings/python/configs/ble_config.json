@@ -1,0 +1,56 @@
+{
+    "config": {
+        "Name": "BLE",
+        "Options": {
+            "DefaultProtocolName": "encap:NORDIC_BLE",
+            "DefaultProtocolEncapName": "encap:NORDIC_BLE"
+        },
+        "StateMapper": {
+            "PacketLayerOffset": 1,
+            "Mapping": [
+                {
+                    "AppendSummary": false,
+                    "Filter": "btatt.uuid16",
+                    "LayerName": "GATT",
+                    "StateNameField": "btatt.uuid16"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "btatt.error_code",
+                    "LayerName": "ATT Error",
+                    "StateNameField": "btatt.error_code"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "btatt",
+                    "LayerName": "ATT",
+                    "StateNameField": "btatt.opcode.method"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "btsmp",
+                    "LayerName": "SMP",
+                    "StateNameField": "btsmp.opcode"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "btl2cap",
+                    "LayerName": "L2CAP",
+                    "StateNameField": "btl2cap.cmd_code"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "btle.l2cap_data",
+                    "LayerName": "L2CAP Fragment",
+                    "StateNameField": "btle.l2cap_data"
+                },
+                {
+                    "AppendSummary": false,
+                    "Filter": "btle",
+                    "LayerName": "LL Ctrl",
+                    "StateNameField": "btle.control_opcode"
+                }
+            ]
+        }
+    }
+}

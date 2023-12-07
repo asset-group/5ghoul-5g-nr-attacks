@@ -1,0 +1,50 @@
+PREREQUISITES
+
+	Libmpsse is currently supported on the Linux and OSX platforms.
+
+	Libmpsse requires swig as well as the libftdi and python development packages. 
+	These can typically be installed by your Linux distro's package manager, for Debian:
+
+		# apt-get install swig libftdi-dev python-dev autoconf automake libtool
+
+	For OSX, you will likely need to at least install libftdi from source.
+
+INSTALLATION
+
+	With the required prerequisites installed, libmpsse can be built and installed:
+
+		$ autoreconf --install
+		$ ./configure
+		$ make
+		# make install
+
+	Required paths, such as include and library directories, will typically be detected 
+	automatically by the configure script. To specify alternative directory paths, you 
+	may set the following environment variables:
+
+		SWIG   - Path to the swig binary
+		PYTHON - Path to the python binary
+
+	Example:
+
+		$ PYTHON=/usr/bin/python3 ./configure
+		$ make
+		# make install
+
+	To build without the Python wrapper libraries, specify the --disable-python argument
+	when running the configure script:
+
+		$ ./configure --disable-python
+
+BUILDING EXAMPLE CODE
+
+	After libmpsse has been installed, you can build the example C programs by running:
+
+		$ make examples
+
+UNINSTALLATION
+	
+	Libmpsse can be uninstalled from your system by running:
+
+		# make uninstall
+	

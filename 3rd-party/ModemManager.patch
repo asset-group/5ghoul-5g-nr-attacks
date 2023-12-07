@@ -1,0 +1,332 @@
+diff --git a/.gitignore b/.gitignore
+index 6b88d055..87dbe0cb 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -12,6 +12,13 @@
+ .libs
+ Makefile
+ Makefile.in
++ModemManager.patch
++libqrtr-glib/
++libqmi/
++libmbim/
++glib/
++build/
++runtime/
+ 
+ /INSTALL
+ /aclocal.m4
+diff --git a/build.sh b/build.sh
+new file mode 100755
+index 00000000..ea0a05d0
+--- /dev/null
++++ b/build.sh
+@@ -0,0 +1,29 @@
++#!/usr/bin/env bash
++
++export ROOT_PATH=$(pwd)
++export PKG_CONFIG_PATH=$ROOT_PATH/runtime/lib/$(uname -m)-linux-gnu/pkgconfig/
++# Enable relative path to install/libs folder
++export RPATHS="\$ORIGIN:\$ORIGIN/../:\$ORIGIN/../lib/$(uname -m)-linux-gnu:\$ORIGIN/../lib/"
++export LDFLAGS="-Wl,-rpath=$RPATHS"
++export XDG_DATA_DIRS=$ROOT_PATH/runtime/share/ # points g-ir-scanner to the correct /usr/share folder
++
++# build modem-manager
++meson setup build --buildtype=release --prefix=$ROOT_PATH/runtime/ -Dwerror=true \
++-Dgtk_doc=false -Dpolkit=no -Dman=false \
++-Dsystemdsystemunitdir=$ROOT_PATH/runtime/lib/systemd/system \
++-Dtests=false \
++-Dudevdir=$ROOT_PATH/runtime/lib/udev \
++-Dbash_completion=false
++ninja -C build install
++
++# Apply rpath to all shared libraries and executables
++find runtime -type f -executable -not -path "runtime/share/*" | xargs -i patchelf --set-rpath $RPATHS {} > /dev/null 2>&1 || true
++
++# Copy udev tules from runtime folder to /lib/udev/rules.d
++sudo cp $ROOT_PATH/runtime/lib/udev/rules.d/* /lib/udev/rules.d/ -R || true
++# Copy systemd config file
++sudo cp $ROOT_PATH/runtime/etc/dbus-1/system.d/org.freedesktop.ModemManager1.conf /etc/dbus-1/system.d/org.freedesktop.ModemManager1.conf
++sudo systemctl stop ModemManager || true
++sudo systemctl disable ModemManager || true
++
++echo "Done!"
+diff --git a/cli/meson.build b/cli/meson.build
+index b020749b..c4960918 100644
+--- a/cli/meson.build
++++ b/cli/meson.build
+@@ -38,6 +38,7 @@ executable(
+   include_directories: top_inc,
+   dependencies: deps,
+   install: true,
++  install_rpath: '/opt/ModemManager/lib/' + build_machine.cpu_family() + '-linux-gnu/',
+ )
+ 
+ if enable_bash_completion
+diff --git a/libmm-glib/meson.build b/libmm-glib/meson.build
+index de668dab..4ddb7521 100644
+--- a/libmm-glib/meson.build
++++ b/libmm-glib/meson.build
+@@ -137,6 +137,7 @@ libmm_glib = library(
+   dependencies: deps + [libmm_generated_dep],
+   c_args: '-DLIBMM_GLIB_COMPILATION',
+   install: true,
++  install_rpath: '/opt/ModemManager/lib/' + build_machine.cpu_family() + '-linux-gnu/',
+ )
+ 
+ libmm_glib_dep = declare_dependency(
+diff --git a/plugins/gosuncn/77-mm-gosuncn-port-types.rules b/plugins/gosuncn/77-mm-gosuncn-port-types.rules
+index 122c6666..ffce9aa7 100644
+--- a/plugins/gosuncn/77-mm-gosuncn-port-types.rules
++++ b/plugins/gosuncn/77-mm-gosuncn-port-types.rules
+@@ -14,4 +14,20 @@ ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1405", ENV{.MM_USBIFNUM}=="01", SUBS
+ ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1405", ENV{.MM_USBIFNUM}=="02", SUBSYSTEM=="tty", ENV{ID_MM_PORT_TYPE_AT_SECONDARY}="1"
+ ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1405", ENV{.MM_USBIFNUM}=="05", ENV{ID_MM_PORT_IGNORE}="1"
+ 
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1403", ENV{ID_MM_TTY_FLOW_CONTROL}="rts-cts"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1403", ENV{.MM_USBIFNUM}=="00", ENV{ID_MM_PORT_IGNORE}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1403", ENV{.MM_USBIFNUM}=="01", SUBSYSTEM=="tty", ENV{ID_MM_PORT_TYPE_AT_PRIMARY}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1403", ENV{.MM_USBIFNUM}=="02", ENV{ID_MM_PORT_IGNORE}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1403", ENV{.MM_USBIFNUM}=="03", ENV{ID_MM_PORT_IGNORE}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1403", ENV{.MM_USBIFNUM}=="04", ENV{ID_MM_PORT_IGNORE}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1403", ENV{.MM_USBIFNUM}=="05", ENV{ID_MM_PORT_IGNORE}="1"
++
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1406", ENV{ID_MM_TTY_FLOW_CONTROL}="rts-cts"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1406", ENV{.MM_USBIFNUM}=="00", ENV{ID_MM_PORT_IGNORE}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1406", ENV{.MM_USBIFNUM}=="01", SUBSYSTEM=="tty", ENV{ID_MM_PORT_TYPE_AT_PRIMARY}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1406", ENV{.MM_USBIFNUM}=="02", ENV{ID_MM_PORT_IGNORE}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1406", ENV{.MM_USBIFNUM}=="03", ENV{ID_MM_PORT_IGNORE}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1406", ENV{.MM_USBIFNUM}=="04", ENV{ID_MM_PORT_IGNORE}="1"
++ATTRS{idVendor}=="305a", ATTRS{idProduct}=="1406", ENV{.MM_USBIFNUM}=="05", ENV{ID_MM_PORT_IGNORE}="1"
++
+ LABEL="mm_gosuncn_port_types_end"
+diff --git a/plugins/meson.build b/plugins/meson.build
+index 9e081beb..67da0f22 100644
+--- a/plugins/meson.build
++++ b/plugins/meson.build
+@@ -981,6 +981,7 @@ foreach plugin_name, plugin_data: plugins
+     kwargs: module_args,
+     install: true,
+     install_dir: mm_pkglibdir,
++    install_rpath: '/opt/ModemManager/lib/' + build_machine.cpu_family() + '-linux-gnu/',
+   )
+ 
+   if enable_tests
+diff --git a/plugins/quectel/mm-plugin-quectel.c b/plugins/quectel/mm-plugin-quectel.c
+index 80e1b74d..28f78ad5 100644
+--- a/plugins/quectel/mm-plugin-quectel.c
++++ b/plugins/quectel/mm-plugin-quectel.c
+@@ -97,7 +97,7 @@ mm_plugin_create (void)
+                       MM_PLUGIN_ALLOWED_VENDOR_IDS,     vendor_ids,
+                       MM_PLUGIN_ALLOWED_VENDOR_STRINGS, vendor_strings,
+                       MM_PLUGIN_ALLOWED_AT,             TRUE,
+-                      MM_PLUGIN_REQUIRED_QCDM,          TRUE,
++                      MM_PLUGIN_ALLOWED_QCDM,           TRUE,
+                       MM_PLUGIN_ALLOWED_QMI,            TRUE,
+                       MM_PLUGIN_ALLOWED_MBIM,           TRUE,
+                       NULL));
+diff --git a/requirements.sh b/requirements.sh
+new file mode 100755
+index 00000000..6d0a6d74
+--- /dev/null
++++ b/requirements.sh
+@@ -0,0 +1,56 @@
++#!/usr/bin/env bash
++
++sudo apt install libmount-dev wget libselinux1-dev libelf-dev libdbus-1-dev libxslt1-dev gettext \
++gobject-introspection libgirepository1.0-dev libgudev-1.0-dev libsystemd-dev libpolkit-gobject-1-dev \
++xsltproc patchelf python3 -y
++
++export ROOT_PATH=$(pwd)
++export PKG_CONFIG_PATH=$ROOT_PATH/runtime/lib/$(uname -m)-linux-gnu/pkgconfig/
++# Enable relative path to install/libs folder
++export RPATHS="\$ORIGIN:\$ORIGIN/../:\$ORIGIN/../lib/$(uname -m)-linux-gnu:\$ORIGIN/../lib/"
++export LDFLAGS="-L$ROOT_PATH/runtime/lib/x86_64-linux-gnu/ -Wl,-rpath=$RPATHS"
++export CPPFLAGS="-I$ROOT_PATH/runtime/share/ -I$ROOT_PATH/runtime/include/"
++export XDG_DATA_DIRS=$ROOT_PATH/runtime/share/ # points g-ir-scanner to the correct /usr/share folder
++
++# Clone repos, checkout correct commits and build each library
++
++
++# build glib-2.0
++git clone https://github.com/GNOME/glib -b 2.58.3 --depth=1 --recursive
++cd glib
++meson setup _build --buildtype release --prefix=$ROOT_PATH/runtime/  -Dgtk_doc=false -Dman=false
++ninja -C _build install
++
++
++# build libmbim
++cd $ROOT_PATH
++git clone https://gitlab.freedesktop.org/mobile-broadband/libmbim.git --depth=1 --recursive
++COMMIT=122e68dfab5822831be42bcf95cb6a8c9463ddea
++cd libmbim
++git fetch --depth=1 origin $COMMIT
++git checkout $COMMIT
++meson setup build --prefix=$ROOT_PATH/runtime/ -Dgtk_doc=false -Dman=false -Dbash_completion=false \
++-Dudevdir=$ROOT_PATH/runtime/lib/udev
++ninja -C build install
++
++# build libqrtr-glib
++cd $ROOT_PATH
++git clone https://gitlab.freedesktop.org/mobile-broadband/libqrtr-glib.git --depth=1 --recursive
++COMMIT=756ff802fe9b7e7da8061caefb490d898c0cfe71
++cd libqrtr-glib
++git fetch --depth=1 origin $COMMIT
++git checkout $COMMIT
++meson setup build --prefix=$ROOT_PATH/runtime/ -Dgtk_doc=false -Dman=false
++ninja -C build install
++
++
++# build libqmi
++cd $ROOT_PATH
++git clone https://gitlab.freedesktop.org/mobile-broadband/libqmi.git --depth=1 --recursive
++COMMIT=785d261d4dd26231289e67cf051c345428e9cc87
++cd libqmi
++git fetch --depth=1 origin $COMMIT
++git checkout $COMMIT
++meson setup build --prefix=$ROOT_PATH/runtime/ -Dgtk_doc=false -Dman=false -Dbash_completion=false -Dcollection=basic \
++-Dudevdir=$ROOT_PATH/runtime/lib/udev
++ninja -C build install
+diff --git a/src/meson.build b/src/meson.build
+index e1b061c2..b2652014 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -316,6 +316,7 @@ executable(
+   c_args: c_args,
+   install: true,
+   install_dir: mm_sbindir,
++  install_rpath: '/opt/ModemManager/lib/' + build_machine.cpu_family() + '-linux-gnu/',
+ )
+ 
+ pkg.generate(
+diff --git a/src/mm-context.c b/src/mm-context.c
+index 92f8ffd4..d00c3aef 100644
+--- a/src/mm-context.c
++++ b/src/mm-context.c
+@@ -15,6 +15,8 @@
+ 
+ #include <config.h>
+ #include <stdlib.h>
++#include <stdio.h>
++#include <unistd.h>
+ 
+ #include <ModemManager.h>
+ #define _LIBMM_INSIDE_MM
+@@ -332,10 +334,65 @@ mm_context_get_test_enable (void)
+ }
+ #endif
+ 
++const gchar *
++get_plugindir(gboolean use_install_folder)
++{
++    static _Thread_local gchar executable_path[256];
++    static _Thread_local gchar cmd_output[256];
++
++    if(use_install_folder)
++        return PLUGINDIR;
++
++    // get executable path via /proc/self/exe
++    int ret = readlink("/proc/self/exe", executable_path, 256);
++    if (ret == -1) {
++        return PLUGINDIR;
++    }
++
++    gchar *dir_path = g_path_get_dirname(executable_path);
++
++    if (!dir_path)
++    {
++        g_printerr("dir_path\n"); 
++        return PLUGINDIR;
++    }
++
++    // Get arch name
++    FILE *arch_name_cmd = popen("uname -m", "r");
++    if (!arch_name_cmd)
++        return PLUGINDIR;
++
++    while(fgets(cmd_output, sizeof(cmd_output)-1, arch_name_cmd) != NULL) {
++    /* There is stuff in 'buf' */
++    }
++    pclose(arch_name_cmd);
++
++    // Remove /n from output
++    gchar c = cmd_output[strlen(cmd_output)-1];
++    if (c == '\n' || c == '\r')
++        cmd_output[strlen(cmd_output)-1] = 0;
++
++    gchar *f_dir_path = g_strconcat(dir_path, "/../lib/", cmd_output, "-linux-gnu/ModemManager/", (gchar *)NULL);
++    if (!f_dir_path)
++    {
++        g_printerr("f_dir_path\n");
++        return PLUGINDIR;
++    }
++
++    g_strlcpy(executable_path, f_dir_path, sizeof(executable_path)-1);
++
++    g_free (dir_path);
++    g_free (f_dir_path);
++
++    g_print("Plugin Dir: %s\n", executable_path);
++
++    return executable_path;
++}
++
+ const gchar *
+ mm_context_get_test_plugin_dir (void)
+ {
+-    return test_plugin_dir ? test_plugin_dir : PLUGINDIR;
++    return test_plugin_dir ? test_plugin_dir : get_plugindir(FALSE);
+ }
+ 
+ #if defined WITH_UDEV
+@@ -403,6 +460,7 @@ print_help (GOptionContext *context)
+     str = g_option_context_get_help (context, FALSE, NULL);
+     g_print ("%s", str);
+     g_free (str);
++    g_print ("\nCurrent PLUGINDIR: %s\n", PLUGINDIR);
+ }
+ 
+ void
+diff --git a/src/mm-log.c b/src/mm-log.c
+index 26260b7c..8558ba16 100644
+--- a/src/mm-log.c
++++ b/src/mm-log.c
+@@ -165,7 +165,14 @@ log_backend_syslog (const char *loc,
+                     const char *message,
+                     size_t      length)
+ {
+-    syslog (syslog_level, "%s", message);
++    // syslog (syslog_level, "%s", message);
++    if (length < 1)
++        return;
++
++    if (message[length-1] == '\n')
++        printf("%s", message);
++    else
++        puts(message);
+ }
+ 
+ #if defined WITH_SYSTEMD_JOURNAL
+diff --git a/src/mm-port-serial.c b/src/mm-port-serial.c
+index b7394ae3..ef9c4d7d 100644
+--- a/src/mm-port-serial.c
++++ b/src/mm-port-serial.c
+@@ -519,7 +519,17 @@ real_config_fd (MMPortSerial *self, int fd, GError **error)
+ 
+     set_flow_control_termios (self, self->priv->flow_control, &stbuf);
+ 
+-    return internal_tcsetattr (self, fd, &stbuf, error);
++    int ret = internal_tcsetattr (self, fd, &stbuf, error);
++
++    if (self->priv->flow_control == MM_FLOW_CONTROL_RTS_CTS) 
++    {
++        //Set RTS and DTR pin
++        int ioctl_flags;
++        ioctl_flags = TIOCM_RTS | TIOCM_DTR;
++        ioctl(fd, TIOCMBIS, &ioctl_flags);
++    }
++
++    return ret;
+ }
+ 
+ static void

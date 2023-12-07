@@ -1,0 +1,112 @@
+<html>
+    <head>
+
+        <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css">
+        <link href="https://cdn.jsdelivr.net/npm/quasar@2.0.1/dist/quasar.prod.css" rel="stylesheet" type="text/css">
+ 
+
+<!--         <title>
+            {% if title is defined -%}
+                {{title}}
+            {% else -%}
+                Documentation
+            {% endif -%}
+        </title> -->
+        
+    </head>
+    <body style="overflow-x: hidden; margin-top: 0px; padding-top: 0px;">
+
+        <div id="q-app" >
+
+            <q-toolbar class="bg-primary glossy text-white">
+
+            {% if title is defined -%}
+                <q-toolbar-title>{{title}}</q-toolbar-title>
+            {% else -%}
+                <q-toolbar-title>{{Documentation}}</q-toolbar-title>
+            {% endif -%}
+            <q-btn flat round dense icon="whatshot" />
+            
+            </q-toolbar>
+
+            {% for doc in autodoc %}
+
+            <div class="mapping">
+<!--                 <q-expansion-item
+                expand-separator
+                label="{{doc.rule}}"
+                caption="{{doc.docstring|urlize|nl2br|safe}}"
+                >
+                <q-card>
+                  <q-card-section>
+                    <q-btn-group push>
+                    {% for method in doc.methods -%}
+                        {% if method == 'GET' and doc.args == ['None'] %}
+                            <q-btn size="15px" push label="{{method}}" color="secondary" href="{{doc.rule}}" type="a" ></q-btn> 
+                        {% endif %}
+                        {% if method == 'POST' %}
+                            <q-btn size="15px" push label="{{method}}"></q-btn> 
+                        {% endif %}
+                    {% endfor %}
+                    </q-btn-group>
+                  </q-card-section>
+                </q-card>
+                </q-expansion-item> -->
+
+                <q-list bordered separator>   
+                    <q-item v-ripple>
+                        <q-item-section avatar>
+                            <q-btn-group push>
+                            {% for method in doc.methods -%}
+                                {% if method == 'GET' and doc.args == ['None'] %}
+                                    <q-btn size="10px" push label="{{method}}" color="secondary" href="{{doc.rule}}" type="a" ></q-btn>
+                                {% endif %}
+                                {% if method == 'POST' %}
+                                    <q-btn size="10px" push label="{{method}}"></q-btn> 
+                                {% endif %}
+                            {% endfor %}
+                            </q-btn-group>
+                        </q-item-section>
+
+                        <q-item-section>
+                            <q-item-label>{{doc.rule}}</q-item-label>
+                            <q-item-label caption>{{doc.docstring|urlize|nl2br|safe}}</q-item-label>
+                        </q-item-section>
+                    </q-item>
+
+                </q-list>
+
+<!--            <a id="rule-{{doc.rule|urlencode}}" class="rule"><h2>{{doc.rule|escape}}</h2></a>
+                <ul class="methods">
+                    {% for method in doc.methods -%}
+                        {% if method == 'GET' and doc.args == ['None'] %}
+                            <a href="{{doc.rule}}" class="getmethod">
+                                <li class="method">{{method}}</li>
+                            </a>
+                        {% else %}
+                            <li class="method">{{method}}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <p class="docstring">{{doc.docstring|urlize|nl2br|safe}}</p> -->
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/quasar@2.0.1/dist/quasar.umd.prod.js"></script>
+
+        <script>
+          const app = Vue.createApp({
+            setup () {
+              return {}
+            }
+          })
+
+          app.use(Quasar)
+          app.mount('#q-app')
+        </script>
+
+    </body>
+</html>

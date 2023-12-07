@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin-left: 3px;
+        margin-right: 3px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        overflow-y: hidden;
+        overflow-x: hidden;
+    }
+</style>
+
+<html>
+
+<head>
+    <script src="./svg-pan-zoom.min.js"></script>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+
+<body>
+    <svg id="svg-view"></svg>
+</body>
+
+</html>
+
+<script>
+
+    function CreateSvg() {
+        let svg_el = document.getElementsByTagName('body')[0].getElementsByTagName("svg");
+
+        if (svg_el.length > 0) {
+            svg_el[0].setAttribute('id', 'svg-view');
+            svg_el[0].style.width = "100vw";
+            svg_el[0].style.height = "100vh";
+        }
+
+        window.panZoom = svgPanZoom('#svg-view', {
+            zoomEnabled: true,
+            controlIconsEnabled: true,
+            fit: 1,
+            center: 1,
+            dblClickZoomEnabled: true,
+            zoomScaleSensitivity: 0.4
+        });
+        // window.panZoom.zoomBy(0.95);
+    }
+
+
+    window.onresize = function () {
+        if (!window.panZoom) return;
+        window.panZoom.resize();
+        window.panZoom.center();
+    };
+
+    // ------------- User Functions -------------
+
+    window.SVGUpdate = (svg_string) => {
+        let restore_view = false;
+        let last_view = {};
+
+        if (window.panZoom) {
+            restore_view = true;
+            last_view = {
+                pan: window.panZoom.getPan(),
+                zoom: window.panZoom.getZoom()
+            };
+            window.panZoom.destroy();
+        }
+
+        document.getElementById('svg-view').innerHTML = svg_string;
+        CreateSvg();
+
+        if (restore_view) {
+            window.panZoom.zoom(last_view.zoom);
+            window.panZoom.pan(last_view.pan);
+        }
+    };
+
+
+    window.SVGReset = () => {
+        if (!window.panZoom) return;
+        window.panZoom.reset();
+        window.panZoom.center();
+    };
+
+
+    window.SVGCenter = () => {
+        if (!window.panZoom) return;
+        window.panZoom.center();
+    };
+
+
+    window.SVGClear = () => {
+        if (window.panZoom)
+            window.panZoom.destroy();
+        document.getElementById('svg-view').innerHTML = "";
+        window.panZoom = undefined;
+    };
+
+</script>

@@ -1,0 +1,388 @@
+diff --git a/.gitignore b/.gitignore
+index 1783da8be..8a8165a67 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -4,3 +4,7 @@ subprojects/libtins
+ subprojects/usrsctp
+ 
+ webui/.next
++
++build/
++
++install/
+diff --git a/.vscode/c_cpp_properties.json b/.vscode/c_cpp_properties.json
+new file mode 100644
+index 000000000..12a5c54c3
+--- /dev/null
++++ b/.vscode/c_cpp_properties.json
+@@ -0,0 +1,17 @@
++{
++    "configurations": [
++        {
++            "name": "Linux",
++            "includePath": [
++                "${workspaceFolder}/**"
++            ],
++            "defines": [],
++            "compilerPath": "/usr/bin/clang",
++            "cStandard": "c17",
++            "cppStandard": "c++14",
++            "intelliSenseMode": "linux-clang-x64",
++            "compileCommands": "${workspaceFolder}/builddir/compile_commands.json"
++        }
++    ],
++    "version": 4
++}
+\ No newline at end of file
+diff --git a/.vscode/settings.json b/.vscode/settings.json
+new file mode 100644
+index 000000000..a614f51f0
+--- /dev/null
++++ b/.vscode/settings.json
+@@ -0,0 +1,3 @@
++{
++    "workbench.editor.enablePreview": false
++}
+\ No newline at end of file
+diff --git a/build.sh b/build.sh
+new file mode 100755
+index 000000000..015692406
+--- /dev/null
++++ b/build.sh
+@@ -0,0 +1,15 @@
++#!/usr/bin/env bash
++
++# Enable relative path to install/libs folder
++export LDFLAGS="-Wl,-rpath=\$ORIGIN:\$ORIGIN/../libs/x86_64-linux-gnu"
++
++
++if [[ ! -d "install/" ]]; then
++    meson build --prefix=`pwd`/install
++fi
++
++git submodule update --init --recursive || true
++ninja -C build
++ninja -C build install &> /dev/null
++
++echo "Build completed"
+diff --git a/lib/core/ogs-pkbuf.c b/lib/core/ogs-pkbuf.c
+index a231ca8ef..202c12c37 100644
+--- a/lib/core/ogs-pkbuf.c
++++ b/lib/core/ogs-pkbuf.c
+@@ -299,7 +299,7 @@ ogs_pkbuf_t *ogs_pkbuf_copy_debug(ogs_pkbuf_t *pkbuf, const char *file_line)
+     ogs_pkbuf_t *newbuf;
+     int size = pkbuf->end - pkbuf->head;
+ 
+-    ogs_assert(size > 0);
++    // ogs_assert(size > 0);
+     newbuf = ogs_pkbuf_alloc_debug(NULL, size, file_line);
+     if (!pkbuf) {
+         ogs_error("ogs_pkbuf_alloc() failed [size=%d]", size);
+diff --git a/lib/nas/5gs/encoder.c b/lib/nas/5gs/encoder.c
+index 359fd464d..55e3bfd8e 100644
+--- a/lib/nas/5gs/encoder.c
++++ b/lib/nas/5gs/encoder.c
+@@ -32,6 +32,7 @@
+  * from 24501-g41.docx
+  ******************************************************************************/
+ 
++#include <wd_shm_nas_utils.h>
+ #include "ogs-nas-5gs.h"
+ 
+ int ogs_nas_5gs_encode_registration_request(ogs_pkbuf_t *pkbuf, ogs_nas_5gs_message_t *message);
+@@ -2963,6 +2964,8 @@ ogs_pkbuf_t *ogs_nas_5gmm_encode(ogs_nas_5gs_message_t *message)
+ 
+     pkbuf->len = encoded;
+ 
++    wd_shm_send_pdu_nas(WD_SHM_EVT_NAS_5GS_DL_PLAIN, 0, pkbuf->data, pkbuf->len);
++
+     return pkbuf;
+ }
+ 
+@@ -3077,6 +3080,8 @@ ogs_pkbuf_t *ogs_nas_5gsm_encode(ogs_nas_5gs_message_t *message)
+     ogs_assert(ogs_pkbuf_push(pkbuf, encoded));
+     pkbuf->len = encoded;
+ 
++    wd_shm_send_pdu_nas(WD_SHM_EVT_NAS_5GS_DL_PLAIN, 0, pkbuf->data, pkbuf->len);
++
+     return pkbuf;
+ }
+ 
+diff --git a/lib/nas/common/meson.build b/lib/nas/common/meson.build
+index 6c3aaccd3..ed324e109 100644
+--- a/lib/nas/common/meson.build
++++ b/lib/nas/common/meson.build
+@@ -28,10 +28,10 @@ libnas_common = library('ogsnas-common',
+     version : libogslib_version,
+     c_args : '-DOGS_NAS_COMPILATION',
+     include_directories : [libnas_common_inc, libcrypt_inc, libinc],
+-    dependencies : [libcore_dep, libcrypt_dep],
++    dependencies : [libcore_dep, libcrypt_dep, libshm_interface_dep],
+     install : true)
+ 
+ libnas_common_dep = declare_dependency(
+     link_with : libnas_common,
+     include_directories : [libnas_common_inc, libcrypt_inc, libinc],
+-    dependencies : [libcore_dep, libcrypt_dep])
++    dependencies : [libcore_dep, libcrypt_dep, libshm_interface_dep])
+diff --git a/meson.build b/meson.build
+index 4f7507060..737a7c731 100644
+--- a/meson.build
++++ b/meson.build
+@@ -20,7 +20,7 @@ project('open5gs', 'c', 'cpp',
+     license : 'AGPL-3.0-or-later',
+     meson_version : '>= 0.43.0',
+     default_options : [
+-        'c_std=gnu89',
++        'c_std=gnu11',
+     ],
+ )
+ 
+@@ -109,6 +109,7 @@ add_project_arguments(
+     cc.get_supported_arguments(possible_cc_flags),
+     language : 'c')
+ 
++subdir('shm_interface')
+ subdir('configs')
+ subdir('lib')
+ subdir('src')
+diff --git a/misc/netconf.sh b/misc/netconf.sh
+index e6025cdba..221209e69 100755
+--- a/misc/netconf.sh
++++ b/misc/netconf.sh
+@@ -10,8 +10,8 @@ if [ "$SYSTEM" = "Linux" ]; then
+ 		echo "net.ipv6.conf.ogstun.disable_ipv6=0" > /etc/sysctl.d/30-open5gs.conf
+ 		sysctl -p /etc/sysctl.d/30-open5gs.conf
+ 	fi
+-    ip addr del 10.45.0.1/16 dev ogstun 2> /dev/null
+-    ip addr add 10.45.0.1/16 dev ogstun
++    ip addr del 45.45.0.1/16 dev ogstun 2> /dev/null
++    ip addr add 45.45.0.1/16 dev ogstun
+     ip addr del 2001:db8:cafe::1/48 dev ogstun 2> /dev/null
+     ip addr add 2001:db8:cafe::1/48 dev ogstun
+     ip link set ogstun up
+diff --git a/requirements.sh b/requirements.sh
+new file mode 100755
+index 000000000..8d886704f
+--- /dev/null
++++ b/requirements.sh
+@@ -0,0 +1,23 @@
++#!/usr/bin/env bash
++
++# Core Network Open5GS requirements
++sudo apt install -y bison wget flex git iptables libtalloc-dev libconfig-dev build-essential libsctp-dev libgcrypt-dev \
++libssl-dev libidn11-dev libmongoc-dev libbson-dev libyaml-dev libmicrohttpd-dev libcurl4-gnutls-dev autoconf \
++libpcap-dev libtool libgnutls28-dev libnghttp2-dev
++
++# Install mongodb 5.X (mongod)
++if ! which mongod > /dev/null;
++then
++	wget https://repo.mongodb.org/apt/ubuntu/dists/bionic/mongodb-org/5.0/multiverse/binary-amd64/mongodb-org-server_5.0.16_amd64.deb
++	sudo apt install -y ./mongodb-org-server_5.0.16_amd64.deb
++	sudo systemctl enable mongod --now || true
++	sudo rm mongodb*
++fi
++
++# Install mongodb shell (mongo)
++if ! which mongo > /dev/null;
++then
++	wget https://repo.mongodb.org/apt/ubuntu/dists/bionic/mongodb-org/5.0/multiverse/binary-amd64/mongodb-org-shell_5.0.16_amd64.deb
++	sudo apt install -y ./mongodb-org-shell_5.0.16_amd64.deb
++	sudo rm mongodb*
++fi
+diff --git a/shm_interface b/shm_interface
+new file mode 120000
+index 000000000..3e1558716
+--- /dev/null
++++ b/shm_interface
+@@ -0,0 +1 @@
++../../src/drivers/shm_interface
+\ No newline at end of file
+diff --git a/src/amf/amf-sm.c b/src/amf/amf-sm.c
+index 164f46057..e00c5c2ec 100644
+--- a/src/amf/amf-sm.c
++++ b/src/amf/amf-sm.c
+@@ -17,6 +17,7 @@
+  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+ 
++#include <wd_shm_nas_utils.h>
+ #include "sbi-path.h"
+ #include "ngap-path.h"
+ #include "nas-path.h"
+@@ -779,6 +780,8 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
+                 }
+             }
+ 
++            wd_shm_send_pdu_nas(WD_SHM_EVT_NAS_5GS_UL_PLAIN, 0, pkbuf->data, pkbuf->len);
++
+             /* 
+              * TS23.502
+              * 4.2.3.2 UE Triggered Service Request
+diff --git a/src/amf/gmm-handler.c b/src/amf/gmm-handler.c
+index c1ef48e9d..40ec38564 100644
+--- a/src/amf/gmm-handler.c
++++ b/src/amf/gmm-handler.c
+@@ -17,6 +17,7 @@
+  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+ 
++#include <wd_shm_nas_utils.h>
+ #include "nas-security.h"
+ 
+ #include "ngap-path.h"
+@@ -107,26 +108,26 @@ int gmm_handle_registration_request(amf_ue_t *amf_ue,
+         OGS_NAS_5GS_REGISTRATION_REQUEST_EPS_NAS_MESSAGE_CONTAINER_PRESENT| \
+         OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT)
+ 
+-    if (ngap_code == NGAP_ProcedureCode_id_InitialUEMessage &&
+-        registration_request->presencemask &
+-        ~OGS_REGISTRATION_CLEARTEXT_PRESENT) {
+-        ogs_error("Non cleartext IEs is included [0x%llx]",
+-                (long long)registration_request->presencemask);
+-        ogs_assert(OGS_OK ==
+-            nas_5gs_send_registration_reject(amf_ue,
+-                OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE));
+-        return OGS_ERROR;
+-    }
+-
+-    if (!h.integrity_protected &&
+-        (registration_request->presencemask &
+-        OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT)) {
+-        ogs_error("NAS container present without Integrity-protected");
+-        ogs_assert(OGS_OK ==
+-            nas_5gs_send_registration_reject(amf_ue,
+-                OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE));
+-        return OGS_ERROR;
+-    }
++    // if (ngap_code == NGAP_ProcedureCode_id_InitialUEMessage &&
++    //     registration_request->presencemask &
++    //     ~OGS_REGISTRATION_CLEARTEXT_PRESENT) {
++    //     ogs_error("Non cleartext IEs is included [0x%llx]",
++    //             (long long)registration_request->presencemask);
++    //     ogs_assert(OGS_OK ==
++    //         nas_5gs_send_registration_reject(amf_ue,
++    //             OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE));
++    //     return OGS_ERROR;
++    // }
++
++    // if (!h.integrity_protected &&
++    //     (registration_request->presencemask &
++    //     OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT)) {
++    //     ogs_error("NAS container present without Integrity-protected");
++    //     ogs_assert(OGS_OK ==
++    //         nas_5gs_send_registration_reject(amf_ue,
++    //             OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE));
++    //     return OGS_ERROR;
++    // }
+ 
+     if (!mobile_identity->length || !mobile_identity->buffer) {
+         ogs_error("No Mobile Identity");
+@@ -730,16 +731,18 @@ int gmm_handle_authentication_response(amf_ue_t *amf_ue,
+     ogs_kdf_hxres_star(
+             amf_ue->rand, authentication_response_parameter->res, hxres_star);
+ 
+-    if (memcmp(hxres_star, amf_ue->hxres_star, OGS_MAX_RES_LEN) != 0) {
++    if (memcmp(hxres_star, amf_ue->hxres_star, OGS_MAX_RES_LEN) != 0)
+         ogs_error("[%s] MAC failure", amf_ue->suci);
+-        ogs_log_hexdump(OGS_LOG_ERROR,
+-                authentication_response_parameter->res,
+-                authentication_response_parameter->length);
+-        ogs_log_hexdump(OGS_LOG_ERROR, hxres_star, OGS_MAX_RES_LEN);
+-        ogs_log_hexdump(OGS_LOG_ERROR,
+-                amf_ue->hxres_star, OGS_MAX_RES_LEN);
+-        return OGS_ERROR;
+-    }
++    // if (memcmp(hxres_star, amf_ue->hxres_star, OGS_MAX_RES_LEN) != 0) {
++    //     ogs_error("[%s] MAC failure", amf_ue->suci);
++    //     ogs_log_hexdump(OGS_LOG_ERROR,
++    //             authentication_response_parameter->res,
++    //             authentication_response_parameter->length);
++    //     ogs_log_hexdump(OGS_LOG_ERROR, hxres_star, OGS_MAX_RES_LEN);
++    //     ogs_log_hexdump(OGS_LOG_ERROR,
++    //             amf_ue->hxres_star, OGS_MAX_RES_LEN);
++    //     return OGS_ERROR;
++    // }
+ 
+     memcpy(amf_ue->xres_star, authentication_response_parameter->res,
+             authentication_response_parameter->length);
+@@ -1243,6 +1246,8 @@ static int gmm_handle_nas_message_container(
+         return OGS_ERROR;
+     }
+ 
++        wd_shm_send_pdu_nas(WD_SHM_EVT_NAS_5GS_UL_PLAIN, 0, nasbuf->data, nasbuf->len);
++
+     switch (nas_message.gmm.h.message_type) {
+         case OGS_NAS_5GS_REGISTRATION_REQUEST:
+             ogs_debug("Registration request in NAS message container");
+diff --git a/src/amf/init.c b/src/amf/init.c
+index 625f40551..13ce14cec 100644
+--- a/src/amf/init.c
++++ b/src/amf/init.c
+@@ -16,7 +16,7 @@
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+-
++#include <wd_shm_nas_utils.h>
+ #include "sbi-path.h"
+ #include "ngap-path.h"
+ 
+@@ -56,6 +56,11 @@ int amf_initialize()
+ 
+     initialized = 1;
+ 
++    if(shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH))
++        ogs_info("[SHM] WD SHM Init Success");
++    else
++        ogs_info("[SHM] WD SHM Init Disabled");
++
+     return OGS_OK;
+ }
+ 
+diff --git a/tests/app/meson.build b/tests/app/meson.build
+index bee11824e..d1b961aa0 100644
+--- a/tests/app/meson.build
++++ b/tests/app/meson.build
+@@ -44,7 +44,9 @@ executable('epc',
+     sources : [testepc_sources],
+     c_args : libtestepc_cc_args,
+     include_directories : srcinc,
+-    dependencies : libtestepc_dep)
++    dependencies : libtestepc_dep,
++    install_rpath : libdir,
++    install : true)
+ 
+ libtest5gc_cc_args = '-DDEFAULT_CONFIG_FILENAME="@0@/configs/sample.yaml"'.format(meson.build_root())
+ 
+@@ -72,7 +74,9 @@ executable('5gc',
+     sources : [test5gc_sources],
+     c_args : libtest5gc_cc_args,
+     include_directories : srcinc,
+-    dependencies : libtest5gc_dep)
++    dependencies : libtest5gc_dep,
++    install_rpath : libdir,
++    install : true)
+ 
+ libtestapp_cc_args = '-DDEFAULT_CONFIG_FILENAME="@0@/configs/sample.yaml"'.format(meson.build_root())
+ 
+diff --git a/webui.sh b/webui.sh
+new file mode 100755
+index 000000000..50ae12d08
+--- /dev/null
++++ b/webui.sh
+@@ -0,0 +1,14 @@
++#!/bin/bash
++
++cd webui
++
++package='missing:'
++if [ $(npm list | grep -c $package) -ne 0 ]; then
++    npm install
++fi
++
++npm run dev
++
++cd ..
++
++

@@ -1,0 +1,7 @@
+test/Build
+*.xcuserstate
+xcuserdata
+python-module/build
+max-externals/project/Build
+*.xccheckout
+build/

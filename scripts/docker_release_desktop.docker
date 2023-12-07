@@ -1,0 +1,54 @@
+FROM kasmweb/core-ubuntu-jammy:1.14.0-rolling
+USER root
+
+ENV HOME /home/kasm-default-profile
+ENV STARTUPDIR /dockerstartup
+ENV INST_SCRIPTS $STARTUPDIR/install
+WORKDIR $HOME
+
+######### Customize Container Here ###########
+
+
+RUN echo "Start" && apt-get update \
+    && apt-get install -y sudo git zstd tshark \
+    && echo 'kasm-user ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+    && git config --system --add safe.directory '*' 
+
+
+ADD org.wireshark.Wireshark.desktop /usr/share/applications/
+ADD wireshark.ico /usr/share/icons/
+ADD mimeapps.list $HOME/.config/
+# Install Custom Certificate Authority
+# COPY privkey.pem $HOME/.vnc/self.pem
+# COPY vnc_startup.sh $STARTUPDIR/vnc_startup.sh
+
+# Configure shortcuts and wireshark mime
+RUN chmod +x /usr/share/applications/org.wireshark.Wireshark.desktop && \
+ln -s /usr/share/applications/org.wireshark.Wireshark.desktop $HOME/Desktop/org.wireshark.Wireshark.desktop && \
+ln -s /home/kasm-user $HOME/Desktop/home && \
+ln -s /opt/wdissector/ $HOME/wdissector
+
+######### End Customizations ###########
+
+RUN chown 1000:0 $HOME
+RUN $STARTUPDIR/set_user_permission.sh $HOME
+
+ENV HOME /home/kasm-user
+WORKDIR $HOME
+RUN mkdir -p $HOME && chown -R 1000:0 $HOME
+
+USER 1000 
+
+# Install wdissector runtime requirements
+ADD --chown=kasm-user:kasm-user ./release/wdissector.tar.zst /opt/
+RUN sudo chown 1000:0 /opt/ && cd /opt/wdissector && ./requirements.sh
+# Add groups and permissions
+RUN sudo chown 1000:0 /usr/share/applications/org.wireshark.Wireshark.desktop && \
+    sudo groupadd --system wireshark && cd /opt/wdissector && sudo chgrp wireshark bin/dumpcap && \
+    sudo usermod -a -G wireshark kasm-user && sudo chmod u+s bin/dumpcap && \
+    sudo setcap cap_net_raw,cap_net_admin+eip bin/dumpcap
+
+# Fix wdissector permissions
+RUN groupadd -r plugdev &> /dev/null || true && \
+    groupadd -r dialout &> /dev/null || true && \
+    usermod -a -G plugdev,sudo,dialout kasm-user

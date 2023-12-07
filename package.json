@@ -1,0 +1,27 @@
+{
+  "name": "WDissector",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "WDissector Documentation",
+  "main": "index.js",
+  "authors": {
+    "name": "Matheus Eduardo Garbelini",
+    "email": "matheus_garbelini@mymail.sutd.edu.sg"
+  },
+  "repository": "https://gitlab.com/asset-sutd/software/wireless-deep-fuzzer/-/tree/wdissector/WDissector",
+  "scripts": {
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs && node docs/offlinify.js docs",
+    "build_only": "vuepress build docs",
+    "pdf": "vuepress export docs && mkdir -p release && mv site.pdf release/docs.pdf"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.9.12",
+    "@snowdog/vuepress-plugin-pdf-export": "^1.1.0",
+    "node-fetch": "^2.6.1",
+    "quasar": "^1.15.0",
+    "vue-scrollin": "^0.1.2",
+    "vuepress": "1.7.1",
+    "vuepress-plugin-code-copy": "^1.0.6"
+  }
+}

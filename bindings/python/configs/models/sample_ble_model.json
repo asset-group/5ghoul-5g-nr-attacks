@@ -1,0 +1,1577 @@
+{
+    "StatesNodes": {
+        "IDLE": {
+            "direction": 0,
+            "layers_count": 0,
+            "node_number": 0,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 130448
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "RX / ATT Error / Attribute Not Found": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 25,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 155295
+            },
+            "timeout": 0,
+            "type_value": 10
+        },
+        "RX / GATT / Alert Notification Control Point": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 23,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154985
+            },
+            "timeout": 0,
+            "type_value": 10820
+        },
+        "RX / GATT / Alert Notification Service": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 22,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154834
+            },
+            "timeout": 0,
+            "type_value": 6161
+        },
+        "RX / GATT / Appearance": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 17,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154602
+            },
+            "timeout": 0,
+            "type_value": 10753
+        },
+        "RX / GATT / Client Characteristic Configuration": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 21,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154784
+            },
+            "timeout": 0,
+            "type_value": 10498
+        },
+        "RX / GATT / Device Name": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 40,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 169757
+            },
+            "timeout": 0,
+            "type_value": 10752
+        },
+        "RX / GATT / GATT Characteristic Declaration": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 16,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154547
+            },
+            "timeout": 0,
+            "type_value": 10243
+        },
+        "RX / GATT / GATT Include Declaration": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 24,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 155111
+            },
+            "timeout": 0,
+            "type_value": 10242
+        },
+        "RX / GATT / GATT Primary Service Declaration": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 13,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154424
+            },
+            "timeout": 0,
+            "type_value": 10240
+        },
+        "RX / GATT / Generic Access Profile": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 11,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154321
+            },
+            "timeout": 0,
+            "type_value": 6144
+        },
+        "RX / GATT / Generic Attribute Profile": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 18,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154651
+            },
+            "timeout": 0,
+            "type_value": 6145
+        },
+        "RX / GATT / Service Changed": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 19,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154727
+            },
+            "timeout": 0,
+            "type_value": 10757
+        },
+        "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP": {
+            "direction": 1,
+            "layers_count": 2,
+            "node_number": 9,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154266
+            },
+            "timeout": 0,
+            "type_value": 16
+        },
+        "RX / LL Ctrl / LL_ENC_RSP": {
+            "direction": 1,
+            "layers_count": 2,
+            "node_number": 33,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168480
+            },
+            "timeout": 0,
+            "type_value": 4
+        },
+        "RX / LL Ctrl / LL_FEATURE_RSP": {
+            "direction": 1,
+            "layers_count": 2,
+            "node_number": 6,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154189
+            },
+            "timeout": 0,
+            "type_value": 9
+        },
+        "RX / LL Ctrl / LL_SLAVE_FEATURE_REQ": {
+            "direction": 1,
+            "layers_count": 2,
+            "node_number": 4,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154136
+            },
+            "timeout": 0,
+            "type_value": 14
+        },
+        "RX / LL Ctrl / LL_START_ENC_REQ": {
+            "direction": 1,
+            "layers_count": 2,
+            "node_number": 34,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168522
+            },
+            "timeout": 0,
+            "type_value": 5
+        },
+        "RX / LL Ctrl / LL_VERSION_IND": {
+            "direction": 1,
+            "layers_count": 2,
+            "node_number": 2,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154079
+            },
+            "timeout": 0,
+            "type_value": 12
+        },
+        "RX / SMP / Master Identification": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 36,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168614
+            },
+            "timeout": 0,
+            "type_value": 7
+        },
+        "RX / SMP / Pairing Confirm": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 29,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168379
+            },
+            "timeout": 0,
+            "type_value": 3
+        },
+        "RX / SMP / Pairing Random": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 31,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168431
+            },
+            "timeout": 0,
+            "type_value": 4
+        },
+        "RX / SMP / Pairing Response": {
+            "direction": 1,
+            "layers_count": 4,
+            "node_number": 27,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 157637
+            },
+            "timeout": 0,
+            "type_value": 2
+        },
+        "TX / ATT / Find Information Request": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 20,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154747
+            },
+            "timeout": 0,
+            "type_value": 4
+        },
+        "TX / ATT / Read By Group Type Request": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 12,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154346
+            },
+            "timeout": 0,
+            "type_value": 16
+        },
+        "TX / GATT / Appearance": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 43,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 220396
+            },
+            "timeout": 0,
+            "type_value": 10753
+        },
+        "TX / GATT / Device Name": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 39,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 169718
+            },
+            "timeout": 0,
+            "type_value": 10752
+        },
+        "TX / GATT / GATT Characteristic Declaration": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 15,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154501
+            },
+            "timeout": 0,
+            "type_value": 10243
+        },
+        "TX / GATT / GATT Include Declaration": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 14,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154444
+            },
+            "timeout": 0,
+            "type_value": 10242
+        },
+        "TX / GATT / GATT Primary Service Declaration": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 8,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154247
+            },
+            "timeout": 0,
+            "type_value": 10240
+        },
+        "TX / LL Ctrl / LL_CHANNEL_MAP_IND": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 42,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 219580
+            },
+            "timeout": 0,
+            "type_value": 1
+        },
+        "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 7,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154207
+            },
+            "timeout": 0,
+            "type_value": 15
+        },
+        "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 10,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154284
+            },
+            "timeout": 0,
+            "type_value": 0
+        },
+        "TX / LL Ctrl / LL_ENC_REQ": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 32,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168449
+            },
+            "timeout": 0,
+            "type_value": 3
+        },
+        "TX / LL Ctrl / LL_FEATURE_REQ": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 3,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154103
+            },
+            "timeout": 0,
+            "type_value": 8
+        },
+        "TX / LL Ctrl / LL_FEATURE_RSP": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 5,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154157
+            },
+            "timeout": 0,
+            "type_value": 9
+        },
+        "TX / LL Ctrl / LL_START_ENC_RSP": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 35,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168542
+            },
+            "timeout": 0,
+            "type_value": 6
+        },
+        "TX / LL Ctrl / LL_TERMINATE_IND": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 41,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 172476
+            },
+            "timeout": 0,
+            "type_value": 2
+        },
+        "TX / LL Ctrl / LL_VERSION_IND": {
+            "direction": 0,
+            "layers_count": 2,
+            "node_number": 1,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 154038
+            },
+            "timeout": 0,
+            "type_value": 12
+        },
+        "TX / SMP / Encryption Information": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 37,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168633
+            },
+            "timeout": 0,
+            "type_value": 6
+        },
+        "TX / SMP / Master Identification": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 38,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168658
+            },
+            "timeout": 0,
+            "type_value": 7
+        },
+        "TX / SMP / Pairing Confirm": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 28,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168342
+            },
+            "timeout": 0,
+            "type_value": 3
+        },
+        "TX / SMP / Pairing Random": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 30,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 168398
+            },
+            "timeout": 0,
+            "type_value": 4
+        },
+        "TX / SMP / Pairing Request": {
+            "direction": 0,
+            "layers_count": 4,
+            "node_number": 26,
+            "on_timeout": "",
+            "time": {
+                "tv_sec": 1679043924,
+                "tv_usec": 157591
+            },
+            "timeout": 0,
+            "type_value": 1
+        }
+    },
+    "StatesTransitions": {
+        "IDLE": {
+            "from_state": null,
+            "to_state": {
+                "TX / LL Ctrl / LL_VERSION_IND": {
+                    "dst_state_name": "TX / LL Ctrl / LL_VERSION_IND",
+                    "src_state_name": "IDLE",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154045
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / ATT Error / Attribute Not Found": {
+            "from_state": [
+                "RX / GATT / GATT Characteristic Declaration",
+                "TX / ATT / Find Information Request"
+            ],
+            "to_state": {
+                "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ": {
+                    "dst_state_name": "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                    "src_state_name": "RX / ATT Error / Attribute Not Found",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155311
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / Alert Notification Control Point": {
+            "from_state": [
+                "TX / GATT / GATT Characteristic Declaration"
+            ],
+            "to_state": {
+                "TX / ATT / Find Information Request": {
+                    "dst_state_name": "TX / ATT / Find Information Request",
+                    "src_state_name": "RX / GATT / Alert Notification Control Point",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155004
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / Alert Notification Service": {
+            "from_state": [
+                "TX / GATT / GATT Include Declaration"
+            ],
+            "to_state": {
+                "RX / GATT / GATT Include Declaration": {
+                    "dst_state_name": "RX / GATT / GATT Include Declaration",
+                    "src_state_name": "RX / GATT / Alert Notification Service",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 170493
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Characteristic Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "src_state_name": "RX / GATT / Alert Notification Service",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154851
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / Appearance": {
+            "from_state": [
+                "TX / GATT / Appearance",
+                "TX / GATT / GATT Characteristic Declaration"
+            ],
+            "to_state": {
+                "TX / GATT / GATT Include Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Include Declaration",
+                    "src_state_name": "RX / GATT / Appearance",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154620
+                    },
+                    "trigger": ""
+                },
+                "TX / LL Ctrl / LL_TERMINATE_IND": {
+                    "dst_state_name": "TX / LL Ctrl / LL_TERMINATE_IND",
+                    "src_state_name": "RX / GATT / Appearance",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 221844
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / Client Characteristic Configuration": {
+            "from_state": [
+                "TX / ATT / Find Information Request"
+            ],
+            "to_state": {
+                "TX / ATT / Find Information Request": {
+                    "dst_state_name": "TX / ATT / Find Information Request",
+                    "src_state_name": "RX / GATT / Client Characteristic Configuration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155046
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Include Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Include Declaration",
+                    "src_state_name": "RX / GATT / Client Characteristic Configuration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154802
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / Device Name": {
+            "from_state": [
+                "TX / GATT / Device Name"
+            ],
+            "to_state": {
+                "TX / GATT / Appearance": {
+                    "dst_state_name": "TX / GATT / Appearance",
+                    "src_state_name": "RX / GATT / Device Name",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 220398
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Primary Service Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Primary Service Declaration",
+                    "src_state_name": "RX / GATT / Device Name",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 169776
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / GATT Characteristic Declaration": {
+            "from_state": [
+                "TX / GATT / GATT Characteristic Declaration"
+            ],
+            "to_state": {
+                "RX / ATT Error / Attribute Not Found": {
+                    "dst_state_name": "RX / ATT Error / Attribute Not Found",
+                    "src_state_name": "RX / GATT / GATT Characteristic Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 218780
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / Service Changed": {
+                    "dst_state_name": "RX / GATT / Service Changed",
+                    "src_state_name": "RX / GATT / GATT Characteristic Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154729
+                    },
+                    "trigger": ""
+                },
+                "TX / ATT / Find Information Request": {
+                    "dst_state_name": "TX / ATT / Find Information Request",
+                    "src_state_name": "RX / GATT / GATT Characteristic Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155261
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Characteristic Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "src_state_name": "RX / GATT / GATT Characteristic Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154564
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / GATT Include Declaration": {
+            "from_state": [
+                "RX / GATT / Alert Notification Service",
+                "RX / GATT / Generic Attribute Profile",
+                "TX / GATT / GATT Include Declaration"
+            ],
+            "to_state": {
+                "TX / ATT / Find Information Request": {
+                    "dst_state_name": "TX / ATT / Find Information Request",
+                    "src_state_name": "RX / GATT / GATT Include Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 170189
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Characteristic Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "src_state_name": "RX / GATT / GATT Include Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155128
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / GATT Primary Service Declaration": {
+            "from_state": [
+                "TX / GATT / GATT Primary Service Declaration"
+            ],
+            "to_state": {
+                "TX / GATT / GATT Include Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Include Declaration",
+                    "src_state_name": "RX / GATT / GATT Primary Service Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154445
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / Generic Access Profile": {
+            "from_state": [
+                "TX / GATT / GATT Primary Service Declaration",
+                "TX / GATT / GATT Include Declaration",
+                "TX / ATT / Read By Group Type Request",
+                "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND"
+            ],
+            "to_state": {
+                "TX / ATT / Read By Group Type Request": {
+                    "dst_state_name": "TX / ATT / Read By Group Type Request",
+                    "src_state_name": "RX / GATT / Generic Access Profile",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154348
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / Device Name": {
+                    "dst_state_name": "TX / GATT / Device Name",
+                    "src_state_name": "RX / GATT / Generic Access Profile",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 169720
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Characteristic Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "src_state_name": "RX / GATT / Generic Access Profile",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154503
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Primary Service Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Primary Service Declaration",
+                    "src_state_name": "RX / GATT / Generic Access Profile",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154384
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / Generic Attribute Profile": {
+            "from_state": [
+                "TX / GATT / GATT Include Declaration"
+            ],
+            "to_state": {
+                "RX / GATT / GATT Include Declaration": {
+                    "dst_state_name": "RX / GATT / GATT Include Declaration",
+                    "src_state_name": "RX / GATT / Generic Attribute Profile",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 170137
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Characteristic Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "src_state_name": "RX / GATT / Generic Attribute Profile",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154668
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / GATT / Service Changed": {
+            "from_state": [
+                "TX / GATT / GATT Characteristic Declaration",
+                "RX / GATT / GATT Characteristic Declaration"
+            ],
+            "to_state": {
+                "TX / ATT / Find Information Request": {
+                    "dst_state_name": "TX / ATT / Find Information Request",
+                    "src_state_name": "RX / GATT / Service Changed",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154749
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP": {
+            "from_state": [
+                "RX / SMP / Pairing Response",
+                "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                "TX / GATT / GATT Primary Service Declaration"
+            ],
+            "to_state": {
+                "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND": {
+                    "dst_state_name": "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND",
+                    "src_state_name": "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154285
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / LL Ctrl / LL_ENC_RSP": {
+            "from_state": [
+                "TX / LL Ctrl / LL_ENC_REQ"
+            ],
+            "to_state": {
+                "RX / LL Ctrl / LL_START_ENC_REQ": {
+                    "dst_state_name": "RX / LL Ctrl / LL_START_ENC_REQ",
+                    "src_state_name": "RX / LL Ctrl / LL_ENC_RSP",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168524
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / LL Ctrl / LL_FEATURE_RSP": {
+            "from_state": [
+                "TX / LL Ctrl / LL_FEATURE_RSP"
+            ],
+            "to_state": {
+                "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ": {
+                    "dst_state_name": "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                    "src_state_name": "RX / LL Ctrl / LL_FEATURE_RSP",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154209
+                    },
+                    "trigger": ""
+                },
+                "TX / LL Ctrl / LL_ENC_REQ": {
+                    "dst_state_name": "TX / LL Ctrl / LL_ENC_REQ",
+                    "src_state_name": "RX / LL Ctrl / LL_FEATURE_RSP",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 174206
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / LL Ctrl / LL_SLAVE_FEATURE_REQ": {
+            "from_state": [
+                "RX / LL Ctrl / LL_VERSION_IND",
+                "TX / LL Ctrl / LL_FEATURE_REQ"
+            ],
+            "to_state": {
+                "TX / LL Ctrl / LL_FEATURE_RSP": {
+                    "dst_state_name": "TX / LL Ctrl / LL_FEATURE_RSP",
+                    "src_state_name": "RX / LL Ctrl / LL_SLAVE_FEATURE_REQ",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154158
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / LL Ctrl / LL_START_ENC_REQ": {
+            "from_state": [
+                "RX / LL Ctrl / LL_ENC_RSP"
+            ],
+            "to_state": {
+                "TX / LL Ctrl / LL_START_ENC_RSP": {
+                    "dst_state_name": "TX / LL Ctrl / LL_START_ENC_RSP",
+                    "src_state_name": "RX / LL Ctrl / LL_START_ENC_REQ",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168544
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / LL Ctrl / LL_VERSION_IND": {
+            "from_state": [
+                "TX / LL Ctrl / LL_VERSION_IND"
+            ],
+            "to_state": {
+                "RX / LL Ctrl / LL_SLAVE_FEATURE_REQ": {
+                    "dst_state_name": "RX / LL Ctrl / LL_SLAVE_FEATURE_REQ",
+                    "src_state_name": "RX / LL Ctrl / LL_VERSION_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 174156
+                    },
+                    "trigger": ""
+                },
+                "TX / LL Ctrl / LL_FEATURE_REQ": {
+                    "dst_state_name": "TX / LL Ctrl / LL_FEATURE_REQ",
+                    "src_state_name": "RX / LL Ctrl / LL_VERSION_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154105
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / SMP / Master Identification": {
+            "from_state": [
+                "TX / LL Ctrl / LL_START_ENC_RSP"
+            ],
+            "to_state": {
+                "TX / SMP / Encryption Information": {
+                    "dst_state_name": "TX / SMP / Encryption Information",
+                    "src_state_name": "RX / SMP / Master Identification",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168634
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / SMP / Pairing Confirm": {
+            "from_state": [
+                "TX / SMP / Pairing Confirm"
+            ],
+            "to_state": {
+                "TX / SMP / Pairing Random": {
+                    "dst_state_name": "TX / SMP / Pairing Random",
+                    "src_state_name": "RX / SMP / Pairing Confirm",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168399
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / SMP / Pairing Random": {
+            "from_state": [
+                "TX / SMP / Pairing Random"
+            ],
+            "to_state": {
+                "TX / LL Ctrl / LL_ENC_REQ": {
+                    "dst_state_name": "TX / LL Ctrl / LL_ENC_REQ",
+                    "src_state_name": "RX / SMP / Pairing Random",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168450
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "RX / SMP / Pairing Response": {
+            "from_state": [
+                "RX / SMP / Pairing Response",
+                "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ"
+            ],
+            "to_state": {
+                "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP": {
+                    "dst_state_name": "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP",
+                    "src_state_name": "RX / SMP / Pairing Response",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 157685
+                    },
+                    "trigger": ""
+                },
+                "RX / SMP / Pairing Response": {
+                    "dst_state_name": "RX / SMP / Pairing Response",
+                    "src_state_name": "RX / SMP / Pairing Response",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 157663
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / ATT / Find Information Request": {
+            "from_state": [
+                "RX / GATT / GATT Include Declaration",
+                "RX / GATT / GATT Characteristic Declaration",
+                "RX / GATT / Client Characteristic Configuration",
+                "RX / GATT / Alert Notification Control Point",
+                "RX / GATT / Service Changed"
+            ],
+            "to_state": {
+                "RX / ATT Error / Attribute Not Found": {
+                    "dst_state_name": "RX / ATT Error / Attribute Not Found",
+                    "src_state_name": "TX / ATT / Find Information Request",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155297
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / Client Characteristic Configuration": {
+                    "dst_state_name": "RX / GATT / Client Characteristic Configuration",
+                    "src_state_name": "TX / ATT / Find Information Request",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154786
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Include Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Include Declaration",
+                    "src_state_name": "TX / ATT / Find Information Request",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155077
+                    },
+                    "trigger": ""
+                },
+                "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ": {
+                    "dst_state_name": "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                    "src_state_name": "TX / ATT / Find Information Request",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 170840
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / ATT / Read By Group Type Request": {
+            "from_state": [
+                "RX / GATT / Generic Access Profile"
+            ],
+            "to_state": {
+                "RX / GATT / Generic Access Profile": {
+                    "dst_state_name": "RX / GATT / Generic Access Profile",
+                    "src_state_name": "TX / ATT / Read By Group Type Request",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154368
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / GATT / Appearance": {
+            "from_state": [
+                "RX / GATT / Device Name"
+            ],
+            "to_state": {
+                "RX / GATT / Appearance": {
+                    "dst_state_name": "RX / GATT / Appearance",
+                    "src_state_name": "TX / GATT / Appearance",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 220432
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / GATT / Device Name": {
+            "from_state": [
+                "TX / GATT / Device Name",
+                "TX / LL Ctrl / LL_CHANNEL_MAP_IND",
+                "RX / GATT / Generic Access Profile"
+            ],
+            "to_state": {
+                "RX / GATT / Device Name": {
+                    "dst_state_name": "RX / GATT / Device Name",
+                    "src_state_name": "TX / GATT / Device Name",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 169759
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / Device Name": {
+                    "dst_state_name": "TX / GATT / Device Name",
+                    "src_state_name": "TX / GATT / Device Name",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 219783
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / GATT / GATT Characteristic Declaration": {
+            "from_state": [
+                "RX / GATT / GATT Include Declaration",
+                "RX / GATT / Alert Notification Service",
+                "RX / GATT / Generic Attribute Profile",
+                "RX / GATT / GATT Characteristic Declaration",
+                "RX / GATT / Generic Access Profile"
+            ],
+            "to_state": {
+                "RX / GATT / Alert Notification Control Point": {
+                    "dst_state_name": "RX / GATT / Alert Notification Control Point",
+                    "src_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154987
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / Appearance": {
+                    "dst_state_name": "RX / GATT / Appearance",
+                    "src_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154604
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / GATT Characteristic Declaration": {
+                    "dst_state_name": "RX / GATT / GATT Characteristic Declaration",
+                    "src_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154548
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / Service Changed": {
+                    "dst_state_name": "RX / GATT / Service Changed",
+                    "src_state_name": "TX / GATT / GATT Characteristic Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 218268
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / GATT / GATT Include Declaration": {
+            "from_state": [
+                "TX / ATT / Find Information Request",
+                "RX / GATT / Client Characteristic Configuration",
+                "RX / GATT / Appearance",
+                "RX / GATT / GATT Primary Service Declaration"
+            ],
+            "to_state": {
+                "RX / GATT / Alert Notification Service": {
+                    "dst_state_name": "RX / GATT / Alert Notification Service",
+                    "src_state_name": "TX / GATT / GATT Include Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154836
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / GATT Include Declaration": {
+                    "dst_state_name": "RX / GATT / GATT Include Declaration",
+                    "src_state_name": "TX / GATT / GATT Include Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155113
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / Generic Access Profile": {
+                    "dst_state_name": "RX / GATT / Generic Access Profile",
+                    "src_state_name": "TX / GATT / GATT Include Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154479
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / Generic Attribute Profile": {
+                    "dst_state_name": "RX / GATT / Generic Attribute Profile",
+                    "src_state_name": "TX / GATT / GATT Include Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154653
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / GATT / GATT Primary Service Declaration": {
+            "from_state": [
+                "RX / GATT / Device Name",
+                "TX / SMP / Master Identification",
+                "RX / GATT / Generic Access Profile",
+                "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ"
+            ],
+            "to_state": {
+                "RX / GATT / GATT Primary Service Declaration": {
+                    "dst_state_name": "RX / GATT / GATT Primary Service Declaration",
+                    "src_state_name": "TX / GATT / GATT Primary Service Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154426
+                    },
+                    "trigger": ""
+                },
+                "RX / GATT / Generic Access Profile": {
+                    "dst_state_name": "RX / GATT / Generic Access Profile",
+                    "src_state_name": "TX / GATT / GATT Primary Service Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 169701
+                    },
+                    "trigger": ""
+                },
+                "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP": {
+                    "dst_state_name": "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP",
+                    "src_state_name": "TX / GATT / GATT Primary Service Declaration",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154268
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_CHANNEL_MAP_IND": {
+            "from_state": [
+                "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND"
+            ],
+            "to_state": {
+                "TX / GATT / Device Name": {
+                    "dst_state_name": "TX / GATT / Device Name",
+                    "src_state_name": "TX / LL Ctrl / LL_CHANNEL_MAP_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 219758
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ": {
+            "from_state": [
+                "TX / ATT / Find Information Request",
+                "TX / SMP / Pairing Request",
+                "RX / ATT Error / Attribute Not Found",
+                "RX / LL Ctrl / LL_FEATURE_RSP"
+            ],
+            "to_state": {
+                "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP": {
+                    "dst_state_name": "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 155339
+                    },
+                    "trigger": ""
+                },
+                "RX / SMP / Pairing Response": {
+                    "dst_state_name": "RX / SMP / Pairing Response",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 157639
+                    },
+                    "trigger": ""
+                },
+                "TX / GATT / GATT Primary Service Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Primary Service Declaration",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154249
+                    },
+                    "trigger": ""
+                },
+                "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND": {
+                    "dst_state_name": "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 170892
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND": {
+            "from_state": [
+                "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                "RX / LL Ctrl / LL_CONNECTION_PARAM_RSP"
+            ],
+            "to_state": {
+                "RX / GATT / Generic Access Profile": {
+                    "dst_state_name": "RX / GATT / Generic Access Profile",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154323
+                    },
+                    "trigger": ""
+                },
+                "TX / LL Ctrl / LL_CHANNEL_MAP_IND": {
+                    "dst_state_name": "TX / LL Ctrl / LL_CHANNEL_MAP_IND",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 219583
+                    },
+                    "trigger": ""
+                },
+                "TX / LL Ctrl / LL_TERMINATE_IND": {
+                    "dst_state_name": "TX / LL Ctrl / LL_TERMINATE_IND",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 172478
+                    },
+                    "trigger": ""
+                },
+                "TX / SMP / Pairing Confirm": {
+                    "dst_state_name": "TX / SMP / Pairing Confirm",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168345
+                    },
+                    "trigger": ""
+                },
+                "TX / SMP / Pairing Request": {
+                    "dst_state_name": "TX / SMP / Pairing Request",
+                    "src_state_name": "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 157593
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_ENC_REQ": {
+            "from_state": [
+                "RX / LL Ctrl / LL_FEATURE_RSP",
+                "RX / SMP / Pairing Random"
+            ],
+            "to_state": {
+                "RX / LL Ctrl / LL_ENC_RSP": {
+                    "dst_state_name": "RX / LL Ctrl / LL_ENC_RSP",
+                    "src_state_name": "TX / LL Ctrl / LL_ENC_REQ",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168482
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_FEATURE_REQ": {
+            "from_state": [
+                "RX / LL Ctrl / LL_VERSION_IND"
+            ],
+            "to_state": {
+                "RX / LL Ctrl / LL_SLAVE_FEATURE_REQ": {
+                    "dst_state_name": "RX / LL Ctrl / LL_SLAVE_FEATURE_REQ",
+                    "src_state_name": "TX / LL Ctrl / LL_FEATURE_REQ",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154138
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_FEATURE_RSP": {
+            "from_state": [
+                "RX / LL Ctrl / LL_SLAVE_FEATURE_REQ"
+            ],
+            "to_state": {
+                "RX / LL Ctrl / LL_FEATURE_RSP": {
+                    "dst_state_name": "RX / LL Ctrl / LL_FEATURE_RSP",
+                    "src_state_name": "TX / LL Ctrl / LL_FEATURE_RSP",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154191
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_START_ENC_RSP": {
+            "from_state": [
+                "RX / LL Ctrl / LL_START_ENC_REQ"
+            ],
+            "to_state": {
+                "RX / SMP / Master Identification": {
+                    "dst_state_name": "RX / SMP / Master Identification",
+                    "src_state_name": "TX / LL Ctrl / LL_START_ENC_RSP",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168616
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_TERMINATE_IND": {
+            "from_state": [
+                "RX / GATT / Appearance",
+                "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND"
+            ],
+            "to_state": {
+                "TX / LL Ctrl / LL_VERSION_IND": {
+                    "dst_state_name": "TX / LL Ctrl / LL_VERSION_IND",
+                    "src_state_name": "TX / LL Ctrl / LL_TERMINATE_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 174107
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / LL Ctrl / LL_VERSION_IND": {
+            "from_state": [
+                "TX / LL Ctrl / LL_TERMINATE_IND",
+                "IDLE"
+            ],
+            "to_state": {
+                "RX / LL Ctrl / LL_VERSION_IND": {
+                    "dst_state_name": "RX / LL Ctrl / LL_VERSION_IND",
+                    "src_state_name": "TX / LL Ctrl / LL_VERSION_IND",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 154081
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / SMP / Encryption Information": {
+            "from_state": [
+                "RX / SMP / Master Identification"
+            ],
+            "to_state": {
+                "TX / SMP / Master Identification": {
+                    "dst_state_name": "TX / SMP / Master Identification",
+                    "src_state_name": "TX / SMP / Encryption Information",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168659
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / SMP / Master Identification": {
+            "from_state": [
+                "TX / SMP / Encryption Information"
+            ],
+            "to_state": {
+                "TX / GATT / GATT Primary Service Declaration": {
+                    "dst_state_name": "TX / GATT / GATT Primary Service Declaration",
+                    "src_state_name": "TX / SMP / Master Identification",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 169667
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / SMP / Pairing Confirm": {
+            "from_state": [
+                "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND"
+            ],
+            "to_state": {
+                "RX / SMP / Pairing Confirm": {
+                    "dst_state_name": "RX / SMP / Pairing Confirm",
+                    "src_state_name": "TX / SMP / Pairing Confirm",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168381
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / SMP / Pairing Random": {
+            "from_state": [
+                "RX / SMP / Pairing Confirm"
+            ],
+            "to_state": {
+                "RX / SMP / Pairing Random": {
+                    "dst_state_name": "RX / SMP / Pairing Random",
+                    "src_state_name": "TX / SMP / Pairing Random",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 168433
+                    },
+                    "trigger": ""
+                }
+            }
+        },
+        "TX / SMP / Pairing Request": {
+            "from_state": [
+                "TX / LL Ctrl / LL_CONNECTION_UPDATE_IND"
+            ],
+            "to_state": {
+                "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ": {
+                    "dst_state_name": "TX / LL Ctrl / LL_CONNECTION_PARAM_REQ",
+                    "src_state_name": "TX / SMP / Pairing Request",
+                    "time": {
+                        "tv_sec": 1679043924,
+                        "tv_usec": 157616
+                    },
+                    "trigger": ""
+                }
+            }
+        }
+    }
+}

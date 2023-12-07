@@ -1,0 +1,8 @@
+*
+!.git
+!3rd-party/*.patch
+!src/drivers/shm_interface
+!src/drivers/firmware_bluetooth
+!scripts
+!requirements.sh
+!.gitmodules

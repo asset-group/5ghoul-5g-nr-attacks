@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e846b8cd..4f0b71a5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -134,7 +134,7 @@ endif ()
+ message(STATUS "Required features: ${FMT_REQUIRED_FEATURES}")
+ 
+ if (FMT_MASTER_PROJECT AND NOT DEFINED CMAKE_CXX_VISIBILITY_PRESET)
+-  set_verbose(CMAKE_CXX_VISIBILITY_PRESET hidden CACHE STRING
++  set_verbose(CMAKE_CXX_VISIBILITY_PRESET default CACHE STRING
+               "Preset for the export of private symbols")
+   set_property(CACHE CMAKE_CXX_VISIBILITY_PRESET PROPERTY STRINGS
+                hidden default)
+@@ -228,6 +228,7 @@ endif ()
+ 
+ add_library(fmt ${FMT_SOURCES} ${FMT_HEADERS} README.rst ChangeLog.rst)
+ add_library(fmt::fmt ALIAS fmt)
++add_library(Fmt ALIAS fmt)
+ 
+ if (FMT_WERROR)
+   target_compile_options(fmt PRIVATE ${WERROR_FLAG})

@@ -1,0 +1,46 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: gcc build active file",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-g",
+				"${file}",
+				"-I${workspaceFolder}",
+				"-L${workspaceFolder}/../",
+				"-lmpsse-static",
+				"-lpthread",
+				"-ludev",
+				"-o",
+				"${fileDirname}/${fileBasenameNoExtension}"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: /usr/bin/gcc"
+		},
+		{
+			"label": "spiflashfast",
+			"type": "shell",
+			"command": "cd examples && make && sudo ./spiflashfast",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "spiflash",
+			"type": "shell",
+			"command": "cd examples && make && sudo ./spiflash",
+			"group": "build",
+			"problemMatcher": []
+		}
+	]
+}

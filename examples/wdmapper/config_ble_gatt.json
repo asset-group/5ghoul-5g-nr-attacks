@@ -1,0 +1,61 @@
+{
+    "config": {
+        "Name": "Bluetooth",
+        "Options": {
+            "DefaultProtocolEncapName": "encap:BLUETOOTH_HCI_H4",
+            "DefaultProtocolName": "encap:BLUETOOTH_HCI_H4",
+            "DefaultPrograms": [],
+            "Program": 0,
+            "CoreDump": true
+        },
+        "StateMapper": {
+            "PacketLayerOffset": 1,
+            "Mapping": [
+               {
+                    "Filter": "btatt.uuid16",
+                    "LayerName": "GATT",
+                    "StateNameField": "btatt.uuid16",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "btatt.error_code",
+                    "LayerName": "ATT Error",
+                    "StateNameField": "btatt.error_code",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "btatt",
+                    "LayerName": "ATT",
+                    "StateNameField": "btatt.opcode.method",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "btsmp",
+                    "LayerName": "SMP",
+                    "StateNameField": "btsmp.opcode",
+                    "AppendSummary": false
+                },
+                {
+                    "Filter": "btl2cap",
+                    "LayerName": "L2CAP",
+                    "StateNameField": "btl2cap.cmd_code",
+                    "AppendSummary" : false
+                }
+            ],
+            "Overrides": {},
+            "SaveFolder": "configs/models/generic/",
+            "ShowAllStates": true
+        },
+        "Fuzzing": {
+            "Excludes": [{
+                "ApplyTo": "",
+                "Description": "",
+                "Filter": ""
+            }]
+        },
+        "Validation": {
+            "CommonRejections": [],
+            "InitialState": "Connect"
+        }
+    }
+}

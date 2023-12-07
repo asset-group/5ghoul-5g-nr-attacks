@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# This is a libev-git maintainer script. Do not run it unless you know what you
+# are doing!
+#
+# Since upstream libev is managed in CVS, this script will import the latest
+# changes from the upstream libev CVS trunk into the cvs branch in this Git
+# repository, which is a pure, unadulterated mirror of the upstream source code.
+# It is then your responsibility to do a merge into the master branch, and
+# correctly resolve any merge conflicts that may arise.
+#
+
+set -e
+
+if [ ! -e .git ] || [ ! -e ev.c ]; then
+    echo "This script must be run in the libev-git repository!" 1>&2
+    exit 1
+fi
+
+current_branch=$(git branch 2>/dev/null | awk '{if($1 == "*"){print $2; exit 0;}}')
+if [ -z "$current_branch" ]; then
+    echo "Failed to get the current branch" 1>&2
+    exit 1
+fi
+
+if ! git status 2>/dev/null | grep -qs 'working tree clean'; then
+    echo "Working tree not clean. Please stash or commit your changes," 1>&2
+    echo "then run this script again." 1>&2
+    exit 1
+fi
+
+if [ "$current_branch" != 'cvs' ]; then
+    if ! git checkout cvs; then
+        echo "Failed to checkout the 'cvs' branch" 1>&2
+        exit 1
+    fi
+
+    trap "git checkout $current_branch" EXIT INT QUIT TERM
+fi
+
+if ! git pull; then
+    echo "Failed to pull the latest changes from the 'cvs' branch" 1>&2
+    exit 1
+fi
+
+if ! git cvsimport -v -o cvs -a -d :pserver:anonymous@cvs.schmorp.de/schmorpforge libev; then
+    echo "Failed to import the latest changes from CVS" 1>&2
+    exit 1
+fi
+
+echo "######################### COMPLETE #########################"
+echo "The 'cvs' branch is up-to-date with upstream. Please do a"
+echo "'git merge cvs' into your current branch, resolve any merge"
+echo "conflicts, and do a test build."
+echo "############################################################"
+exit 0

@@ -1,6 +1,6 @@
 # 5Ghoul - 5G NR Attacks & 5G OTA Fuzzing
 
-> Proof of Concept of 5G NR Attacks against commercial smartphones, CPE routers, USB Modems, etc. Fuzzer included⚡. 5Ghoul is family of implementation-level 5G DoS vulnerabilities affecting **Qualcomm** and **MediaTek** mobile platforms.   
+> Proof of Concept (PoC) of 5G NR Attacks against commercial smartphones, CPE routers, USB Modems, etc. Fuzzer included⚡. 5Ghoul is family of implementation-level 5G DoS vulnerabilities affecting **Qualcomm** and **MediaTek** mobile platforms.   
 
 ![attack_overview_with_output](./docs/figures/attack_overview_with_output.png)
 
@@ -27,11 +27,11 @@
 
 # 1. 📋 Requirements
 
-* **Software:** The binary release has been tested and confirmed to work on bare-metal Ubuntu 18.04.  However a docker container is provided to run *5Ghoul PoC & Fuzzer* in **any Linux based OS capable of running Docker**. We have validated the container in `Docker version 24.0.2`. Note that **we don't recommend using any virtual machine** since the latency of USB3 needs to be kept as low as possible.
+* **Software:** The binary release has been tested and confirmed to work on bare-metal Ubuntu 18.04.  However a docker container is provided to run *5Ghoul PoC & Fuzzer* in **any Linux based OS capable of running Docker**. We have validated the container in `Docker version 24.0.2`. Note that **we do not recommend using any virtual machine** since the latency of USB3 needs to be kept as low as possible.
 
 * **Hardware:** 
 
-  * **USRP B210:** Use of a software-defined-radio (SDR) is required. We recommend the use of **[USRP B210](https://www.ettus.com/all-products/ub210-kit/)**, which can be acquired directly from ETTUS. However, *5Ghoul PoC & Fuzzer* relies on OpenAirInterface 5G software stack, which can works with other [other SDRs](https://gitlab.eurecom.fr/oai/openairinterface5g/-/wikis/OpenAirSystemRequirements#supported-rf) that might also work with our PoC.
+  * **USRP B210:** Use of a software-defined-radio (SDR) is required. We recommend the use of **[USRP B210](https://www.ettus.com/all-products/ub210-kit/)**, which can be acquired directly from ETTUS. However, *5Ghoul PoC & Fuzzer* relies on OpenAirInterface 5G software stack, which can work with other [other SDRs](https://gitlab.eurecom.fr/oai/openairinterface5g/-/wikis/OpenAirSystemRequirements#supported-rf) that might also work with our PoC.
     
      <p align="center"><img src="./docs/figures/sdr-usrpb210.png" alt="sdr-usrpb210" width="150" height="auto" /></p> 
 <p align="center">
@@ -48,7 +48,7 @@
 
 # 2. ⏩ Quick Start 
 
-To get started with *5Ghoul PoC*, we recomend usage of **5Ghoul Container**, available our docker hub. To simplify its usage, we created a wrapper script to run the container with all the required docker arguments:
+To get started with *5Ghoul PoC*, we recomend usage of **5Ghoul Container**, available in our docker hub. To simplify its usage, we created a wrapper script to run the container with all the required docker arguments:
 
 ```bash
 mkdir 5ghoul # Create 5ghoul folder
@@ -72,9 +72,9 @@ To put it simply, you can just run the following command after connecting USRP B
 sudo ./bin/5g_fuzzer --exploit=mac_sch_rrc_setup_crash_var --MCC=001 --MNC=01
 ```
 
-Once the 5Ghoul PoC runs, it will start a rogue base station (gNB) using the provided MCC and MNC by the command line. You can attempt to connect to this rogue base station by inserting a compatible testing SIM card and scanning for operator networks in Android mobile connectivity settings. More details on this in Section Phone Configuration.
+Once the 5Ghoul PoC runs, it will start a rogue base station (gNB) using the provided MCC and MNC by the command line. You can attempt to connect to this rogue base station by inserting a compatible testing SIM card and scanning for operator networks in Android mobile connectivity settings. More details on this is provided in Section Phone Configuration.
 
-When the smartphone connects to the rogue base station and an attack is launched, the terminal will print messages such as `"Malformed rrc setup sent!"`. These messages depend on the chosen exploit script. The Figure below exemplifies the expected output for the *5Ghoul* vulnerability **V7**, which disables the 5G of the smartphone. In this context, the smartphone won't be able to reconnect to the rogue base station and message` "Target is not responding"` is printed if no communication with the smartphone is possible after 45 seconds.
+When the smartphone connects to the rogue base station and an attack is launched, the terminal will print messages such as `"Malformed rrc setup sent!"`. These messages depend on the chosen exploit script. The Figure below exemplifies the expected output for the *5Ghoul* vulnerability **V7**, which disables the 5G connection of the smartphone. In this context, the smartphone won't be able to reconnect to the rogue base station and message` "Target is not responding"` is printed if no communication with the smartphone is possible after 45 seconds.
 
 ![poc-attack-v7](./docs/figures/poc-attack-v7.svg)
 
@@ -156,7 +156,7 @@ sudo bin/5g_fuzzer --MCC=001 --MNC=01 --EnableMutation=true --gui # Run with gra
 
 # 5. 🛠️ (Optional) Build *5Ghoul* software from source
 
-Several requirements needs to be installed before compiling the project. An automated script for Ubuntu 18.04/20.04 is provided on `requirements.sh`. To compile from source, simply run the following commands:
+Several requirements need to be installed before compiling the project. An automated script for Ubuntu 18.04/20.04 is provided on `requirements.sh`. To compile from source, simply run the following commands:
 
 ```bash
 git clone https://github.com/asset-group/5ghoul-5g-nr-attacks

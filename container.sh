@@ -218,7 +218,6 @@ then
 
 	if [[ ! -z "$2" ]]
 	then
-		sudo docker login ${CONTAINER_REPO}
 		sudo docker pull ${CONTAINER_REPO}:$2-$ARCH
 		sudo docker system prune -f
 	else

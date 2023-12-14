@@ -54,7 +54,7 @@ To get started with *5Ghoul PoC*, we recomend usage of **5Ghoul Container**, ava
 mkdir 5ghoul # Create 5ghoul folder
 curl -LJO https://github.com/asset-group/5ghoul-5g-nr-attacks/raw/master/container.sh
 chmod +x container.sh # Give exec. permission to the 5Ghoul container script
-./container.sh release-5g # This will pull and start the terminal of the 5Ghoul container
+./container.sh run release-5g # This will pull and start the terminal of the 5Ghoul container
 sudo bin/5g_fuzzer --MCC=001 --MNC=01 # This will start the rogue base station inside the container
 ```
 

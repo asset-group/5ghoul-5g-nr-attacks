@@ -180,7 +180,7 @@ You can list all options of 5Ghoul PoC by running it with  `--help`  argument as
 sudo bin/5g_fuzzer --help
 Fuzzer for 5G NR User Equipment (UE) - MAC-NR, PDCP-NR, RLC-NR, NAS-5GS
 Usage:
-  lte_fuzzer [OPTION...]
+  5g_fuzzer [OPTION...]
 
   -h, --help            Print help
       --default-config  Start with default config

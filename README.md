@@ -308,3 +308,8 @@ Usage:
 
 
 <p align="center"><img src="./docs/figures/protocol-stack-5g.svg" alt="protocol-stack-5g" style="zoom:150%;" /></p>
+
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=asset-group/5ghoul-5g-nr-attacks&type=Date)](https://star-history.com/#asset-group/5ghoul-5g-nr-attacks&Date)

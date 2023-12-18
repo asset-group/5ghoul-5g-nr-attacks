@@ -357,7 +357,7 @@ sudo bin/5g_fuzzer --MCC=001 --MNC=01 --EnableMutation=true --gui # Run with gra
 
 # 6. 🛠️ (Optional) Build *5Ghoul* software from source
 
-Several requirements need to be installed before compiling the project. An automated script for Ubuntu 18.04/20.04 is provided on `requirements.sh`. To compile from source, simply run the following commands:
+Several requirements need to be installed before compiling the project. An automated script for **Ubuntu 18.04** is provided on `requirements.sh`. To compile from source, simply run the following commands:
 
 ```bash
 git clone https://github.com/asset-group/5ghoul-5g-nr-attacks

@@ -270,13 +270,14 @@ Detailed information on callbacks that are invoked when receiving Downlink frame
   ```c++
   int tx_post_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)
   {
-      // Test if uplink packet matches filter f1, previously registered in rx_pre_dissection
+      // Test if downlink packet matches filter f1, previously registered in rx_pre_dissection
       if (wd_read_filter(ctx->wd, f1))
       {
           printf("Packet filter matched here, let's mutate it!!!!\n");
           wd_log_y("Malformed MAC data sent!"); // Same as printf, but uses internal API to log messages
           pkt_buf[60 - 48] = 0xB5; // Modify raw packet at offset 12
           pkt_buf[61 - 48] = 0x02; // Modify raw packet at offset 13
+          return 1;
       }
       return 0;
   }

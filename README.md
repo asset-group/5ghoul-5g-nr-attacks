@@ -168,11 +168,11 @@ Available Exploits:
 
 <p align="center"><img src="./docs/figures/interception-diagram-uplink.svg" alt="interception-diagram-uplink" style="zoom:170%;" /></p>
 
-* **Uplink Packet Interception Path** - The base station (gNB) receives a 5G NR MAC frame from the user equipment (UE). Then, the OpenAirInterface software stack forwards such MAC packet to the *5Ghoul Packet Interception API*. This Interception API is used to decode and analyze packets according to certain *filtering rules*, which are analogous to Wireshark's Display Filter. Consequently, the user can leverage such Interception API in a C++ exploit script to launch new attacks, perform packet analysis, intrusion detection, etc.
+* **Uplink Packet Interception Path** - The base station (gNB) receives a 5G NR MAC frame from the user equipment (UE). Then, the OpenAirInterface software stack forwards such MAC packet to the *5Ghoul Packet Interception API*. This Interception API is used to decode and analyze packets according to certain *filtering rules*, which are analogous to Wireshark's Display Filter. Consequently, the user can leverage such Interception API in a C++ exploit script to launch new attacks, perform packet analysis and intrusion detection, among others.
 
 <p align="center"><img src="./docs/figures/interception-diagram-downlink.svg" alt="interception-diagram-downlink" style="zoom:170%;" /></p>
 
-* **Downlink Packet Interception Path** - Downlink packets are generated from within OpenAirInterface and  then passed to the Interception API via a ***Hold*** operation. Once the Interception API, controlled by the user, finishes processing of the hold packet, the packet is forwarded back to OpenAirInterface and finally transmitted to the UE.
+* **Downlink Packet Interception Path** - Downlink packets are generated from within OpenAirInterface and  then passed to the Interception API via a ***Hold*** operation. Once the Interception API, controlled by the user, finishes processing of the hold packet, the packet is forwarded back to OpenAirInterface and finally transmitted to the target UE.
 
 
 
@@ -252,7 +252,7 @@ Detailed information on callbacks that are invoked when receiving Uplink frames 
 
 <p align="center"><img src="./docs/figures/interception-script-downlink.svg" alt="interception-script-downlink" style="zoom:200%;" /></p>
 
-Detailed information on callbacks that are invoked when receiving Downlink frames from the UE is discussed below.
+Detailed information on callbacks that are invoked when receiving Downlink frames to the UE is discussed in the following sections.
 
 * `int tx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` - Called ***BEFORE*** a Downlink packet to the UE is decoded. You can use this to manually check the raw bytes of the Downlink packet `pkt_buf` or register filters (via `wd_register_filter`) that are to be used later in `_post_` callback. Note that `ctx->wd` is a internal context variable used to track the state of the protocol decoding:
 

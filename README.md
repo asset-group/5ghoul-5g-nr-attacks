@@ -78,7 +78,7 @@ The final command above (`sudo bin/5g_fuzzer ...`) will start the rogue base sta
 
 ## 2.1. Simulation (Testing 5Ghoul without SDR)
 
-If you don't have a SDR, but would like to test 5Ghoul for 5G experimentation or to launch sample attacks, there is a *experimental* simulation support provided by OpenAirInterface. You can use such simulation mode by running 5Ghoul PoC with the additional argument  `--EnableSimulator=true` as shown in the Figure below. Note that you will receive an error message `UE MAC Authentication Failure`. This is because OpenAirInterface stack does not implement all the functionalities to connect the UE to the gNB during simulation. You can however use this simulation mode to check 5G captures and test custom exploit scripts:
+If you do not have an SDR, but would like to test 5Ghoul for 5G experimentation or to launch sample attacks, there is an *experimental* simulation support provided by OpenAirInterface. You can use such simulation mode by running 5Ghoul PoC with the additional argument  `--EnableSimulator=true` as shown in the Figure below. Note that you will receive an error message `UE MAC Authentication Failure`. This is because OpenAirInterface stack does not implement all the functionalities to connect the UE to the gNB during simulation. You can however use this simulation mode to check 5G captures and test custom exploit scripts:
 
 ```
 sudo bin/5g_fuzzer --EnableSimulator=true --EnableMutation=false --GlobalTimeout=false
@@ -176,21 +176,21 @@ Available Exploits:
 
 
 
-When saving a new exploit script to folder `modules/exploits/5gnr_gnb`, the 5Ghoul PoC binary will compile and load the new script during startup. You can check if your script has compiled and loaded correctly, by listing it in the exploits list: `sudo bin/5g_fuzzer --list-exploits`. Note that sometim  es the script compilation will randomly fail, but you can try recompiling by running the 5Ghoul PoC binary again.
+When saving a new exploit script to folder `modules/exploits/5gnr_gnb`, the 5Ghoul PoC binary will compile and load the new script during startup. You can check if your script has compiled and loaded correctly, by listing it in the exploits list: `sudo bin/5g_fuzzer --list-exploits`. It is possible for the script compilation to randomly fail, but you can try recompiling by running the 5Ghoul PoC binary again.
 
 
 
 ## 4.1. Exploits Script API Usage
 
-5Ghoul PoC loads a script at startup from [modules/exploits/5gnr_gnb](https://github.com/asset-group/5ghoul-5g-nr-attacks/tree/master/modules/exploits/5gnr_gnb) and calls `int setup(wd_modules_ctx_t *ctx)` and `const char *module_name()`. However other functions are called for every received 5G packet to and from the UE (via Base Station). In this context, received **uplink packets** are firstly forwarded to `rx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)`, decoded and finally passed to `rx_post_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` via arguments containing the raw packet buffer (`pkt_buf`, `pkt_length`) and the *decoding context variable* `ctx`. These callback functions need to be defined inside the exploit script created by the user. Otherwise, 5Ghoul will simply ignore calls for these functions and essentially not do anything after receiving a 5G packet. Consequently, the intention of using `_pre_` and `_post_` callbacks is to allow the user to filter 5G packets before and after decoding. In the case of Downlink packets, it is possible to even alter packets destined to the target UE or inject new packets. However, a simpler explanation showing Uplink (analysis only) is shown in the Figure below.
+5Ghoul PoC loads a script at startup from [modules/exploits/5gnr_gnb](https://github.com/asset-group/5ghoul-5g-nr-attacks/tree/master/modules/exploits/5gnr_gnb) and calls `int setup(wd_modules_ctx_t *ctx)` and `const char *module_name()`. Additionally, other functions are called for every received 5G packet to and from the UE (via Base Station). In this context, received **uplink packets** are firstly forwarded to `rx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)`, decoded and finally passed to `rx_post_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` via arguments containing the raw packet buffer (`pkt_buf`, `pkt_length`) and the *decoding context variable* `ctx`. These callback functions need to be defined inside the exploit script created by the user. Otherwise, 5Ghoul will simply ignore calls for these functions and essentially not do anything after receiving a 5G packet. In summary, the intention of using `_pre_` and `_post_` callbacks is to allow the user to filter 5G packets before and after decoding. In the case of Downlink packets, it is possible to alter packets destined to the target UE or inject new packets. Firstly, a simple example of capturing Uplink (analysis only) is illustrated in the Figure below.
 
 <p align="center"><img src="./docs/figures/interception-script-uplink.svg" alt="interception-script-uplink" style="zoom:200%;" /></p>
 
 <h3 align="center">Initialization</h3>
 
-Detailed information on callbacks that is called during initialization of 5Ghoul PoC is discussed below.
+Detailed information on callbacks that are invoked during initialization of 5Ghoul PoC is discussed below.
 
-* `int setup(wd_modules_ctx_t *ctx)` - Configure 5Ghoul PoC configuration before 5G stack is started. Usually this is used to disable some options that makes 5Ghoul process time out and restart the 5G stack or disable fuzzing (mutation) since that would interfere with the exploit test cases. Additionally you can initialize variables and *declare* filters (`wd_filter("...")`) in `setup`:
+* `int setup(wd_modules_ctx_t *ctx)` - Configures 5Ghoul PoC configuration before 5G stack is started. In general, this is used to disable some options that makes 5Ghoul process times out and restart the 5G stack or disable fuzzing (mutation) since fuzzing would interfere with the exploit test cases. Additionally you can initialize variables and *declare* filters (`wd_filter("...")`) in `setup`:
 
   ```c++
   int setup(wd_modules_ctx_t *ctx)
@@ -204,7 +204,7 @@ Detailed information on callbacks that is called during initialization of 5Ghoul
   }
   ```
 
-* `const char *module_name()` - Used to indicate a friendly name or description to the current exploit script to be loaded at runtime. Currently this is not used. You can return any string in this callback:
+* `const char *module_name()` - Used to indicate a friendly name or description of the current exploit script to be loaded at runtime. Currently this is not used. You can return any string in this callback:
 
   ```c++
   const char *module_name()
@@ -217,9 +217,9 @@ Detailed information on callbacks that is called during initialization of 5Ghoul
 
 <h3 align="center">Uplink Interception (Packet Analysis Only)</h3>
 
-Detailed information on callbacks that are called when receiving Uplink frames from the UE is discussed below.
+Detailed information on callbacks that are invoked when receiving Uplink frames from the UE is discussed below.
 
-* `int rx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` - Called ***BEFORE*** an Uplink packet from the UE is decoded. You can use this to manually check the raw bytes of the Uplink packet `pkt_buf` or register filters (via `wd_register_filter`) that are to be be used later in `_post_` callback. Note that `ctx->wd` is a internal context variable used to track state of the protocol decoding:
+* `int rx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` - Called ***BEFORE*** an Uplink packet from the UE is decoded. You can use this to manually check the raw bytes of the Uplink packet `pkt_buf` or register filters (via `wd_register_filter`) that are to be used later in `_post_` callback. Note that `ctx->wd` is an internal context variable used to track the state of the protocol decoding:
 
   ```c++
   int rx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)
@@ -248,13 +248,13 @@ Detailed information on callbacks that are called when receiving Uplink frames f
 
 <h3 align="center">Downlink Interception (Packet Analysis and Mutation)</h3>
 
-**Downlink Interception** is arguably a bit more complicated than uplink interception since it offers slightly more features to the user in terms of test case creation. Whenever the Base Station wants to reply to the UE, it will generate a raw 5G MAC buffer which can be modified by the user C++ exploit script, before such buffer is ultimately transmitted over-the-air to the UE. To this end, 5Ghoul Interception API connects the `_pre_` and `_post_` callbacks in a similar fashion as Uplink, but the main difference is such that transmission of a downlink packet is delayed to the UE until the `tx_post_dissection` callback finishes its execution. Since `tx_post_dissection` passes as argument the raw buffer `pkt_buf` to the function, **any change in this packet buffer will be forwarded to the Base Station software stack**, which will then transmit the mutated payload over-the-air. For this reason it is important to remember that the user shall not insert delays (e.g., `usleep`) inside both `tx_pre_dissection` and `tx_post_dissection`. Doing such would make the Base Station delay its communication downlink transmission and ultimately terminate its 5G communication with the UE. An example of the execution flow of a downlink packet through `tx_pre_dissection` and `tx_post_dissection` callbacks is illustrated in the Figure below.
+**Downlink Interception** is arguably a bit more complicated than uplink interception. This is because downlink interception offers slightly more features to the user in terms of test case creation. Whenever the Base Station wants to reply to the UE, it will generate a raw 5G MAC buffer. This buffer can be modified by the user C++ exploit script, before such buffer is ultimately transmitted over-the-air to the UE. To this end, 5Ghoul Interception API connects the `_pre_` and `_post_` callbacks in a similar fashion as Uplink, but the main difference is that transmission of a downlink packet is delayed to the UE until the `tx_post_dissection` callback finishes its execution. Since `tx_post_dissection` passes as argument the raw buffer `pkt_buf` to the function, **any change in this packet buffer will be forwarded to the Base Station software stack**, which will then transmit the mutated payload over-the-air. For this reason, it is important to remember that the user should not insert delays (e.g., `usleep`) inside both `tx_pre_dissection` and `tx_post_dissection`. Doing such would make the Base Station delay its communication downlink transmission and ultimately terminate its 5G communication with the UE. An example of the execution flow of a downlink packet through `tx_pre_dissection` and `tx_post_dissection` callbacks is illustrated in the Figure below.
 
 <p align="center"><img src="./docs/figures/interception-script-downlink.svg" alt="interception-script-downlink" style="zoom:200%;" /></p>
 
-Detailed information on callbacks that are called when receiving Uplink frames from the UE is discussed below.
+Detailed information on callbacks that are invoked when receiving Downlink frames from the UE is discussed below.
 
-* `int tx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` - Called ***BEFORE*** an Downlink packet from the UE is decoded. You can use this to manually check the raw bytes of the Downlink packet `pkt_buf` or register filters (via `wd_register_filter`) that are to be used later in `_post_` callback. Note that `ctx->wd` is a internal context variable used to track state of the protocol decoding:
+* `int tx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` - Called ***BEFORE*** a Downlink packet to the UE is decoded. You can use this to manually check the raw bytes of the Downlink packet `pkt_buf` or register filters (via `wd_register_filter`) that are to be used later in `_post_` callback. Note that `ctx->wd` is a internal context variable used to track the state of the protocol decoding:
 
   ```c++
   int tx_pre_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)
@@ -265,8 +265,8 @@ Detailed information on callbacks that are called when receiving Uplink frames f
   }
   ```
 
-* `int tx_post_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` - Called ***AFTER*** an Downlink packet from the UE is decoded. You can use this to check if a condition, previously registered in `_pre_` callback, matches with the current decoded packet `pkt_buf`. Consequently, inside the condition you can modify any bytes of the raw Downlink packet. The modified bytes will be then sent to the UE after end of execution of this callback. Return 1 to indicate if the packet has been mutated, otherwise return 0 for no change.
-
+* `int tx_post_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)` - Called ***AFTER*** a Downlink packet to the UE is decoded. You can use this to check if a condition, previously registered in `_pre_` callback, matches with the current decoded packet `pkt_buf`. Consequently, inside the condition you can modify any bytes of the raw Downlink packet. The modified bytes will be then sent to the UE after the end of execution of this callback.
+  
   ```c++
   int tx_post_dissection(uint8_t *pkt_buf, int pkt_length, wd_modules_ctx_t *ctx)
   {
@@ -286,7 +286,7 @@ Detailed information on callbacks that are called when receiving Uplink frames f
 
 ## 4.2. Example (MAC/RLC Crash C++ Script)
 
-A full 5Ghoul Exploit script example is provided below. The sample script below ([mac_sch_mac_rlc_crash.cpp](https://github.com/asset-group/5ghoul-5g-nr-attacks/blob/master/modules/exploits/5gnr_gnb/mac_sch_mac_rlc_crash.cpp)) only defines callback functions to analyze downlink ( `tx_pre_dissection`, `tx_post_dissection`) since we only care about changing bytes of the downlink to launch an attack. However, if you want to create script that analyses the response of the UE, using the uplink callbacks (`rx_pre_dissectoin` and `rx_post_dissection`) is greatly helpful.
+A full 5Ghoul Exploit script example is provided below. The sample script below ([mac_sch_mac_rlc_crash.cpp](https://github.com/asset-group/5ghoul-5g-nr-attacks/blob/master/modules/exploits/5gnr_gnb/mac_sch_mac_rlc_crash.cpp)) only defines callback functions to analyze downlink ( `tx_pre_dissection`, `tx_post_dissection`) since we curently focus on  changing bytes of the downlink packets to launch an attack. However, if you want to create a script that analyses the response of the UE, using the uplink callbacks (`rx_pre_dissectoin` and `rx_post_dissection`) is greatly helpful.
 
 ```c++
 #include <ModulesInclude.hpp>

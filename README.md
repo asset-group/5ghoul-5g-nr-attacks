@@ -363,9 +363,11 @@ Several requirements need to be installed before compiling the project. An autom
 ```bash
 git clone https://github.com/asset-group/5ghoul-5g-nr-attacks
 cd 5ghoul-5g-nr-attacks
-./requirements.sh 5g # Install all system requirements to compile 5ghoul fuzzer, OpenAirInterface and Open5GS
-./build.sh all # Compile all binaries + Wireshark. It may take around 20min. Go get a coffe!
-./build.sh dev # (Optional) Compile all binaries without Wireshark.
+./requirements.sh dev # Install all system requirements to compile 5ghoul fuzzer (Important)
+./requirements.sh 5g # Install all system requirements to compile OpenAirInterface and Open5GS
+./build.sh all # Compile all binaries WITH Wireshark. It may take around 20min. Go get a coffe!
+./build.sh dev # (OPTIONAL) Compile all binaries WITHOUT Wireshark.
+./build.sh # Run without arguments to quickly build the 5g_fuzzer after modifying any file inside ./src folder.
 ```
 
 The expected output during the build process is shown below:

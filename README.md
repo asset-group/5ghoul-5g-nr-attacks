@@ -15,6 +15,7 @@
    * 2.2. [Over-the-air packet traces (Wireshark Capture)](#22-over-the-air-packet-traces-wireshark-capture)
    
 3. [☢️ Launching a 5Ghoul attack](#3-%EF%B8%8F-launching-a-5ghoul-attack)
+   * [Tutorial Video](#tutorial-video)
    * [Summary of Available Attacks](#summary-of-available-attacks)
 
 
@@ -113,6 +114,16 @@ Once the 5Ghoul PoC runs, it will start a rogue base station (gNB) using the pro
 When the smartphone connects to the rogue base station and an attack is launched, the terminal will print messages such as `"Malformed rrc setup sent!"`. These messages depend on the chosen exploit script. The Figure below exemplifies the expected output for the *5Ghoul* vulnerability **V7**, which disables the 5G connection of the smartphone. In this context, the smartphone won't be able to reconnect to the rogue base station and message` "Target is not responding"` is printed if no communication with the smartphone is possible after 45 seconds.
 
 ![poc-attack-v7](./docs/figures/poc-attack-v7.svg)
+
+
+
+## Tutorial Video
+
+[Cemaexecuter](https://twitter.com/cemaxecuter) prepared a video to show how to configure 5Ghoul to launch attacks against a Qualcomm-based 5G modem from Quectel.
+
+<iframe width="560" height="560" src="https://www.youtube.com/embed/HN2r6esRDjM?si=fEy5oXQZ2QuXktYE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+
 
 
 

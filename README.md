@@ -119,11 +119,9 @@ When the smartphone connects to the rogue base station and an attack is launched
 
 ## Tutorial Video
 
-[Cemaexecuter](https://twitter.com/cemaxecuter) prepared a video to show how to configure 5Ghoul to launch attacks against a Qualcomm-based 5G modem from Quectel.
+User [Cemaexecuter](https://twitter.com/cemaxecuter) prepared a video to show how to configure 5Ghoul to launch attacks against a Qualcomm-based 5G modem from Quectel.
 
-<iframe width="560" height="560" src="https://www.youtube.com/embed/HN2r6esRDjM?si=fEy5oXQZ2QuXktYE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
-
+[![Alt text](./docs/figures/video-cemaexecuter.png)](https://www.youtube.com/watch?v=HN2r6esRDjM)
 
 
 

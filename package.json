@@ -16,7 +16,7 @@
     "pdf": "vuepress export docs && mkdir -p release && mv site.pdf release/docs.pdf"
   },
   "dependencies": {
-    "@quasar/extras": "^1.9.12",
+    "@quasar/extras": "^1.16.9",
     "@snowdog/vuepress-plugin-pdf-export": "^1.1.0",
     "node-fetch": "^2.6.7",
     "quasar": "^1.22.10",

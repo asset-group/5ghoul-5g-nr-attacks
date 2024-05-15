@@ -18,7 +18,7 @@
   "dependencies": {
     "@quasar/extras": "^1.16.11",
     "@snowdog/vuepress-plugin-pdf-export": "^1.1.0",
-    "node-fetch": "^2.6.7",
+    "node-fetch": "^2.7.0",
     "quasar": "^1.22.10",
     "vue-scrollin": "^0.1.2",
     "vuepress": "1.7.1",

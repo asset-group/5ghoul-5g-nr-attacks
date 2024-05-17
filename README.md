@@ -145,6 +145,8 @@ Currently, *5Ghoul* PoC has 12 exploits available. The correspondence between th
 | V12 - Invalid RRC searchSpacesToAddModList | *mac_sch_mtk_rrc_setup_crash_1*     | CVE-2023-32841 |
 | V13 - Invalid RRC Uplink Conﬁg Element     | *mac_sch_mtk_rrc_setup_crash_3*     | CVE-2023-32843 |
 | V14 - Null RRC Uplink Conﬁg Element        | *mac_sch_mtk_rrc_setup_crash_7*     | CVE-2023-32845 |
+| V15 - Invalid RRC CellGroup ID             | *mac_sch_mtk_rrc_setup_crash_8*     | CVE-2024-20003 |
+| V16 - Invalid RRC CellGroupConfig          | *mac_sch_mtk_rrc_setup_crash_9*     | CVE-2024-20004 |
 | DA1 - NAS Flooding Downgrade               | **TBA**                             | N.A            |
 
 * Vulnerabilities **V3,V4** do not seem to affect Qualcomm modems with firmware version dated since 2021.

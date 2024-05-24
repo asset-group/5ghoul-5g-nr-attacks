@@ -10,24 +10,24 @@
 
 **Table of Contents**
 
-1. [📋 Requirements](./#1--requirements)
-2. [⏩ Quick Start (Docker Container)](./#2--quick-start-docker-container)
-   * 2.1 [Simulation (Testing 5Ghoul without SDR)](./#21-simulation-testing-5ghoul-without-sdr)
-   * 2.2 [Over-the-air packet traces (Wireshark Capture)](./#22-over-the-air-packet-traces-wireshark-capture)
+1. [📋 Requirements](#1--requirements)
+2. [⏩ Quick Start (Docker Container)](#2--quick-start-docker-container)
+   * 2.1 [Simulation (Testing 5Ghoul without SDR)](#21-simulation-testing-5ghoul-without-sdr)
+   * 2.2 [Over-the-air packet traces (Wireshark Capture)](#22-over-the-air-packet-traces-wireshark-capture)
 3. [☢️ Launching a 5Ghoul attack](#3-️-launching-a-5ghoul-attack)
    * 3.1 [Tutorial Video](#31-tutorial-video)
    * 3.2 [Summary of Available Attacks](#32-summary-of-available-attacks)
-4. [📜 Create your own 5G exploits (test cases)](./#4--create-your-own-5g-exploits-test-cases)
-   * 4.1 [Exploits Script API Usage](./#41-exploits-script-api-usage)
-   * 4.2 [Example (MAC/RLC Crash C++ Script)](./#42-example-macrlc-crash-c-script)
-5. [🔀 Running the 5G NR Fuzzer](./#5--running-the-5g-nr-fuzzer)
-6. [🛠️ (Optional) Build _5Ghoul_ software from source](./#6-️-optional-build-5ghoul-software-from-source)
-7. [⚙️ Advanced Options](./#7-️-advanced-options)
-8.  [✉️ Supported 5G Protocols (Stacks)](./#8-️-supported-5g-protocols-stacks)
+4. [📜 Create your own 5G exploits (test cases)](#4--create-your-own-5g-exploits-test-cases)
+   * 4.1 [Exploits Script API Usage](#41-exploits-script-api-usage)
+   * 4.2 [Example (MAC/RLC Crash C++ Script)](#42-example-macrlc-crash-c-script)
+5. [🔀 Running the 5G NR Fuzzer](#5--running-the-5g-nr-fuzzer)
+6. [🛠️ (Optional) Build _5Ghoul_ software from source](#6-️-optional-build-5ghoul-software-from-source)
+7. [⚙️ Advanced Options](#7-️-advanced-options)
+8.  [✉️ Supported 5G Protocols (Stacks)](#8-️-supported-5g-protocols-stacks)
 
-    🙏 [Third-Party Libraries & Acknowledgements](./#-third-party-libraries--acknowledgements)
+    🙏 [Third-Party Libraries & Acknowledgements](#-third-party-libraries--acknowledgements)
 
-    🌟 [Star History](./#-star-history)
+    🌟 [Star History](#-star-history)
 
 ***
 

@@ -10,6 +10,7 @@
 
 **Table of Contents**
 
+* [📰 Talks & Updates](#-talks--updates)
 1. [📋 Requirements](#1--requirements)
 2. [⏩ Quick Start (Docker Container)](#2--quick-start-docker-container)
    * 2.1 [Simulation (Testing 5Ghoul without SDR)](#21-simulation-testing-5ghoul-without-sdr)
@@ -30,6 +31,10 @@
     🌟 [Star History](#-star-history)
 
 ***
+
+## 📰 Talks & Updates
+
+* **October 31st, 2024 - DEFCON32 Demolabs (August 10)**: Our slides on 5Ghoul are available here: [./docs/5GhoulDefcon32Demo.pptx](./docs/5GhoulDefcon32Demo.pptx)
 
 ## 1. 📋 Requirements
 

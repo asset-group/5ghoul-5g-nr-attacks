@@ -26,7 +26,7 @@
 7. [⚙️ Advanced Options](#7-️-advanced-options)
 8.  [✉️ Supported 5G Protocols (Stacks)](#8-️-supported-5g-protocols-stacks)
 
-        [📝 How to Cite](#9-️-supported-5g-protocols-stacks)
+    📝 [Citing 5Ghoul](#-citing-5ghoul)
 
     🙏 [Third-Party Libraries & Acknowledgements](#-third-party-libraries--acknowledgements)
 

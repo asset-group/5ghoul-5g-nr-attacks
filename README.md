@@ -26,6 +26,8 @@
 7. [⚙️ Advanced Options](#7-️-advanced-options)
 8.  [✉️ Supported 5G Protocols (Stacks)](#8-️-supported-5g-protocols-stacks)
 
+        [📝 How to Cite](#9-️-supported-5g-protocols-stacks)
+
     🙏 [Third-Party Libraries & Acknowledgements](#-third-party-libraries--acknowledgements)
 
     🌟 [Star History](#-star-history)
@@ -512,6 +514,19 @@ _5Ghoul PoC & Fuzzer_ is built upon well known protocols stack implementation. T
 <img src="docs/figures/protocol-stack-5g.svg" alt="protocol-stack-5g">
 
 </div>
+
+## 📝 Citing 5Ghoul
+If you use 5Ghoul in your research, you can cite our paper:
+
+```
+@article{5ghoul,
+  title={5GHOUL: Unleashing Chaos on 5G Edge Devices via Stateful Multi-layer Fuzzing},
+  author={Garbelini, Matheus E and Shang, Zewen and Luo, Shijie and Chattopadhyay, Sudipta and Sun, Sumei and Kurniawan, Ernest},
+  journal={IEEE Transactions on Dependable and Secure Computing},
+  year={2025},
+  publisher={IEEE}
+}
+```
 
 ## 🙏 Third-Party Libraries & Acknowledgements
 

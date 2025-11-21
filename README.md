@@ -36,8 +36,8 @@
 
 ## 📰 Talks & Updates
 
-* **Sept 15th, 2025 - New Bugs**: 5Ghoul discovers another 12 new vulnerabilities (**ALL 12 with HIGH severity**) in baseband modems from a major vendor. Till date, 5Ghoul has discovered 22 new vulnerabilities
-  (**18 with HIGH severity**). Exploits and other details of the undisclosed CVEs will be released after the embargo. 
+* **Sept 15th, 2025 - New Bugs**: 5Ghoul discovers another 12 new vulnerabilities (**ALL 12 with HIGH severity**) in baseband modems from a major vendor. Till date, 5Ghoul has discovered **22 new vulnerabilities
+  (18 with HIGH severity)**. Exploits and other details of the undisclosed CVEs will be released after the embargo. 
 * **June 17th, 2025 - 5Ghoul Publication**: The technical approach embodied in 5Ghoul will appear in **IEEE TDSC**. It is available [here](https://asset-group.github.io/papers/5Ghoul.pdf).
 * **October 31st, 2024 - DEFCON32 Demolabs (August 10)**: Our slides on 5Ghoul are available here: [./docs/5GhoulDefcon32Demo.pptx](./docs/5GhoulDefcon32Demo.pptx)
 

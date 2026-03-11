@@ -5,7 +5,7 @@ set -eo pipefail
 if  [[ ! -v CONTAINER_REPO ]]
 then
 	CONTAINER_REPO=docker.io/megarbelini/5ghoul
-	# echo "CONTAINER_REPO not set. Using default: $CONTAINER_REPO"
+	echo "CONTAINER_REPO not set. Using default: $CONTAINER_REPO"
 else
 	echo "CONTAINER_REPO set to: $CONTAINER_REPO"
 fi
@@ -76,7 +76,7 @@ copy_files_to_host(){
 		mkdir -p modules/exploits
 		mkdir -p modules/reportsender
 		mkdir -p logs
-		sudo docker cp ${CONTAINER_NAME}-$1:/home/user/wdissector/container.sh ./container.sh
+		# sudo docker cp ${CONTAINER_NAME}-$1:/home/user/wdissector/container.sh ./container.sh
 		sudo docker cp ${CONTAINER_NAME}-$1:/home/user/wdissector/configs .
 		sudo docker cp ${CONTAINER_NAME}-$1:/home/user/wdissector/modules/exploits modules
 		sudo docker cp ${CONTAINER_NAME}-$1:/home/user/wdissector/modules/reportsender modules

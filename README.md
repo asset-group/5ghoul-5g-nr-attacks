@@ -368,15 +368,24 @@ sudo bin/5g_fuzzer --MCC=001 --MNC=01 --EnableMutation=true --gui # Run with gra
 
 Several requirements need to be installed before compiling the project. An automated script for **Ubuntu 18.04** is provided on `requirements.sh`. To compile from source, simply run the following commands:
 
+> **Note:** `./requirements.sh 5g` expects the upstream [OpenAirInterface](https://gitlab.eurecom.fr/oai/openairinterface5g) source tree to be present at `3rd-party/oai_5g_sa` inside this repository. `oai_5g_sa` is **not** a standalone GitHub repository — it is a local directory name used by 5Ghoul's build pipeline. You must clone it manually before running the 5g requirements step:
+>
+> ```bash
+> git clone https://gitlab.eurecom.fr/oai/openairinterface5g.git 3rd-party/oai_5g_sa
+> ```
+
 ```bash
 git clone https://github.com/asset-group/5ghoul-5g-nr-attacks
 cd 5ghoul-5g-nr-attacks
+git clone https://gitlab.eurecom.fr/oai/openairinterface5g.git 3rd-party/oai_5g_sa # Clone OpenAirInterface into the expected directory
 ./requirements.sh dev # Install all system requirements to compile 5ghoul fuzzer (Important)
 ./requirements.sh 5g # Install all system requirements to compile OpenAirInterface and Open5GS
 ./build.sh all # Compile all binaries WITH Wireshark. It may take around 20min. Go get a coffe!
 ./build.sh dev # (OPTIONAL) Compile all binaries WITHOUT Wireshark.
 ./build.sh # Run without arguments to quickly build the 5g_fuzzer after modifying any file inside ./src folder.
 ```
+
+> **Troubleshooting:** If you see errors such as `No such file or directory: 3rd-party/oai_5g_sa` or `oaienv: not found`, it means the OpenAirInterface source has not been cloned into `3rd-party/oai_5g_sa`. Run the clone command above and then retry `./requirements.sh 5g`.
 
 The expected output during the build process is shown below:
 

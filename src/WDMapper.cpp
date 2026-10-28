@@ -24,12 +24,15 @@ void ConfigurePseudoHeader(Machine &SM)
     // Process pseudoheader when loading pcap files (set direction)
     if (string_contains(default_pcap_protocol, "_h4") || string_contains(default_protocol, "_h4")) {
         SM.OnProcessPseudoHeader([&SM](uint8_t *pkt, uint32_t pkt_len, uint32_t &offset) {
-            if (pkt_len >= 4) {
-                // Set packet direction
-                wd_set_packet_direction(SM.wd, (int)pkt[3]);
-                // Return pseudoheader offset
-                offset = 4;
+            if (pkt_len < 4) {
+                offset = pkt_len;
+                return;
             }
+
+            // Set packet direction
+            wd_set_packet_direction(SM.wd, (int)pkt[3]);
+            // Return pseudoheader offset
+            offset = 4;
         });
     }
     else if (string_contains(default_pcap_protocol, "sysdig")) {
@@ -37,32 +40,56 @@ void ConfigurePseudoHeader(Machine &SM)
     }
     else if (string_contains(default_protocol, "mac-lte-framed")) {
         SM.OnProcessPseudoHeader([&SM](uint8_t *pkt, uint32_t pkt_len, uint32_t &offset) {
+            if (pkt_len <= 49 + 1) {
+                offset = pkt_len;
+                return;
+            }
             wd_set_packet_direction(SM.wd, !(int)pkt[49 + 1]);
         });
     }
     else if (string_contains(default_protocol, "mac-nr-framed")) {
         SM.OnProcessPseudoHeader([&SM](uint8_t *pkt, uint32_t pkt_len, uint32_t &offset) {
+            if (pkt_len <= 48 + 1) {
+                offset = pkt_len;
+                return;
+            }
             wd_set_packet_direction(SM.wd, !(int)pkt[48 + 1]);
         });
     }
     else if (string_contains(default_pcap_protocol, "ieee802_11_radiotap")) {
         SM.OnProcessPseudoHeader([&SM](uint8_t *pkt, uint32_t pkt_len, uint32_t &offset) {
+            if (pkt_len < 9) {
+                offset = pkt_len;
+                return;
+            }
             wd_set_packet_direction(SM.wd, (int)pkt[8]);
             offset = 9;
         });
     }
     else if (string_contains(default_pcap_protocol, "usb_linux_mmapped") || string_contains(default_pcap_protocol, "220")) {
         SM.OnProcessPseudoHeader([&SM](uint8_t *pkt, uint32_t pkt_len, uint32_t &offset) {
+            if (pkt_len < 11) {
+                offset = pkt_len;
+                return;
+            }
             wd_set_packet_direction(SM.wd, (int)((pkt[10] & 0x80) > 0));
         });
     }
     else if (string_contains(default_pcap_protocol, "nordic_ble") || string_contains(default_pcap_protocol, "272")) {
         SM.OnProcessPseudoHeader([&SM](uint8_t *pkt, uint32_t pkt_len, uint32_t &offset) {
+            if (pkt_len < 9) {
+                offset = pkt_len;
+                return;
+            }
             wd_set_packet_direction(SM.wd, (int)(!((pkt[8] & 0x02) > 0)));
         });
     }
     else if (string_contains(default_pcap_protocol, "sll_v1")) {
         SM.OnProcessPseudoHeader([&SM](uint8_t *pkt, uint32_t pkt_len, uint32_t &offset) {
+            if (pkt_len < 2) {
+                offset = pkt_len;
+                return;
+            }
             wd_set_packet_direction(SM.wd, (int)(!(pkt[1] & 0x04)));
         });
     }

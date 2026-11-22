@@ -64,13 +64,13 @@ mme:
     gummei:
       plmn_id:
         mcc: 001
-        mnc: 02
+        mnc: 01
       mme_gid: 2
       mme_code: 1
     tai:
       plmn_id:
         mcc: 001
-        mnc: 02
+        mnc: 01
       tac: 1
     security:
         integrity_order : [ EIA2, EIA1, EIA0 ]
@@ -139,19 +139,19 @@ amf:
     guami:
       - plmn_id:
           mcc: 001
-          mnc: 02
+          mnc: 01
         amf_id:
           region: 2
           set: 1
     tai:
       - plmn_id:
           mcc: 001
-          mnc: 02
+          mnc: 01
         tac: 1
     plmn_support:
       - plmn_id:
           mcc: 001
-          mnc: 02
+          mnc: 01
         s_nssai:
           - sst: 1
     security:

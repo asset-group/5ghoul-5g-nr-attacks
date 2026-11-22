@@ -15,8 +15,8 @@
             "LaunchProgramWithGDB": false,
             "ProgramsList": [
                 "3rd-party/open5gs-core/build/tests/app/5gc",
-                "3rd-party/oai_5g_sa/cmake_targets/ran_build/build/nr-softmodem",
-                "3rd-party/oai_5g_sa/cmake_targets/ran_build/build/nr-uesoftmodem"
+                "/opt/oai-22.04/bin/nr-softmodem",
+                "/opt/oai-22.04/bin/nr-uesoftmodem"
             ],
             "MainThreadCore": -1,
             "SaveCoreDump": false
@@ -29,7 +29,7 @@
             "CoreNetworkConfigFile": "open5gs.yaml",
             "BaseStationConfigFile": "n78.106.conf",
             "BaseStationArguments": "--sa --continuous-tx -E",
-            "EnableSimulator": false,
+            "EnableSimulator": true,
             "SimulationConnectionTimeoutMS": 1000,
             "SimulatorDelayUS": 2000,
             "SimulatorUEArguments": "-r 106 --numerology 1 --band 78 -E -C 3619200000 --rfsim --sa --ssb 516",
@@ -133,7 +133,7 @@
             "NormalizeProtocolLayersMutation": true,
             "PacketRetry": false,
             "PacketRetryTimeoutMS": 2500,
-            "GlobalTimeout": true,
+            "GlobalTimeout": false,
             "GlobalTimeoutSeconds": 45,
             "StateLoopDetection": false,
             "StateLoopDetectionThreshold": 5,
@@ -233,6 +233,11 @@
                 ],
                 "ADBProgram": "logcat",
                 "ADBSubSystem": "radio,crash,system,main"
+            }
+        },
+        "Services": {
+            "UEModemManager": {
+                "Enable": false
             }
         }
     }

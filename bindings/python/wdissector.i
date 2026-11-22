@@ -78,6 +78,14 @@ extern "C" {
 %immutable loop;
 %immutable StateMachine;
 
+// SWIG 4.5 errors on `using namespace X;` when X has not been parsed (the
+// headers for these live only in the %{ %} block above). Declare them empty so
+// the using-directives in MiscUtils.hpp / Machine.hpp resolve; nothing from
+// these namespaces is wrapped.
+namespace fmt {}
+namespace React {}
+namespace lni {}
+
 %include src/wdissector.h
 %include libs/react-cpp/reactcpp.h
 %include libs/gvpp/gvpp.hpp

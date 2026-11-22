@@ -451,7 +451,7 @@ private:
         wd_set_dissection_mode(wd, dissection_mode);
 
         // Notify correct initialization of wdissector
-        startup_queue.enqueue(gettid());
+        startup_queue.enqueue(wd_gettid());
 
         long run;
         // Wait Run to be called
@@ -479,7 +479,7 @@ private:
      *
      * @details This function initializes a new thread instance using the specified network protocol name and adds it to the global WDInstances vector.
      * The instance configuration is performed by setting the packet direction and dissection mode using wd_set_packet_direction() and wd_set_dissection_mode() functions, respectively.
-     * The function also enqueues the current thread ID to the startup queue using startup_queue.enqueue(gettid()) for synchronization purposes.
+     * The function also enqueues the current thread ID to the startup queue using startup_queue.enqueue(wd_gettid()) for synchronization purposes.
      * If wd_init() fails, a message is logged using LOG4R() and the function returns immediately.
      * After thread initialization, the function dequeues the thread ID from the startup queue and cancels the thread's cancel state using pthread_setcancelstate().
      * If real-time scheduling (enable_rt) is requested, the enable_rt_scheduler() function is invoked to activate it.
@@ -515,7 +515,7 @@ private:
         wd_set_dissection_mode(wd, dissection_mode);
 
         // Notify correct initialization of wdissector
-        startup_queue.enqueue(gettid());
+        startup_queue.enqueue(wd_gettid());
 
         long run;
         // Wait Run to be called

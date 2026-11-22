@@ -15,10 +15,23 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/lexical_cast.hpp>
 
+// Boost.Serialization needs an explicit registration for each std container that
+// is archived. fitness_session_t stores std::vector<std::vector<double>> and
+// std::string; the old in-tree pagmo fork's s11n.hpp used to pull these in, but
+// pagmo 2.9 serialises with cereal, so include them here.
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/string.hpp>
+
 #include <pagmo/algorithm.hpp>
 #include <pagmo/algorithms/pso_gen.hpp>
 #include <pagmo/detail/constants.hpp>
+// conda-forge pagmo 2.9 is header-only and ships no pagmo/detail/visibility.hpp.
+// Only the removed 2020-era in-tree fork shipped it, for its shared-library
+// build. Keep the include conditional so this file also builds against a fork
+// that still ships the header.
+#if __has_include(<pagmo/detail/visibility.hpp>)
 #include <pagmo/detail/visibility.hpp>
+#endif
 #include <pagmo/io.hpp>
 #include <pagmo/population.hpp>
 #include <pagmo/problem.hpp>
@@ -557,5 +570,12 @@ public:
     }
 };
 
+// conda-forge pagmo 2.9 serialises with cereal and defines no
+// PAGMO_S11N_PROBLEM_EXPORT_KEY (the vendored fork used Boost.Serialization and
+// defined it in pagmo/problem.hpp). The key only registers problem_basic with
+// pagmo's own type-erasure serialisation; 5Ghoul serialises nothing but
+// fitness_session_t, via a Boost binary archive, so it is unnecessary on 2.9.
+#if defined(PAGMO_S11N_PROBLEM_EXPORT_KEY)
 PAGMO_S11N_PROBLEM_EXPORT_KEY(Fitness::problem_basic);
+#endif
 #endif

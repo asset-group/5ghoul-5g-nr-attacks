@@ -166,14 +166,6 @@ CMakeCache.txt
 
 modules/python/
 
-libs/pagmo2/cmake_uninstall.cmake
-
-libs/pagmo2/pagmo-config-version.cmake
-
-libs/pagmo2/pagmo-config.cmake
-
-libs/pagmo2/include/pagmo/config.hpp
-
 gpu.txt
 
 .gnupg

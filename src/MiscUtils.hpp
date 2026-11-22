@@ -469,7 +469,11 @@ static void enable_idle_scheduler()
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 }
 
-long gettid()
+// glibc 2.30+ declares gettid() in <unistd.h> (bits/unistd_ext.h); defining our
+// own gettid() here now collides with it ("functions that differ only in their
+// return type cannot be overloaded"). Keep the same behaviour under a private
+// name that cannot clash with libc.
+static inline long wd_gettid()
 {
     return syscall(SYS_gettid);
 }

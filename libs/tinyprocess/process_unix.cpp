@@ -286,17 +286,21 @@ namespace TinyProcessLib {
     {
         close_fds_req = true;
 
-        // Close stdout thread
+        // Close stdout thread.
+        // NOTE: when the child failed to spawn, the reader threads were never
+        // started and native_handle() returns 0. glibc's pthread_cancel
+        // dereferences its argument, so calling it with 0 segfaults. Test
+        // joinable() -- a live thread handle -- before cancelling.
         read_stdout = nullptr;
-        pthread_cancel(stdout_thread.native_handle());
         if (stdout_thread.joinable()) {
+            pthread_cancel(stdout_thread.native_handle());
             stdout_thread.join();
         }
 
-        // Close stderr thread
+        // Close stderr thread (same null-handle hazard as above).
         read_stderr = nullptr;
-        pthread_cancel(stderr_thread.native_handle());
         if (stderr_thread.joinable()) {
+            pthread_cancel(stderr_thread.native_handle());
             stderr_thread.join();
         }
 

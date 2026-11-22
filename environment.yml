@@ -1,0 +1,90 @@
+# Conda environment for building 5Ghoul (wdissector) in WSL2 / Ubuntu 26.04 LTS
+#
+# Derived from an audit of: requirements.sh (dev), Dockerfile, CMakeLists.txt,
+# libs/ and 3rd-party/.  conda-forge is listed first and is the only channel used.
+#
+# STATUS: validated.  These are the pins of the environment that built
+# bin/5g_fuzzer and ran the rfsim simulation (OAI gNB/UE + open5gs) on
+# WSL2 / Ubuntu 26.04.
+name: 5ghoul
+channels:
+  - conda-forge
+dependencies:
+  # ---- toolchain / build system (CMakeLists requires >=3.18.4, C++20, clang+lld) ----
+  - cmake>=3.18.4
+  - ninja
+  - meson
+  - pkg-config
+  - make
+  - clang=15
+  - clangxx=15
+  - clang-tools=15
+  - lld=15
+  - llvm=15
+  - gcc_linux-64=9
+  - gxx_linux-64=9
+  - flex
+  - bison
+  - swig
+  - git
+  - zstd
+  - graphviz
+
+  # ---- core libraries CMake looks for directly ----
+  - glib
+  - freetype
+  - zlib
+  - libpcap                 # replaces libs/libpcap
+  - boost=1.78              # replaces the boost_1_78_0 source download in CMakeLists
+  - fmt                     # replaces libs/fmt
+  - double-conversion       # replaces libs/double-conversion
+  - folly                   # replaces libs/folly (version may need pinning; see audit)
+  - pagmo                   # header-only pagmo 2.x; sole copy (no vendored tree)
+  - zeromq                  # replaces libs/libzmq  (conda-forge name: zeromq, not libzmq)
+  - cppzmq                 # header-only zmq.hpp / zmq_addon.hpp
+  - czmq
+  - json-c
+  - pybind11
+  - snappy
+  - lz4-c
+  - libevent
+  - libunwind
+  - glog
+  - gflags
+
+  # ---- wireshark runtime deps (wireshark itself stays vendored + patched) ----
+  - libgcrypt
+  - gnutls
+  - libxml2
+  - libnghttp2              # conda-forge name: libnghttp2, not nghttp2
+  - krb5
+  - libnl
+  - libcap
+  - brotli
+  - lua=5.2
+  - c-ares
+  - libssh
+  - libmaxminddb
+  - pcre2
+  - speexdsp
+  - libopus                 # conda-forge name: libopus, not opus
+  - libtiff
+  - tbb
+
+  # ---- misc runtime tools referenced by build.sh / requirements.sh ----
+  - sshpass
+  - bc
+  # kmod: not on conda-forge (apt runtime tool only)
+  - curl
+  - wget
+  - nodejs
+  - python=3.11             # tooling only: the binary embeds its own CPython 3.8.16
+  - pip
+
+  # ---- NOT available on conda-forge (keep vendored / apt / skip) ----
+  # libsmi     404 on conda-forge -> wireshark builds without it (or -DENABLE_SMI=OFF)
+  # spandsp    404 on conda-forge -> wireshark optional codec, disable with -DENABLE_SPANDSP=OFF
+  # sbc        404 on conda-forge -> wireshark optional codec, -DENABLE_SBC=OFF
+  # gvpp       404 on conda-forge -> stays vendored (libs/gvpp, thin C++ wrapper over graphviz)
+  # psmisc     404 on conda-forge -> apt:psmisc or not needed for the build
+  # tcpdump    404 on conda-forge -> apt:tcpdump, runtime capture tool only

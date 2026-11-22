@@ -1,4 +1,21 @@
 cmake_minimum_required(VERSION 3.18.4)
+# ---------------------------------------------------------------------------
+# Toolchain note (issue #46, WSL2 / Ubuntu 26.04)
+#
+# clang 15.0.7 (conda-forge) is used deliberately; it is not a fallback.
+# The configure failure at libs/wireshark/ConfigureChecks.cmake:139
+# (HAVE_C99_VSNPRINTF, with sys/types.h, stddef.h and stdint.h all reported
+# "not found") was a LINKER problem, not a compiler one.  conda-forge's clang
+# 15 ships no LLVMgold.so, so GNU ld cannot load the thin-LTO plugin and every
+# CMake probe link fails:
+#     .../bin/x86_64-conda-linux-gnu-ld: .../lib/LLVMgold.so:
+#     error loading plugin: cannot open shared object file
+# A failing probe link makes check_include_file()/check_c_source_runs()
+# report "not found", which is what aborted configure at the vsnprintf test.
+# With the matching lld 15 the identical probe compiles, links and exits 0,
+# so switching clang versions is unnecessary.  llvm-tools 15.0.7 supplies the
+# bitcode-aware llvm-ar/llvm-ranlib that thin-LTO archives require.
+# ---------------------------------------------------------------------------
 set(CMAKE_C_COMPILER "clang-15")
 set(CMAKE_CXX_COMPILER "clang++-15")
 
@@ -94,6 +111,11 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 # Global compiler options
+# C++20 is required (std::unordered_map::contains, if constexpr on concepts).
+# The toolchain deliberately uses libstdc++ 12 headers: GCC 13 would add
+# std::format, which makes the unqualified format(...) calls in
+# Machine/Framework/Modules ambiguous against the vendored fmt::format via ADL,
+# while GCC 9's <valarray> has a noexcept mismatch that clang rejects in C++20.
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
@@ -108,8 +130,8 @@ else()
     "-fno-stack-protector -fpic -Wall -Wno-braced-scalar-init -Wno-unused-variable -Wno-reorder"
   )
 endif()
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${COMMON_FLAGS})
-set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${COMMON_FLAGS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
 set(CMAKE_BUILD_RPATH $ORIGIN bin modules/python/install/lib/)
@@ -117,6 +139,26 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
 
 # Configure linker (enforce lld-15)
 add_link_options("-fuse-ld=lld-15")
+
+# Probes must link with lld as well.  add_link_options() above only applies to
+# targets; CMake's try_compile()/check_* probes use CMAKE_*_LINKER_FLAGS.  With
+# GNU ld those probe links fail (LLVMgold.so missing), which silently turns
+# every ConfigureChecks result into "not found" -- including Wireshark's C99
+# vsnprintf requirement at libs/wireshark/ConfigureChecks.cmake:139.
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld-15")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=lld-15")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fuse-ld=lld-15")
+
+# Thin-LTO object files must be archived/indexed by LLVM's ar, not conda's
+# gcc-ar (also plugin-less).  llvm-tools 15.0.7 provides both.
+find_program(LLVM_AR_EXECUTABLE NAMES llvm-ar-15 llvm-ar)
+find_program(LLVM_RANLIB_EXECUTABLE NAMES llvm-ranlib-15 llvm-ranlib)
+if(LLVM_AR_EXECUTABLE)
+  set(CMAKE_AR "${LLVM_AR_EXECUTABLE}")
+endif()
+if(LLVM_RANLIB_EXECUTABLE)
+  set(CMAKE_RANLIB "${LLVM_RANLIB_EXECUTABLE}")
+endif()
 
 # Print some options
 log(INFO "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
@@ -167,8 +209,8 @@ set(GLFW_USE_WAYLAND OFF)
 set(BUILD_SHARED_LIBS ON)
 add_subdirectory(${PROJECT_SOURCE_DIR}/libs/glfw)
 
-# Configure Pagmo2
-log(INFO "Building libpagmo.so")
+# Configure Pagmo (conda-forge, header-only; there is no vendored copy in-tree)
+log(INFO "Using conda-forge pagmo (header-only)")
 
 # 1) Download and preapre liboost headers
 set(LIBBOOST_DOWNLOAD_DIR ${PROJECT_SOURCE_DIR}/libs/libboost/)
@@ -217,9 +259,28 @@ find_package(Boost 1.51.0 MODULE
   REQUIRED
 )
 
-# 4) Add subdirectories and link libboost to pagmo
-add_subdirectory(${PROJECT_SOURCE_DIR}/libs/pagmo2)
-target_link_libraries(pagmo PUBLIC Boost::iostreams)
+# 4) Pagmo: conda-forge's pagmo 2.9 is the only copy; no vendored tree is kept.
+#
+# pagmo 2.x is header-only, so it is imported as an INTERFACE target.  Its
+# distributed pagmo-config.cmake is deliberately NOT used: that config runs a
+# pre-Eigen-3.4 FindEigen3 (it greps EIGEN_WORLD_VERSION, removed in Eigen 3.4,
+# and this env has Eigen 5.0.1) and it hard-requires IPOPT/NLOPT module files we
+# do not need.
+find_path(PAGMO_INCLUDE_DIR
+  NAMES pagmo/pagmo.hpp
+  PATHS ${CMAKE_PREFIX_PATH}
+  PATH_SUFFIXES include)
+if(NOT PAGMO_INCLUDE_DIR)
+  message(FATAL_ERROR
+    "conda pagmo headers not found (<prefix>/include/pagmo/pagmo.hpp) under "
+    "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}. Install 'pagmo' into the conda env.")
+endif()
+log(INFO "conda pagmo headers: ${PAGMO_INCLUDE_DIR}")
+add_library(pagmo INTERFACE)
+target_include_directories(pagmo INTERFACE ${PAGMO_INCLUDE_DIR})
+# pagmo is header-only, so nothing links these implicitly any more; name them
+# explicitly because 5g_fuzzer archives fitness_session_t with Boost.Serialization.
+target_link_libraries(pagmo INTERFACE Boost::iostreams Boost::serialization)
 
 # Chrome Embbeded Framework (CEF) library
 set(CEF_USE_SANDBOX

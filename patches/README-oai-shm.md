@@ -58,3 +58,26 @@ in the original patch.
 Consequence: the resulting binary exposes and initialises the SHM interface and
 captures PDCP traffic, but does **not** yet inject fuzzed MAC transport blocks.
 Porting the MAC/PHY injection sites is a separate task.
+
+## Validation
+
+* applies to a pristine v3.0.0 checkout and to a `--depth 1 --branch v3.0.0`
+  clone with 0 rejects / 0 fuzz (`git apply --check` then apply);
+* builds `nr-softmodem` and `nr-uesoftmodem` (12,161 targets, RelWithDebInfo,
+  GCC 15.2, `-DAUTO_DOWNLOAD_ASN1C=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5`)
+  with `shm_init`, `shm_mq_init`, `shm_mq_recv`, `shm_mq_available` and
+  `shm_mq_thread_handler` present in both binaries;
+* a patched gNB run prints `[GNB_APP] [SHM] SHM not started` when no 5Ghoul
+  server owns the segment, and then behaves exactly like an unpatched build of
+  the same tree.
+
+### Known pre-existing issue (not caused by this patch)
+
+A v3.0.0 build produced by the plain CMake+GCC 15.2 route above aborts during
+`Initializing NR L1` with `Assertion (ptr) failed! ... calloc fails`, while the
+prebuilt `/opt/oai-latest/bin` binaries (GCC 11.4) get further. A controlled
+A/B in the same tree, same build dir, same flags and same config shows the
+**unpatched** build failing at exactly the same point, so the fault is in the
+build method/toolchain, not in this patch. Max RSS at the abort is only 65 MB,
+so it is not memory exhaustion. Resolve (older GCC / different flags) before
+using a self-built binary for fuzzing.

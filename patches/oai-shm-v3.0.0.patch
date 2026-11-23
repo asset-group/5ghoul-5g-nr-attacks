@@ -19,7 +19,7 @@ index 5e58be3..4113134 100644
  
  target_link_libraries(nr-uesoftmodem PRIVATE
 diff --git a/executables/nr-softmodem.c b/executables/nr-softmodem.c
-index 20c0e62..54edb1e 100644
+index 20c0e62..1b43a1a 100644
 --- a/executables/nr-softmodem.c
 +++ b/executables/nr-softmodem.c
 @@ -61,6 +61,10 @@ unsigned short config_frames[4] = {2,9,11,13};
@@ -33,28 +33,35 @@ index 20c0e62..54edb1e 100644
  #include "ngap_gNB.h"
  #include "nr-softmodem-common.h"
  #include "openair2/E1AP/e1ap_common.h"
-@@ -495,6 +499,16 @@ int main( int argc, char **argv ) {
-   int ru_id, CC_id = 0;
-   start_background_system();
+@@ -523,6 +527,18 @@ int main( int argc, char **argv ) {
+ #endif // E3_AGENT
  
-+  /* WD 5Ghoul: SHM interface */
-+  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH))
+ #if T_TRACER
++  /* WD 5Ghoul: SHM interface.
++   * Initialise the message queue only when the SHM segment could be attached:
++   * with no 5Ghoul server running shm_init() fails and there is no shared
++   * memory for the queue to attach to. */
++  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH)) {
 +    LOG_W(GNB_APP, "[SHM] SHM started\n");
-+  else
++    shm_set_max_timeout(1);
++    shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
++  } else {
 +    LOG_W(GNB_APP, "[SHM] SHM not started\n");
++  }
 +
-+  shm_set_max_timeout(1);
-+  shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
-+  /* ------------------------ */
-+
-   ///static configuration for NR at the moment
-   if ((uniqCfg = load_configmodule(argc, argv, CONFIG_ENABLECMDLINEONLY)) == NULL || CONFIG_ISFLAGSET(CONFIG_ABORT)) {
-     exit_fun("[SOFTMODEM] Error, configuration module init failed\n");
+   T_Config_Init();
+ #endif
+   set_taus_seed (0);
 diff --git a/executables/nr-uesoftmodem.c b/executables/nr-uesoftmodem.c
-index f9ebbc1..ca2fc03 100644
+index f9ebbc1..e6fecfc 100644
 --- a/executables/nr-uesoftmodem.c
 +++ b/executables/nr-uesoftmodem.c
-@@ -62,6 +62,10 @@ unsigned short config_frames[4] = {2,9,11,13};
+@@ -1,3 +1,4 @@
++#include <stdlib.h>
+ /*
+  * SPDX-License-Identifier: LicenseRef-CSSL-1.0
+  */
+@@ -62,6 +63,10 @@ unsigned short config_frames[4] = {2,9,11,13};
  #include "executables/softmodem-common.h"
  #include "executables/thread-common.h"
  
@@ -65,23 +72,25 @@ index f9ebbc1..ca2fc03 100644
  #include "nr_nas_msg.h"
  #include "actor.h"
  
-@@ -284,6 +288,16 @@ int main(int argc, char **argv)
- {
-   start_background_system();
+@@ -301,6 +306,18 @@ int main(int argc, char **argv)
+   softmodem_verify_mode(get_softmodem_params());
  
-+  /* WD 5Ghoul: SHM interface */
-+  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH))
+ #if T_TRACER
++  /* WD 5Ghoul: SHM interface.
++   * Initialise the message queue only when the SHM segment could be attached:
++   * with no 5Ghoul server running shm_init() fails and there is no shared
++   * memory for the queue to attach to. */
++  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH)) {
 +    LOG_W(UTIL, "[SHM] SHM started\n");
-+  else
++    shm_set_max_timeout(1);
++    shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
++  } else {
 +    LOG_W(UTIL, "[SHM] SHM not started\n");
++  }
 +
-+  shm_set_max_timeout(1);
-+  shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
-+  /* ------------------------ */
-+
-   if ((uniqCfg = load_configmodule(argc, argv, CONFIG_ENABLECMDLINEONLY)) == NULL || CONFIG_ISFLAGSET(CONFIG_ABORT)) {
-     exit_fun("[SOFTMODEM] Error, configuration module init failed\n");
-   }
+   T_Config_Init();
+ #endif
+   initTpool(get_softmodem_params()->threadPoolConfig, &(nrUE_params.Tpool), cpumeas(CPUMEAS_GETSTATE));
 diff --git a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c b/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
 index bd7c717..016a765 100644
 --- a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c

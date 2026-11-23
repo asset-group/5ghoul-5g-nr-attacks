@@ -126,6 +126,42 @@ private:
         return timespeccmp(&attrib1.st_mtim, &attrib2.st_mtim, >);
     }
 
+    // A build step is judged by the artifact it has to produce, not by the status
+    // system()/pclose() returns: under load the shell can fail to start (or be
+    // killed) and then there is a non-zero status with no compiler output at all.
+    // Treating that as a compile failure hides the real cause and is wrong when
+    // the artifact was in fact produced.
+    string build_log_path() const
+    {
+        return "/tmp/5g_fuzzer_build_" + to_string(getpid()) + ".log";
+    }
+
+    static bool artifact_ready(const string &path)
+    {
+        struct stat st;
+        return (stat(path.c_str(), &st) == 0 && st.st_size > 0);
+    }
+
+    void report_build_failure(int rc, const string &log_path, const string &what, const string &artifact)
+    {
+        GL1R(TAG, "Failed to compile ", what, " ", artifact);
+        if (WIFSIGNALED(rc))
+            GL1R(TAG, "  compiler killed by signal ", (int)WTERMSIG(rc));
+        else if (WIFEXITED(rc))
+            GL1R(TAG, "  compiler exited with code ", (int)WEXITSTATUS(rc));
+        else
+            GL1R(TAG, "  compiler could not be started (system() returned ", rc, ")");
+        FILE *lf = fopen(log_path.c_str(), "r");
+        if (lf) {
+            char lline[512];
+            int shown = 0;
+            while (fgets(lline, sizeof lline, lf) && shown++ < 40)
+                GL1R(TAG, "  ", lline);
+            fclose(lf);
+        }
+        ::unlink(log_path.c_str());
+    }
+
 public:
     const char *TAG = "[Modules] ";
 
@@ -192,7 +228,16 @@ public:
                     string source_path = modules_path + "/"s + module_name;
                     // Compile module
                     if (has_gcc && was_modified(source_path)) {
-                        system(("g++ -std=c++17 -fPIC -w -O3 src/ModulesStub.cpp -c -o "s + modules_path + "/ModulesStub.o").c_str());
+                        string stub_cpp = "src/ModulesStub.cpp";
+                        string stub_path = string(modules_path) + "/ModulesStub.o";
+                        struct stat stub_src_st, stub_obj_st;
+                        if (stat(stub_cpp.c_str(), &stub_src_st) || stat(stub_path.c_str(), &stub_obj_st) ||
+                            timespeccmp(&stub_src_st.st_mtim, &stub_obj_st.st_mtim, >)) {
+                            string stub_log = build_log_path();
+                            if (system(("g++ -std=c++17 -fPIC -w -O3 " + stub_cpp + " -c -o " + stub_path +
+                                        " 2> " + stub_log).c_str()) && !artifact_ready(stub_path))
+                                report_build_failure(0, stub_log, "module stub", stub_path);
+                        }
                         GL1G("Compiling ", module_name, ".cpp");
                         // Compile obj
                         string g_cmd_obj = "g++ -x c++ -std=c++17 -fPIC -w -O3 -c "s +
@@ -207,28 +252,58 @@ public:
 
                         LOG1(g_cmd_obj);
 
-                        FILE *p_fd = popen(g_cmd_obj.c_str(), "w");
-                        // Add api glue to code (optional)
+                        string obj_path = source_path + ".o";
+                        string obj_log = build_log_path();
+                        ::unlink(obj_path.c_str());
                         string gen_code = gen_module_glue(source_path);
-                        fwrite(&gen_code[0], 1, gen_code.size(), p_fd);
-
-                        if (!pclose(p_fd))
+                        int rc_obj = 0;
+                        for (int attempt = 1; attempt <= 2; attempt++) {
+                            FILE *p_fd = popen((g_cmd_obj + " 2> " + obj_log).c_str(), "w");
+                            if (!p_fd)
+                                break;
+                            // Add api glue to code (optional)
+                            fwrite(&gen_code[0], 1, gen_code.size(), p_fd);
+                            rc_obj = pclose(p_fd);
+                            if (artifact_ready(obj_path))
+                                break;
+                            usleep(20000); // transient fork/exec failure under load
+                        }
+                        if (artifact_ready(obj_path))
                             modules_compiled++;
                         else {
-                            GL1R(TAG, "Failed to compile object ", source_path, ".o");
+                            report_build_failure(rc_obj, obj_log, "object", obj_path);
                             no_err = false;
                         }
 
                         // Compile shared library
-                        string g_cmd_shared = "g++ -std=c++17 -fPIC -w -O3 -shared -o "s + source_path + ".so " +
+                        string so_path = source_path + ".so";
+                        string so_tmp = so_path + ".tmp";
+                        string link_log = build_log_path();
+                        string g_cmd_shared = "g++ -std=c++17 -fPIC -w -O3 -shared -o "s + so_tmp + " " +
                                               source_path + ".o " + modules_path + "/ModulesStub.o " +
                                               "-Lbin/ -Wl,-rpath,'$ORIGIN/bin/' -Wl,-rpath,'$ORIGIN/../../../bin/' "
                                               "-lwdissector -lwireshark";
 
                         LOG1(g_cmd_shared);
 
-                        if (system(g_cmd_shared.c_str())) {
-                            GL1R(TAG, "Failed to compile shared library ", source_path, ".so");
+                        bool linked = false;
+                        int rc_link = 0;
+                        if (artifact_ready(source_path + ".o")) {
+                            for (int attempt = 1; attempt <= 2; attempt++) {
+                                ::unlink(so_tmp.c_str());
+                                rc_link = system((g_cmd_shared + " 2> " + link_log).c_str());
+                                if ((linked = artifact_ready(so_tmp)))
+                                    break;
+                                usleep(20000); // transient fork/exec failure under load
+                            }
+                        }
+                        if (linked) {
+                            if (::rename(so_tmp.c_str(), so_path.c_str())) {
+                                GL1R(TAG, "Failed to install shared library ", so_path);
+                                no_err = false;
+                            }
+                        } else if (artifact_ready(source_path + ".o")) {
+                            report_build_failure(rc_link, link_log, "shared library", so_path);
                             no_err = false;
                         }
                     }

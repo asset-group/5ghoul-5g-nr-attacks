@@ -85,7 +85,20 @@ git clone --depth 1 --branch v3.0.0 \
 mkdir -p oai/build && cd oai/build
 cmake .. -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DAUTO_DOWNLOAD_ASN1C=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-ninja nr-softmodem nr-uesoftmodem
+ninja nr-softmodem nr-uesoftmodem params_libconfig rfsimulator
+```
+
+`params_libconfig` provides the config loader the gNB dlopen()s at startup and
+`rfsimulator` the simulated radio; without them startup fails with
+`libparams_libconfig.so` / `librfsimulator.so` load errors.
+
+OAI calls `mlockall()`, and WSL's default `RLIMIT_MEMLOCK` is 64 MiB, which is
+smaller than a self-built gNB's footprint — the process then aborts with
+`calloc fails` during `Initializing NR L1`. Run with the limit lifted:
+
+```bash
+sudo prlimit --memlock=unlimited:unlimited -- ./nr-softmodem --rfsim \
+     -O ../../5ghoul/configs/5gnr_gnb/rfsim.n78.106.conf
 ```
 
 `asn1c` is normally installed by `cmake_targets/build_oai`; the

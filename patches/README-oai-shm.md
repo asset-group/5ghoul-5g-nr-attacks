@@ -33,43 +33,22 @@ point instead.
 | `executables/nr-uesoftmodem.c` | same |
 | `openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c` | include + three interception hooks: RX PDCP PDU (`nr_pdcp_entity_recv_pdu`), TX plaintext (`nr_pdcp_entity_process_sdu`, MAC-I cleared), TX post-security |
 
+The table above lists only the build wiring and the PDCP hooks. The MAC DL/UL,
+RAR, Msg4, Msg3 and UE UL points ported on top of them are listed in
+*Interception points* further down.
+
 ## What is NOT in the patch
 
-The 2023.w03 patch also instrumented the MAC and PHY for packet injection and
-observation. Those hunks could not be ported to v3.0.0 mechanically, because
-the anchor functions/structures no longer exist upstream:
+Everything the 2023.w03 patch instrumented on the MAC and PHY has a v3.0.0
+equivalent and is now ported there (see *Interception points* below); no point
+was dropped because its original anchor disappeared. What remains out of scope:
 
-| 2023.w03 anchor | v3.0.0 status |
+| Item | Why |
 | --- | --- |
-| `nr_store_dlsch_buffer()` | renamed/refactored away |
-| `pf_dl()` | gone |
-| `dl_lc_ids`, `dl_lc_num` | removed from `NR_sched_ctrl_t` |
-| `harq->transportBlock` (array) | now a struct with `.buf`, allocated via `allocate_transportBlock_buffer()` |
-| `nr_schedule_ra()`, `nr_schedule_sibs()`, `nr_schedule_uci()` | renamed |
-| `nr_rx_prach()`, `nr_phy_data_tx()`, `nr_rx_pucch()` | renamed |
-| `nr_pdcp_entity_data_req()` | replaced by the `process_sdu` hook (ported) |
-| `nr_pdcp_entity_recv_sdu()` | replaced by `nr_pdcp_entity_process_sdu()` (ported) |
-| `dl_lc` hold hunk | lost: the structure it patched is gone in v3.0.0 |
-
-The czmq/json "duplication" feature of the old patch is also omitted: czmq is
-not a dependency of this repository and those hunks were already commented out
-in the original patch.
-
-Consequence: the resulting binary exposes and initialises the SHM interface and
-captures PDCP traffic, but does **not** yet inject fuzzed MAC transport blocks.
-Porting the MAC/PHY injection sites is a separate task.
-
-## Validation
-
-* applies to a pristine v3.0.0 checkout and to a `--depth 1 --branch v3.0.0`
-  clone with 0 rejects / 0 fuzz (`git apply --check` then apply);
-* builds `nr-softmodem` and `nr-uesoftmodem` (12,161 targets, RelWithDebInfo,
-  GCC 15.2, `-DAUTO_DOWNLOAD_ASN1C=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5`)
-  with `shm_init`, `shm_mq_init`, `shm_mq_recv`, `shm_mq_available` and
-  `shm_mq_thread_handler` present in both binaries;
-* a patched gNB run prints `[GNB_APP] [SHM] SHM not started` when no 5Ghoul
-  server owns the segment, and then behaves exactly like an unpatched build of
-  the same tree.
+| `fuzz_nr_dup` duplication feature (czmq/json-c hunks) | not an interception point, and czmq is not a dependency of this tree; those hunks were already commented out in 2023.w03 |
+| `remove_nr_list()` `last == NULL` guard | robustness fix for list corruption, not interception; v3.0.0's list code differs, so it was not carried over |
+| MIB / SIB1 / RA-initiation broadcast hooks | anchors exist in v3.0.0 but the calls are inert in the 2023.w03 reference (commented out upstream); enabling them is optional broadcast-channel work |
+| Mac/PHY `pf_dl` hold | commented out in the reference; the DL hold is implemented in `update_dlsch_buffer()` instead |
 
 ## Interception points
 
@@ -95,6 +74,29 @@ payload back into the caller's buffer, which is how fuzzer-side mutations reach
 the gNB/UE (points 3, 4, 5, 6, 7, 8). Points 9 and 10 use the same mechanism on
 the PDCP queues.
 
+### Receiver robustness: CCCH length check (not an interception point)
+
+`openair2/LAYER2/NR_MAC_UE/nr_ue_procedures.c`, CCCH branch of
+`nr_ue_process_mac_pdu()`, used to abort the whole UE on any MAC PDU whose CCCH
+subheader declared a length that does not fit the received PDU:
+
+```c
+ret = get_mac_len(pduP, pdu_len, &mac_len, &mac_subheader_len);
+AssertFatal(ret, "The mac_len (%d) has an invalid size. PDU len = %d! \n", ...);
+```
+
+A mutated Msg4 / RRC Setup reaches exactly this check, so the UE process died and
+had to be restarted, ending the iteration and hiding the effect of the mutation.
+The patch replaces the assert with a log-and-drop mirroring the "Invalid CCCH
+message" path a few lines below (`done = 1; break;`).
+
+Observed with mutation on: 2 such PDUs dropped in a 120 s run and 0 UE aborts,
+against 1 abort at this exact assertion in the same setup before the fix.
+
+This is a robustness change, not an interception point: it adds no SHM traffic
+and changes no framing. It exists only because the fuzzer sends malformed MAC
+PDUs on purpose.
+
 ### Present in 2023.w03 but not interception points
 
 * `W_GNB_PHY_MIB` (`nr_common_signal_procedures`), `W_GNB_MAC_UE_DL_SIB`
@@ -113,19 +115,70 @@ the PDCP queues.
 ## Validation
 
 * applies to a pristine v3.0.0 checkout and to a `--depth 1 --branch v3.0.0`
-  clone, 0 rejects / 0 fuzz, and the eight patched files are byte-identical to
+  clone, 0 rejects / 0 fuzz, and the nine patched files are byte-identical to
   the tree the binaries were built from;
 * builds `nr-softmodem`, `nr-uesoftmodem`, `params_libconfig` and `rfsimulator`
   (RelWithDebInfo, GCC 15.2) with all SHM symbols in both binaries;
 * the gNB starts, prints `[SHM] SHM not started` when no 5Ghoul server owns the
   segment, and reaches the rfsimulator stage exactly like an unpatched build.
 
-Runtime validation through the 5Ghoul fuzzer could NOT be completed on this
-host: `bin/5g_fuzzer` fails its runtime module compilation
-(`src/ModulesInclude.hpp:108: 'string' does not name a type`, so 12/12 exploit
-modules fail to build and the fuzzer exits 1). That is a defect in the
-5Ghoul tooling, independent of this patch; the port is therefore validated at
-build level and at gNB-startup level only.
+Runtime validation through the 5Ghoul fuzzer now succeeds end to end.
+Conditions on this WSL host: bundled 5GC rebuilt in place (see above),
+`netconf.sh` run, mongod up, `BASICSIM_DELAY_US=2000`, both binaries under
+`prlimit --memlock=unlimited:unlimited`, mutation on at P=0.2 / 2 fields.
+
+| Run | Duration | MAC DL | MAC UL | PDCP DL | PDCP UL | Mutated | Attach | UE aborts |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| B | 380 s | n/m | 6,900 | - | - | 7 | 1/2 RRC, 2/2 PDN | 0 |
+| C | 120 s | 150 | 18,060 | - | - | 20 | 1/2 RRC, 2/2 PDN | 0 |
+| D | 120 s | 70 | 17,230 | 20 | 15 | 9 | none, mutated PDU failed integrity | 0 |
+
+`n/m` = not measured in that run, `-` = that block was not reached. The counts
+come from a temporary counter inside `send_pdu_data_nr()` /
+`send_pdu_data_pdcp_nr()` (printed every 10 MAC / 5 PDCP round trips), removed
+again afterwards; the committed patch carries no counters.
+
+Mutated PDUs seen on the DL MAC channel: RLC AM SRB:1 DATA and CONTROL PDUs,
+`DL-SCH` padding, an LCID 4 subPDU, `DL Information Transfer` Authentication
+request / Security mode command / Registration accept. They reach the UE and are
+acted on: in run D the UE logged `discard NR PDU, integrity failed` twice and did
+not complete the attach, which is the expected result of mutating a protected
+PDU. No run produced a UE abort or an `Open5GS stopped` restart.
+
+RAR/Msg4 and MIB/SIB1 are not in the table: the RAR hook fires only a handful of
+times per attach (below the counter's print threshold), and the MIB/SIB1/RA
+initiation hooks are the inert ones listed above.
+
+### Bundled 5GC: rebuild it in place after the tree moves
+
+`3rd-party/open5gs-core/build/tests/app/5gc` bakes the absolute meson build
+prefix at configure time and execs every NF from
+`<MESON_BUILD_ROOT>/src/<nf>/open5gs-<nf>d`. If the 5Ghoul tree was copied or
+moved after that build, each NF exec fails before it can log anything and `5gc`
+aborts with `child_main: Assertion 'out_return_code == 0' failed`. The fuzzer
+shows this as an endless `[!] Open5GS stopped` loop with no AMF, so nothing ever
+attaches. Rebuild the core at the current path:
+
+```bash
+cd 3rd-party/open5gs-core
+mv build build.stale-issue46            # keep the old build aside
+export LDFLAGS="-Wl,-rpath=\$ORIGIN:\$ORIGIN/../libs/x86_64-linux-gnu"
+meson setup build --prefix="$PWD/install" --wrap-mode=nodownload
+ninja -C build
+```
+
+Also make sure no NF from an earlier aborted run is still alive
+(`pkill -9 -f 'open5gs-.*d -c'`): the orphans hold the SBI ports, the next start
+fails on bind, and that looks like the same abort.
+
+Two 5Ghoul-side behaviours that also stop a run before it starts:
+
+* the fuzzer rebuilds its exploit modules at start-up and kills a `g++`
+  invocation that exceeds its 5 s `ProcessExec` default; on a loaded machine one
+  module then fails to link at random while the same command succeeds by hand.
+  Pre-build the modules (or make the `.so` newer than the `.cpp`) before running;
+* `src/ModulesInclude.hpp` needs `<string>` and `std::string` (fixed on this
+  branch) or all 14 modules fail to compile.
 
 ### Running the binaries: the memlock limit
 

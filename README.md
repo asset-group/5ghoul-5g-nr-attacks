@@ -65,6 +65,59 @@
 
 [SysmoISIM-SJA2](https://sysmocom.de/products/sim/sysmousim/index.html) programmable SIM/USIM/ISIM cards
 
+## 1.1. 🧪 OpenAirInterface v3.0.0 with shared-memory (SHM) support
+
+5Ghoul drives OpenAirInterface over a POSIX shared-memory interface
+(`src/drivers/shm_interface`). A stock OAI build has no such interface, so the
+SHM patch in `patches/oai-shm-v3.0.0.patch` must be applied to an OAI checkout
+before building. It targets exactly tag **v3.0.0** (`6f89078`).
+
+```bash
+# 1. get 5Ghoul (this branch) and vanilla OAI v3.0.0 side by side
+git clone -b hdr-probe https://github.com/asset-group/5ghoul-5g-nr-attacks.git 5ghoul
+git clone --depth 1 --branch v3.0.0 \
+    https://gitlab.eurecom.fr/oai/openairinterface5g.git oai
+
+# 2. apply the SHM patch (creates the shm_interface symlink + applies the diff)
+./5ghoul/scripts/apply_oai_shm_patch.sh "$PWD/oai"
+
+# 3. build the gNB and the UE with the rfsimulator radio
+mkdir -p oai/build && cd oai/build
+cmake .. -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+      -DAUTO_DOWNLOAD_ASN1C=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+ninja nr-softmodem nr-uesoftmodem
+```
+
+`asn1c` is normally installed by `cmake_targets/build_oai`; the
+`AUTO_DOWNLOAD_ASN1C=ON` option above fetches and builds it inside the build
+tree instead, so no system packages are required. OAI also expects the SIMDe
+headers under `<oai>/openair1/simde`; if your checkout lacks them, run
+`./cmake_targets/build_oai --install-deps` once, or clone them manually:
+
+```bash
+git clone --depth 1 https://github.com/simd-everywhere/simde-no-tests.git \
+    oai/openair1/PHY/simde
+ln -sfn PHY/simde oai/openair1/simde
+```
+
+The patch adds:
+
+* `shm_interface -> <5ghoul>/src/drivers/shm_interface` (symlink, created by the apply script)
+* `wd_shm.c` compiled into both `nr-softmodem` and `nr-uesoftmodem`
+* `shm_init()` / `shm_mq_init()` in the gNB and UE `main()`
+* PDCP interception hooks (RX in `nr_pdcp_entity_recv_pdu`, TX plaintext and
+  post-security in `nr_pdcp_entity_process_sdu`)
+
+Verify the result:
+
+```bash
+nm oai/build/nr-softmodem | grep -E 'shm_init|shm_mq_thread_handler'
+```
+
+Note: the MAC/PHY injection sites of the older 2023.w03 patch are **not** part
+of this patch — those functions were renamed or restructured in v3.0.0 (see
+`patches/README-oai-shm.md`).
+
 ## 2. ⏩ Quick Start (Docker Container)
 
 To get started with _5Ghoul PoC_, we recomend usage of **5Ghoul Container**, available in our docker hub. To simplify its usage, we created a wrapper script to run the container with all the required docker arguments:

@@ -1,0 +1,160 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5e58be3..4113134 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1879,6 +1879,7 @@ add_executable(nr-softmodem
+   ${OPENAIR_DIR}/common/utils/lte/prach_utils.c
+   ${PHY_INTERFACE_DIR}/queue_t.c
+   ${OPENAIR1_DIR}/PHY/TOOLS/phy_scope_interface.c
++    ${OPENAIR_DIR}/shm_interface/wd_shm.c
+   )
+ 
+ target_link_libraries(nr-softmodem PRIVATE
+@@ -1953,6 +1954,7 @@ add_executable(nr-uesoftmodem
+   ${OPENAIR1_DIR}/PHY/TOOLS/phy_scope_interface.c
+   ${NFAPI_USER_DIR}/nfapi.c
+   ${PHY_INTERFACE_DIR}/queue_t.c
++    ${OPENAIR_DIR}/shm_interface/wd_shm.c
+   )
+ 
+ target_link_libraries(nr-uesoftmodem PRIVATE
+diff --git a/executables/nr-softmodem.c b/executables/nr-softmodem.c
+index 20c0e62..54edb1e 100644
+--- a/executables/nr-softmodem.c
++++ b/executables/nr-softmodem.c
+@@ -61,6 +61,10 @@ unsigned short config_frames[4] = {2,9,11,13};
+ #include "intertask_interface.h"
+ #include "nfapi/oai_integration/vendor_ext.h"
+ #include "nfapi_nr_interface_scf.h"
++
++/* WD 5Ghoul: SHM interface */
++#include "shm_interface/wd_shm_nr_utils.h"
++/* ------------------------ */
+ #include "ngap_gNB.h"
+ #include "nr-softmodem-common.h"
+ #include "openair2/E1AP/e1ap_common.h"
+@@ -495,6 +499,16 @@ int main( int argc, char **argv ) {
+   int ru_id, CC_id = 0;
+   start_background_system();
+ 
++  /* WD 5Ghoul: SHM interface */
++  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH))
++    LOG_W(GNB_APP, "[SHM] SHM started\n");
++  else
++    LOG_W(GNB_APP, "[SHM] SHM not started\n");
++
++  shm_set_max_timeout(1);
++  shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
++  /* ------------------------ */
++
+   ///static configuration for NR at the moment
+   if ((uniqCfg = load_configmodule(argc, argv, CONFIG_ENABLECMDLINEONLY)) == NULL || CONFIG_ISFLAGSET(CONFIG_ABORT)) {
+     exit_fun("[SOFTMODEM] Error, configuration module init failed\n");
+diff --git a/executables/nr-uesoftmodem.c b/executables/nr-uesoftmodem.c
+index f9ebbc1..ca2fc03 100644
+--- a/executables/nr-uesoftmodem.c
++++ b/executables/nr-uesoftmodem.c
+@@ -62,6 +62,10 @@ unsigned short config_frames[4] = {2,9,11,13};
+ #include "executables/softmodem-common.h"
+ #include "executables/thread-common.h"
+ 
++/* WD 5Ghoul: SHM interface */
++#include "shm_interface/wd_shm_nr_utils.h"
++/* ------------------------ */
++
+ #include "nr_nas_msg.h"
+ #include "actor.h"
+ 
+@@ -284,6 +288,16 @@ int main(int argc, char **argv)
+ {
+   start_background_system();
+ 
++  /* WD 5Ghoul: SHM interface */
++  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH))
++    LOG_W(UTIL, "[SHM] SHM started\n");
++  else
++    LOG_W(UTIL, "[SHM] SHM not started\n");
++
++  shm_set_max_timeout(1);
++  shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
++  /* ------------------------ */
++
+   if ((uniqCfg = load_configmodule(argc, argv, CONFIG_ENABLECMDLINEONLY)) == NULL || CONFIG_ISFLAGSET(CONFIG_ABORT)) {
+     exit_fun("[SOFTMODEM] Error, configuration module init failed\n");
+   }
+diff --git a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c b/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
+index bd7c717..016a765 100644
+--- a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
++++ b/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
+@@ -16,6 +16,10 @@
+ 
+ #include "LOG/log.h"
+ 
++/* WD 5Ghoul: SHM interface */
++#include "shm_interface/wd_shm_nr_utils.h"
++/* ------------------------ */
++
+ /**
+  * @brief returns the maximum PDCP PDU size
+  *        which corresponds to data PDU for DRBs with 18 bits PDCP SN
+@@ -138,6 +142,19 @@ static void nr_pdcp_entity_recv_pdu(nr_pdcp_entity_t *entity,
+     }
+   }
+ 
++  /* WD 5Ghoul: RX NR gNB interception */
++  if (entity->is_gnb) {
++    send_pdu_data_pdcp_nr(
++        NR_DIRECTION_UPLINK,
++        (entity->type == NR_PDCP_SRB ? SIGNALING_PLANE_NR : USER_PLANE_NR),
++        entity->rb_id == 0 ? BEARER_CCCH : BEARER_DCCH,
++        entity->pdusession_id,
++        entity->sn_size,
++        false, 0,
++        buffer, header_size + size + integrity_size);
++  }
++  /* ------------------------ */
++
+   if (rcvd_count < entity->rx_deliv
+       || nr_pdcp_sdu_in_list(entity->rx_list, rcvd_count)) {
+     /* 1280 ms = 128 frames @ 10 ms, to match MAC cadence */
+@@ -263,6 +280,20 @@ static int nr_pdcp_entity_process_sdu(nr_pdcp_entity_t *entity,
+ 
+   memcpy(buf + header_size, buffer, size);
+ 
++  /* WD 5Ghoul: TX NR gNB interception (plaintext, MAC-I cleared) */
++  if (entity->is_gnb) {
++    memset(buf + header_size + size, 0, integrity_size);
++    send_pdu_data_pdcp_nr(
++        NR_DIRECTION_DOWNLINK,
++        (entity->type == NR_PDCP_SRB ? SIGNALING_PLANE_NR : USER_PLANE_NR),
++        entity->rb_id == 0 ? BEARER_CCCH : BEARER_DCCH,
++        entity->pdusession_id,
++        entity->sn_size,
++        false, 0,
++        (uint8_t *)buf, header_size + size + integrity_size);
++  }
++  /* ------------------------ */
++
+   if (entity->has_integrity) {
+     uint8_t integrity[PDCP_INTEGRITY_SIZE] = {0};
+     entity->integrity(entity->integrity_context,
+@@ -283,6 +314,19 @@ static int nr_pdcp_entity_process_sdu(nr_pdcp_entity_t *entity,
+                    entity->rb_id, count, entity->is_gnb ? 1 : 0);
+   }
+ 
++  /* WD 5Ghoul: TX NR gNB interception (ciphered PDU) */
++  if ((entity->has_integrity || entity->has_ciphering) && entity->is_gnb) {
++    send_pdu_data_pdcp_nr(
++        NR_DIRECTION_UPLINK,
++        (entity->type == NR_PDCP_SRB ? SIGNALING_PLANE_NR : USER_PLANE_NR),
++        entity->rb_id == 0 ? BEARER_CCCH : BEARER_DCCH,
++        entity->pdusession_id,
++        entity->sn_size,
++        true, 0,
++        (uint8_t *)buf, header_size + size + integrity_size);
++  }
++  /* ------------------------ */
++
+   entity->tx_next++;
+ 
+   entity->stats.txpdu_pkts++;

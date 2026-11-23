@@ -29,15 +29,16 @@ public:
     bool init()
     {
         try {
-            // Set new environment variables for standalone python
+            // The interpreter comes from the conda env (see CMakeLists.txt).
+            // PYTHONHOME must match the interpreter, so it is deliberately NOT
+            // set here: the old code pointed it at the bundled cpython 3.8 tree,
+            // which a 3.11 interpreter refuses to start with.
             char cwd[256];
             getcwd(cwd, sizeof(cwd));
-            python_home = "PYTHONHOME="s + cwd + "/modules/python/install/";
-            python_path = "PYTHONPATH="s + cwd + "/modules/python/install/lib/python3.8/";
-            new_path = "PATH="s + cwd + "/modules/python/install/bin/:" + getenv("PATH");
-            putenv((char *)python_home.c_str());
-            putenv((char *)python_path.c_str());
-            putenv((char *)new_path.c_str());
+            (void)cwd;
+            (void)python_home;
+            (void)python_path;
+            (void)new_path;
 
             // Initialize runtime
             py::initialize_interpreter(true);
@@ -45,7 +46,6 @@ public:
             // Add library paths
             sys = py::module::import("sys");
             sys.attr("path").cast<py::list>().insert(0, "modules");
-            sys.attr("path").cast<py::list>().insert(0, "modules/python/libs");
 
             auto version_info = sys.attr("version_info");
             version_major = version_info.attr("major").cast<int>();

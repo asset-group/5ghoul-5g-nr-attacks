@@ -1768,7 +1768,7 @@ int main(int argc, char **argv)
     g_free(current_dir);
 
     // TODO: Move QCMonitor to monitors folder
-    QCMonitor.setup("./modules/python/install/bin/python3",
+    QCMonitor.setup(WD_PYTHON,
                     "modules/QCSuper/qcsuper.py --usb-modem " +
                         conf.monitor.qcdm.qcdm_device +
                         " --diag-messages --pcap-dump logs/5gnr_gnb/ue_capture.pcap",

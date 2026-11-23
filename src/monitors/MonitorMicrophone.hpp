@@ -8,8 +8,8 @@
 #include <thread>
 #include <string>
 #include <src/Machine.hpp>
-#include <libs/rtaudio/RtAudio.h>
-#include <libs/rtaudio/Gist/src/Gist.h>
+#include <rtaudio/RtAudio.h>
+#include <libs/gist/src/Gist.h>
 #include <libs/mv_average.hpp>
 
 using namespace std;

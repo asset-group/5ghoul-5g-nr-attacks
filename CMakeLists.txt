@@ -144,7 +144,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
-set(CMAKE_BUILD_RPATH $ORIGIN bin modules/python/install/lib/)
+set(CMAKE_BUILD_RPATH $ORIGIN bin)
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
 
 # Configure linker (enforce lld from the same LLVM release as clang)
@@ -320,64 +320,43 @@ include_directories(
   libs/PcapPlusPlus/Packet++/header/
   libs/PcapPlusPlus/Common++/header/)
 
-# RTAudio
-add_subdirectory(${PROJECT_SOURCE_DIR}/libs/rtaudio/)
+# RTAudio -- conda-forge librtaudio 5.2.0. The package ships no CMake config module
+# (only rtaudio.pc), so import the shared library by hand under the name the link
+# lists already use. Gist (audio feature extraction) lived inside the old vendored
+# rtaudio tree and is still needed by MonitorMicrophone, so it stays vendored.
+find_library(RTAUDIO_LIBRARY NAMES rtaudio REQUIRED)
+find_path(RTAUDIO_INCLUDE_DIR NAMES rtaudio/RtAudio.h REQUIRED)
+add_library(rtaudio UNKNOWN IMPORTED)
+set_target_properties(rtaudio PROPERTIES
+  IMPORTED_LOCATION "${RTAUDIO_LIBRARY}"
+  INTERFACE_INCLUDE_DIRECTORIES "${RTAUDIO_INCLUDE_DIR}")
+message(STATUS "rtaudio: ${RTAUDIO_LIBRARY} (headers ${RTAUDIO_INCLUDE_DIR})")
+add_subdirectory(${PROJECT_SOURCE_DIR}/libs/gist)
 
 # PyBind11 (Run Python Modules from C++)
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/modules/python/success)
-  message(STATUS "Downloading Python 3.8.16")
-  file(
-    DOWNLOAD
-    https://github.com/indygreg/python-build-standalone/releases/download/20230116/cpython-3.8.16+20230116-${CMAKE_HOST_SYSTEM_PROCESSOR}-unknown-linux-gnu-lto-full.tar.zst
-    ${PROJECT_SOURCE_DIR}/modules/python.tar.zst
-    SHOW_PROGRESS)
-  execute_process(
-    COMMAND bash -c "sync && tar -I zstd -xf python.tar.zst || true"
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/modules/
-    ERROR_VARIABLE PYTHON_ERROR)
-
-  execute_process(
-    COMMAND bash -c "rm python.tar.zst || true && sync"
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/modules/)
-
-  # Create symbolic links to python3 libs
-  execute_process(
-    COMMAND bash -c "ln -sfn ../modules/python/install/lib/libpython3* ."
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  )
-
-  # Install requirements from modules/server/requirements.txt
-  set(ENV{PIP_DISABLE_PIP_VERSION_CHECK} 1)
-  execute_process(
-    COMMAND bash -c
-    "./python/install/bin/python3 -m pip install -r ./requirements.txt --use-pep517 --root-user-action=ignore"
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/modules/
-    ERROR_VARIABLE PYTHON_ERROR)
-
-  if(PYTHON_ERROR)
-    message(FATAL_ERROR ${PYTHON_ERROR})
-  endif(PYTHON_ERROR)
-
-  # Save success indication file
-  execute_process(
-    COMMAND bash -c "touch python/success"
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/modules/
-    ERROR_VARIABLE PYTHON_ERROR)
-
-  if(PYTHON_ERROR)
-    message(FATAL_ERROR ${PYTHON_ERROR})
-  endif(PYTHON_ERROR)
-endif()
+#
+# The interpreter is the conda env's Python, not a bundled standalone build.
+# This used to download cpython 3.8.16 into modules/python, pip-install
+# modules/requirements.txt into it and pin PYTHON_* at that tree.  The runtime
+# dependencies now live in the env's site-packages instead:
+#     python3 -m pip install -r modules/requirements.txt
+# (done once per env; see logs/py311-pip-install.log)
+find_package(Python3 3.11 COMPONENTS Interpreter Development REQUIRED)
+message(STATUS "python: ${Python3_EXECUTABLE} (${Python3_VERSION}, headers ${Python3_INCLUDE_DIRS})")
 
 set(PYBIND11_PYTHONLIBS_OVERWRITE OFF)
-set(PYTHON_EXECUTABLE ${PROJECT_SOURCE_DIR}/modules/python/install/bin/python3)
-set(PYTHON_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/modules/python/install/include/python3.8/)
-set(PYTHON_LIBDIR ${PROJECT_SOURCE_DIR}/modules/python/install/lib/)
-set(PYTHON_LIBRARY ${PROJECT_SOURCE_DIR}/modules/python/install/lib/libpython3.8.so)
+set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+set(PYTHON_INCLUDE_DIR ${Python3_INCLUDE_DIRS})
+set(PYTHON_LIBDIR ${Python3_LIBRARY_DIRS})
+set(PYTHON_LIBRARY ${Python3_LIBRARIES})
+
+# Absolute interpreter path for the places that spawn python as a subprocess
+# (Framework.hpp WD_PYTHON, QCMonitor/QCSuper).
+add_compile_definitions(WD_PYTHON_DEFAULT="${Python3_EXECUTABLE}")
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/libs/pybind11/)
 target_link_directories(pybind11::embed INTERFACE
-  ${PROJECT_SOURCE_DIR}/modules/python/install/lib/)
+  ${Python3_LIBRARY_DIRS})
 
 # Dynamo (shared library loader)
 add_subdirectory(${PROJECT_SOURCE_DIR}/libs/dynalo/)
@@ -626,7 +605,8 @@ set(FUZZER_LIBS
   pybind11::embed
   cefdll_wrapper
   serial
-  rtaudio)
+  rtaudio
+  Gist)
 
 # Common Fuzzer libs
 set(MINIMAL_FUZZER_LIBS
@@ -647,7 +627,8 @@ set(MINIMAL_FUZZER_LIBS
   ${PcapPlusPlus}
   pybind11::embed
   serial
-  rtaudio)
+  rtaudio
+  Gist)
 
 # Common Fuzzer libs
 set(EXPLOITER_LIBS
@@ -663,7 +644,8 @@ set(EXPLOITER_LIBS
   reactcpp
   ${PcapPlusPlus}
   serial
-  rtaudio)
+  rtaudio
+  Gist)
 
 # ------- Fuzzers -------
 

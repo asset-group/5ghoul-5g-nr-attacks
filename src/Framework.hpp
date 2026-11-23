@@ -19,7 +19,11 @@
 
 // Common defines
 #define WD_MODULES_PATH "modules/exploits/"
-#define WD_PYTHON "modules/python/install/bin/python3"
+#ifdef WD_PYTHON_DEFAULT
+#define WD_PYTHON WD_PYTHON_DEFAULT
+#else
+#define WD_PYTHON "python3"
+#endif
 
 // Common macros
 #define WD_HANDLER_PKT_DRV_TYPE function<void(wd_t *, WDEventQueue<pkt_evt_t> &, T &)>

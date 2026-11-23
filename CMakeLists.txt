@@ -2,22 +2,32 @@ cmake_minimum_required(VERSION 3.18.4)
 # ---------------------------------------------------------------------------
 # Toolchain note (issue #46, WSL2 / Ubuntu 26.04)
 #
-# clang 15.0.7 (conda-forge) is used deliberately; it is not a fallback.
-# The configure failure at libs/wireshark/ConfigureChecks.cmake:139
-# (HAVE_C99_VSNPRINTF, with sys/types.h, stddef.h and stdint.h all reported
-# "not found") was a LINKER problem, not a compiler one.  conda-forge's clang
-# 15 ships no LLVMgold.so, so GNU ld cannot load the thin-LTO plugin and every
-# CMake probe link fails:
-#     .../bin/x86_64-conda-linux-gnu-ld: .../lib/LLVMgold.so:
-#     error loading plugin: cannot open shared object file
-# A failing probe link makes check_include_file()/check_c_source_runs()
-# report "not found", which is what aborted configure at the vsnprintf test.
-# With the matching lld 15 the identical probe compiles, links and exits 0,
-# so switching clang versions is unnecessary.  llvm-tools 15.0.7 supplies the
-# bitcode-aware llvm-ar/llvm-ranlib that thin-LTO archives require.
+# The compiler is conda-forge clang, selected by major version through the
+# WDS_CLANG_MAJOR cache variable (default 23 = clang/LLD/LLVM 23.1.6, the
+# newest release published on conda-forge).  15.0.7 is the version this tree
+# was first proven with: pass -DWDS_CLANG_MAJOR=15 to reproduce that build.
+#
+# Two linker facts drive the code below:
+#  * conda-forge's clang ships no LLVMgold.so, so GNU ld cannot load the
+#    thin-LTO plugin and every CMake probe link fails:
+#        .../bin/x86_64-conda-linux-gnu-ld: .../lib/LLVMgold.so:
+#        error loading plugin: cannot open shared object file
+#    A failing probe link makes check_include_file()/check_c_source_runs()
+#    report "not found", which is what aborted configure at Wireshark's
+#    HAVE_C99_VSNPRINTF test (libs/wireshark/ConfigureChecks.cmake:139).
+#    With lld the identical probe compiles, links and exits 0.
+#  * lld <= 19 is installed by conda-forge as lld-<major>, and the driver
+#    accepts -fuse-ld=lld-<major>.  lld 20+ ships only ld.lld/lld and clang
+#    rejects "-fuse-ld=lld-23" with "invalid linker name", so the name is
+#    resolved from what is installed instead of being hardcoded.
+#
+# llvm-tools supplies the bitcode-aware llvm-ar/llvm-ranlib that thin-LTO
+# archives require (conda's gcc-ar is plugin-less).
 # ---------------------------------------------------------------------------
-set(CMAKE_C_COMPILER "clang-15")
-set(CMAKE_CXX_COMPILER "clang++-15")
+set(WDS_CLANG_MAJOR "23" CACHE STRING
+  "conda-forge clang major version to build with (23 = latest, 15 = original)")
+set(CMAKE_C_COMPILER "clang-${WDS_CLANG_MAJOR}")
+set(CMAKE_CXX_COMPILER "clang++-${WDS_CLANG_MAJOR}")
 
 project(
   wdissector
@@ -137,22 +147,31 @@ set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
 set(CMAKE_BUILD_RPATH $ORIGIN bin modules/python/install/lib/)
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
 
-# Configure linker (enforce lld-15)
-add_link_options("-fuse-ld=lld-15")
+# Configure linker (enforce lld from the same LLVM release as clang)
+find_program(WDS_LLD_VERSIONED NAMES lld-${WDS_CLANG_MAJOR} ld.lld-${WDS_CLANG_MAJOR})
+if(WDS_LLD_VERSIONED)
+  set(WDS_LLD_NAME "lld-${WDS_CLANG_MAJOR}")
+else()
+  # lld 20+ installs only ld.lld/lld; -fuse-ld=lld resolves ld.lld in PATH.
+  find_program(WDS_LLD_UNVERSIONED NAMES ld.lld lld REQUIRED)
+  set(WDS_LLD_NAME "lld")
+endif()
+log(INFO "Linker: -fuse-ld=${WDS_LLD_NAME} (${WDS_LLD_VERSIONED}${WDS_LLD_UNVERSIONED})")
+add_link_options("-fuse-ld=${WDS_LLD_NAME}")
 
 # Probes must link with lld as well.  add_link_options() above only applies to
 # targets; CMake's try_compile()/check_* probes use CMAKE_*_LINKER_FLAGS.  With
 # GNU ld those probe links fail (LLVMgold.so missing), which silently turns
 # every ConfigureChecks result into "not found" -- including Wireshark's C99
 # vsnprintf requirement at libs/wireshark/ConfigureChecks.cmake:139.
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld-15")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=lld-15")
-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fuse-ld=lld-15")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=${WDS_LLD_NAME}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=${WDS_LLD_NAME}")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fuse-ld=${WDS_LLD_NAME}")
 
 # Thin-LTO object files must be archived/indexed by LLVM's ar, not conda's
-# gcc-ar (also plugin-less).  llvm-tools 15.0.7 provides both.
-find_program(LLVM_AR_EXECUTABLE NAMES llvm-ar-15 llvm-ar)
-find_program(LLVM_RANLIB_EXECUTABLE NAMES llvm-ranlib-15 llvm-ranlib)
+# gcc-ar (also plugin-less).  llvm-tools provides both, versioned or plain.
+find_program(LLVM_AR_EXECUTABLE NAMES llvm-ar-${WDS_CLANG_MAJOR} llvm-ar)
+find_program(LLVM_RANLIB_EXECUTABLE NAMES llvm-ranlib-${WDS_CLANG_MAJOR} llvm-ranlib)
 if(LLVM_AR_EXECUTABLE)
   set(CMAKE_AR "${LLVM_AR_EXECUTABLE}")
 endif()
@@ -168,7 +187,7 @@ log(INFO "EXPORT_COMPILE_COMMANDS: ${EXPORT_COMPILE_COMMANDS}")
 # Global Includes
 include_directories(
   AFTER ${PROJECT_SOURCE_DIR}/ ${PROJECT_SOURCE_DIR}/src/
-  ${PROJECT_SOURCE_DIR}/libs/ ${PROJECT_SOURCE_DIR}/libs/libpcap/)
+  ${PROJECT_SOURCE_DIR}/libs/)
 
 # WDissector Includes
 set(WDISSECTOR_INCLUDES
@@ -192,60 +211,37 @@ execute_process(
   COMMAND bash -c "./scripts/apply_patches.sh ./libs && ./scripts/apply_patches.sh ./modules"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
-# libPCAP
-add_subdirectory(${PROJECT_SOURCE_DIR}/libs/libpcap)
+# libPCAP from the conda env (1.10.6).  The vendored tree used to provide the
+# `pcap` target that wireapi links, so recreate it as an INTERFACE target.
+find_path(PCAP_INCLUDE_DIR NAMES pcap.h PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES include)
+find_library(PCAP_LIBRARY NAMES pcap PATHS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib)
+if(NOT PCAP_INCLUDE_DIR OR NOT PCAP_LIBRARY)
+  message(FATAL_ERROR
+    "conda libpcap not found (pcap.h / libpcap.so) under ${CMAKE_PREFIX_PATH}")
+endif()
+# IMPORTED, not INTERFACE: wireshark's CMake exports its targets and an
+# INTERFACE library would have to join that export set, which fails with
+# "export called with target caputils which requires target pcap that is not in
+# any export set".  Imported targets are not exported and need no set.
+add_library(pcap UNKNOWN IMPORTED)
+set_target_properties(pcap PROPERTIES
+  IMPORTED_LOCATION "${PCAP_LIBRARY}"
+  INTERFACE_INCLUDE_DIRECTORIES "${PCAP_INCLUDE_DIR}")
 set(HAVE_LIBPCAP 1)
 set(ENABLE_PCAP ON)
 set(CAN_SET_CAPTURE_BUFFER_SIZE 1)
 set(PCAP_FOUND ON)
 
-# GLFW3 (No Wayland)
-set(GLFW_BUILD_DOCS OFF)
-set(GLFW_BUILD_EXAMPLES OFF)
-set(GLFW_BUILD_TESTS OFF)
-set(GLFW_INSTALL OFF)
-set(GLFW_USE_OSMESA OFF)
-set(GLFW_USE_WAYLAND OFF)
-set(BUILD_SHARED_LIBS ON)
-add_subdirectory(${PROJECT_SOURCE_DIR}/libs/glfw)
+# GLFW3 from the conda env (3.4, the exact version the vendored tree shipped).
+# glfw3Config exports the `glfw` target that imgui links.
+find_package(glfw3 CONFIG REQUIRED)
 
 # Configure Pagmo (conda-forge, header-only; there is no vendored copy in-tree)
 log(INFO "Using conda-forge pagmo (header-only)")
 
-# 1) Download and preapre liboost headers
-set(LIBBOOST_DOWNLOAD_DIR ${PROJECT_SOURCE_DIR}/libs/libboost/)
-set(LIBBOOST_DOWNLOAD_URL https://www.mirrorservice.org/sites/tinycorelinux.net/13.x/x86_64/tcz/src/boost/boost_1_78_0.tar.gz)
-string(REGEX MATCH "boost_[^.]*" LIBBOOST_VERSION "${LIBBOOST_DOWNLOAD_URL}")
-set(BOOST_ROOT ${LIBBOOST_DOWNLOAD_DIR}/${LIBBOOST_VERSION}/)
-set(Boost_NO_SYSTEM_PATHS ON)
-set(Boost_NO_WARN_NEW_VERSIONS 1)
-
-if(NOT EXISTS ${LIBBOOST_DOWNLOAD_DIR}/boost)
-  message(STATUS "Downloading libboost")
-  file(
-    DOWNLOAD
-    ${LIBBOOST_DOWNLOAD_URL}
-    ${PROJECT_SOURCE_DIR}/libs/libboost/boost.tar.gz
-    SHOW_PROGRESS)
-
-  # Extract libboost
-  execute_process(
-    COMMAND bash -c "tar -xf boost.tar.gz && ln -sfn ${LIBBOOST_VERSION}/boost boost && sync && rm boost.tar.gz"
-    WORKING_DIRECTORY ${LIBBOOST_DOWNLOAD_DIR})
-
-  # Compile libboost required modules
-  execute_process(
-    COMMAND bash -c "sync && ./bootstrap.sh && sync && ./b2 --with-serialization --with-iostreams --with-context --with-filesystem --with-program_options --with-regex --with-system --with-thread"
-    WORKING_DIRECTORY ${LIBBOOST_DOWNLOAD_DIR}/${LIBBOOST_VERSION}/)
-endif()
-
-if(NOT EXISTS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/libboost_serialization.so)
-  # Copy boost binaries to bin folder
-  execute_process(
-    COMMAND bash -c "mkdir -p ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} && sync && find ./stage/lib -name '*.so*' -exec cp -prv '{}' '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}' ';'"
-    WORKING_DIRECTORY ${LIBBOOST_DOWNLOAD_DIR}/${LIBBOOST_VERSION}/)
-endif()
-
+# Boost comes from the conda env (1.90.0).  The vendored 1.78 tree that used
+# to be downloaded and b2-built here was dead weight: nothing linked it, and the
+# .so files it copied into bin/ were never resolved (ldd shows conda's 1.90.0).
 find_package(Boost 1.51.0 MODULE
   COMPONENTS
   context
@@ -261,11 +257,14 @@ find_package(Boost 1.51.0 MODULE
 
 # 4) Pagmo: conda-forge's pagmo 2.9 is the only copy; no vendored tree is kept.
 #
-# pagmo 2.x is header-only, so it is imported as an INTERFACE target.  Its
-# distributed pagmo-config.cmake is deliberately NOT used: that config runs a
-# pre-Eigen-3.4 FindEigen3 (it greps EIGEN_WORLD_VERSION, removed in Eigen 3.4,
-# and this env has Eigen 5.0.1) and it hard-requires IPOPT/NLOPT module files we
-# do not need.
+# conda-forge pagmo >= 2.20 is NOT header-only any more: pagmo::population,
+# pso_gen::evolve and get_extra_info live in libpagmo.so, and leaving them out
+# produces "undefined symbol: pagmo::population::population(...)" at link time.
+# The distributed pagmo-config.cmake is still deliberately NOT used: that config
+# runs a pre-Eigen-3.4 FindEigen3 (it greps EIGEN_WORLD_VERSION, removed in
+# Eigen 3.4, and this env has Eigen 5.0.1) and it hard-requires IPOPT/NLOPT
+# module files we do not need.  So headers are found by hand and the shared
+# library is linked directly.
 find_path(PAGMO_INCLUDE_DIR
   NAMES pagmo/pagmo.hpp
   PATHS ${CMAKE_PREFIX_PATH}
@@ -275,12 +274,24 @@ if(NOT PAGMO_INCLUDE_DIR)
     "conda pagmo headers not found (<prefix>/include/pagmo/pagmo.hpp) under "
     "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}. Install 'pagmo' into the conda env.")
 endif()
+find_library(PAGMO_LIBRARY
+  NAMES pagmo
+  PATHS ${CMAKE_PREFIX_PATH}
+  PATH_SUFFIXES lib)
+if(NOT PAGMO_LIBRARY)
+  message(FATAL_ERROR
+    "conda libpagmo not found (<prefix>/lib/libpagmo.so) under "
+    "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}. pagmo >= 2.20 is not header-only.")
+endif()
 log(INFO "conda pagmo headers: ${PAGMO_INCLUDE_DIR}")
+log(INFO "conda pagmo library: ${PAGMO_LIBRARY}")
 add_library(pagmo INTERFACE)
 target_include_directories(pagmo INTERFACE ${PAGMO_INCLUDE_DIR})
-# pagmo is header-only, so nothing links these implicitly any more; name them
-# explicitly because 5g_fuzzer archives fitness_session_t with Boost.Serialization.
-target_link_libraries(pagmo INTERFACE Boost::iostreams Boost::serialization)
+# Boost.Serialization is named explicitly because 5g_fuzzer archives
+# fitness_session_t with it; libpagmo itself pulls nlopt/ipopt/tbb via its
+# RUNPATH deps in the same conda prefix.
+target_link_libraries(pagmo INTERFACE ${PAGMO_LIBRARY}
+  Boost::iostreams Boost::serialization)
 
 # Chrome Embbeded Framework (CEF) library
 set(CEF_USE_SANDBOX
@@ -371,24 +382,24 @@ target_link_directories(pybind11::embed INTERFACE
 # Dynamo (shared library loader)
 add_subdirectory(${PROJECT_SOURCE_DIR}/libs/dynalo/)
 
-# Import and build libzmq
-add_subdirectory(libs/libzmq)
+# libzmq and cppzmq come from the conda env (zeromq 4.3.5, cppzmq 4.11.0).
+# ZeroMQConfig exports the `libzmq` target, the same name FUZZER_LIBS links.
+find_package(ZeroMQ CONFIG REQUIRED)
 
-# Import double-conversion (folly dependency)
-set(DOUBLE_CONVERSION_LIBRARY double-conversion)
-set(DOUBLE_CONVERSION_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/libs/double-conversion/double-conversion/)
-add_subdirectory(libs/double-conversion)
+# double-conversion used to be vendored for the in-tree folly build.  conda
+# folly links its own double-conversion 3.4.0 from the env, and nothing in this
+# project links the vendored copy, so the subdirectory is gone.
 
-# Import libfmt (static build)
-set(BUILD_SHARED_LIBS OFF)
-add_subdirectory(libs/fmt)
-set(BUILD_SHARED_LIBS ON)
-
-# Import reduced libfolly 0.57.0 (shared build)
-set(BUILD_SHARED_LIBS OFF)
-add_subdirectory(libs/folly)
-target_include_directories(folly PUBLIC libs/folly/folly)
-set(BUILD_SHARED_LIBS ON)
+# fmt and folly come from the conda env: fmt 12.1.0 and folly 2026.10.26.00.
+# conda's libfolly is compiled against fmt 12, so the vendored fmt 9.1.1 tree
+# cannot be mixed with it in the same translation units.  Both packages are
+# already present in env 5ghoul23 and satisfy each other's pins
+# (folly: fmt >=12.1.0,<12.2.0, libboost >=1.90,<1.91, glog >=0.7.1,<0.8,
+#  libstdcxx >=15 -- the env has libstdcxx 16.2.0).
+find_package(fmt CONFIG REQUIRED)
+find_package(folly CONFIG REQUIRED)
+log(INFO "conda fmt:   ${fmt_VERSION}")
+log(INFO "conda folly: ${FOLLY_INCLUDE_DIR}")
 
 # Build Wireshark if needed
 if(NOT WIRESHARK_GUI)
@@ -567,19 +578,16 @@ target_compile_definitions(imgui PRIVATE -DIMGUI_IMPL_OPENGL_LOADER_GL3W)
 target_include_directories(
   imgui
   PUBLIC libs/imgui/libs/gl3w/ libs/imgui/ ${FREETYPE_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/ ${PROJECT_SOURCE_DIR}/libs libs/glfw/include)
+  ${PROJECT_SOURCE_DIR}/ ${PROJECT_SOURCE_DIR}/libs
+  $<TARGET_PROPERTY:glfw,INTERFACE_INCLUDE_DIRECTORIES>)
 target_link_libraries(imgui PRIVATE GL glfw rt m dl ${FREETYPE_LIBRARIES})
 
 add_library(nanolog STATIC libs/NanoLog.cpp)
 target_include_directories(nanolog PRIVATE ${PROJECT_SOURCE_DIR}/)
 
-# Add libmpsse-static (FTDI MPSSI - SPI mode)
-add_library(mpsse-static STATIC IMPORTED)
-set_target_properties(
-  mpsse-static PROPERTIES IMPORTED_LOCATION
-  ${PROJECT_SOURCE_DIR}/libs/libmpsse/libmpsse-static.a)
-target_link_libraries(mpsse-static INTERFACE pthread udev)
-target_include_directories(mpsse-static INTERFACE libs/libmpsse/)
+# libmpsse-static used to be declared here.  It had no consumer in any target
+# (CMakeLists, src, modules, bindings) and produced zero build edges, so the
+# dead IMPORTED target and the 14 MB tree are gone.
 
 # ---------------- Targets --------------------
 # Targets are compiled with shared libraries associated with wireapi.a
@@ -602,10 +610,10 @@ target_compile_options(macpdu2wireshark PRIVATE "-w")
 set(FUZZER_LIBS
   ${CMAKE_THREAD_LIBS_INIT}
   wdissector_static
-  fmt
+  fmt::fmt
   pagmo
   imgui
-  folly
+  Folly::folly
   shm_interface
   gvc # From graphviz
   cgraph # From graphviz
@@ -624,9 +632,9 @@ set(FUZZER_LIBS
 set(MINIMAL_FUZZER_LIBS
   ${CMAKE_THREAD_LIBS_INIT}
   wdissector_static
-  fmt
+  fmt::fmt
   imgui
-  folly
+  Folly::folly
   pagmo
   shm_interface
   gvc # From graphviz
@@ -645,9 +653,9 @@ set(MINIMAL_FUZZER_LIBS
 set(EXPLOITER_LIBS
   ${CMAKE_THREAD_LIBS_INIT}
   wdissector_static
-  fmt
+  fmt::fmt
   imgui
-  folly
+  Folly::folly
   libzmq # ZMQ
   gvpp
   tinyprocess
@@ -676,7 +684,7 @@ target_link_libraries(shm_client pthread shm_interface -lrt)
 # WDMapper
 add_executable(wdmapper src/WDMapper.cpp)
 target_link_libraries(wdmapper PRIVATE wdissector_static gvc cgraph gvpp
-  ${PcapPlusPlus} reactcpp fmt Boost::iostreams folly)
+  ${PcapPlusPlus} reactcpp fmt::fmt Boost::iostreams Folly::folly)
 target_compile_options(wdmapper PRIVATE -w -O0)
 target_precompile_headers(wdmapper PRIVATE src/WDMapper.h)
 

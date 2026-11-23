@@ -17,7 +17,7 @@
 
 #include "GlobalConfig.hpp"
 #include "MiscUtils.hpp"
-#include "libs/fmt/include/fmt/core.h"
+#include <fmt/core.h>
 #include "libs/gvpp/gvpp.hpp"
 #include "libs/profiling.h"
 #include "libs/react-cpp/reactcpp.h"

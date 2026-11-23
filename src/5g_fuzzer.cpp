@@ -10,9 +10,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "libs/folly/folly/FBVector.h"
-#include "libs/folly/folly/concurrency/UnboundedQueue.h"
-#include "libs/folly/folly/stats/TimeseriesHistogram.h"
+#include <folly/FBVector.h>
+#include <folly/concurrency/UnboundedQueue.h>
+#include <folly/stats/TimeseriesHistogram.h>
 #include "libs/log_misc_utils.hpp"
 #include "libs/oai_tracing/T_IDs.h"
 

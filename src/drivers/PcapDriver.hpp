@@ -3,7 +3,7 @@
 
 #include "Machine.hpp"
 #include "MiscUtils.hpp"
-#include "libs/zmq.hpp"
+#include <zmq.hpp>
 #include "libs/shared_memory.h"
 #include <PcapFileDevice.h>
 #include <RawPacket.h>

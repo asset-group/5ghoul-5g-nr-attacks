@@ -6,7 +6,7 @@ using namespace misc_utils;
 typedef struct
 {
     uint8_t *buf;
-    unsigned int buf_len;
+    size_t buf_len;
 } graphviz_output_t;
 
 uint16_t opt_udp_dst_port = 0;
@@ -85,7 +85,7 @@ graphviz_output_t graphviz_dot_to_format(const char *dot_graph, const char *outp
     lock_guard<mutex> m(dot_mutex);
     Agraph_t *g;
     char *buf;
-    unsigned int buf_len;
+    size_t buf_len;
 
     output.buf = NULL;
     output.buf_len = 0;

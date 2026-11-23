@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <unordered_map>
 
-#include "libs/folly/folly/concurrency/UnboundedQueue.h"
+#include <folly/concurrency/UnboundedQueue.h>
 
 #include "Machine.hpp"
 #include "MiscUtils.hpp"

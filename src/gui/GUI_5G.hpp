@@ -624,7 +624,10 @@ uint8_t gui_set_graph_dot(const string dot_graph)
     lock_guard<mutex> m(dot_mutex);
     Agraph_t *g;
     char *buf;
-    unsigned int buf_len;
+    // graphviz >= 14 declares gvRenderData's length parameter as size_t*;
+    // older releases used unsigned int*.  Use size_t so the call matches the
+    // header that is actually installed.
+    size_t buf_len;
 
     profiling_timer_start(11);
     g = agmemread(dot_graph.c_str());

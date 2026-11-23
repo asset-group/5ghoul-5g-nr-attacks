@@ -4,8 +4,8 @@
 
 #include <mutex>
 
-#include "libs/cxxopts/cxxopts.hpp"
-#include "libs/folly/folly/concurrency/UnboundedQueue.h"
+#include <cxxopts.hpp>
+#include <folly/concurrency/UnboundedQueue.h>
 
 #include <graphviz/gvc.h>
 

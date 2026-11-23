@@ -3257,7 +3257,12 @@ namespace strtk
       }
 
    private:
-      T *pointer_;
+      // mutable: the const call operator below is the strtk "output iterator"
+      // interface and must advance the output cursor.  clang 23 rejects the
+      // assignment outright ("cannot assign to non-static data member within
+      // const member function"), which older compilers accepted.  insert_count_
+      // is a reference, so incrementing it was never a const violation.
+      mutable T *pointer_;
       std::size_t &insert_count_;
    };
 

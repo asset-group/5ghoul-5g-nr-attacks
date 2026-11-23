@@ -8,7 +8,7 @@
 
 #include "Machine.hpp"
 #include "MiscUtils.hpp"
-#include "libs/cxxopts/cxxopts.hpp"
+#include <cxxopts.hpp>
 
 class WDParseArgs {
 private:

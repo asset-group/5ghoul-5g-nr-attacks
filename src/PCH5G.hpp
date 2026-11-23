@@ -32,9 +32,9 @@
 #include "libs/mv_average.hpp"
 #include "libs/oai_tracing/T_IDs.h"
 #include "libs/termcolor.hpp"
-#include "libs/zmq.hpp"
+#include <zmq.hpp>
 #include "libs/gvpp/gvpp.hpp"
-#include "libs/cxxopts/cxxopts.hpp"
+#include <cxxopts.hpp>
 
 // GUI - imgui
 #include "libs/imgui/imgui.h"
@@ -54,9 +54,9 @@
 #include <pybind11/stl.h>
 
 // Libs - Folly
-#include "libs/folly/folly/FBVector.h"
-#include "libs/folly/folly/concurrency/UnboundedQueue.h"
-#include "libs/folly/folly/stats/TimeseriesHistogram.h"
+#include <folly/FBVector.h>
+#include <folly/concurrency/UnboundedQueue.h>
+#include <folly/stats/TimeseriesHistogram.h>
 
 // Framework - Core Includes
 #include "Machine.hpp"

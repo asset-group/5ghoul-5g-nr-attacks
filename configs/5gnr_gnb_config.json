@@ -15,8 +15,8 @@
             "LaunchProgramWithGDB": false,
             "ProgramsList": [
                 "3rd-party/open5gs-core/build/tests/app/5gc",
-                "/opt/oai-22.04/bin/nr-softmodem",
-                "/opt/oai-22.04/bin/nr-uesoftmodem"
+                "/opt/oai-latest/bin-patched/nr-softmodem",
+                "/opt/oai-latest/bin-patched/nr-uesoftmodem"
             ],
             "MainThreadCore": -1,
             "SaveCoreDump": false
@@ -28,11 +28,11 @@
             "AutoStartBaseStation": true,
             "CoreNetworkConfigFile": "open5gs.yaml",
             "BaseStationConfigFile": "n78.106.conf",
-            "BaseStationArguments": "--sa --continuous-tx -E",
+            "BaseStationArguments": "--continuous-tx -E --rfsimulator.[0].serveraddr server",
             "EnableSimulator": true,
             "SimulationConnectionTimeoutMS": 1000,
             "SimulatorDelayUS": 2000,
-            "SimulatorUEArguments": "-r 106 --numerology 1 --band 78 -E -C 3619200000 --rfsim --sa --ssb 516",
+            "SimulatorUEArguments": "-r 106 --numerology 1 --band 78 -E -C 3619200000 --rfsim --ssb 516",
             "Subscribers": [
                 {
                     "IMSI": "001010000000001",

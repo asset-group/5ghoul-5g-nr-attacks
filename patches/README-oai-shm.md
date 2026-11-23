@@ -71,6 +71,62 @@ Porting the MAC/PHY injection sites is a separate task.
   server owns the segment, and then behaves exactly like an unpatched build of
   the same tree.
 
+## Interception points
+
+Every ACTIVE interception point of `3rd-party/oai_5g_sa.patch` (2023.w03), and
+where it lives in v3.0.0. The event ids, queues and framing are unchanged, so
+the 5Ghoul side needs no modification.
+
+| # | 2023.w03 anchor | v3.0.0 site | SHM event / queue | kind |
+|---|-----------------|-------------|-------------------|------|
+| 1 | `nr_store_dlsch_buffer` | `update_dlsch_buffer()` (gNB_scheduler_dlsch.c) | `W_MQ_MAC_DL` availability | hold |
+| 2 | `nr_schedule_ue_spec` LC loop | `generate_dl_mac_pdu()` RLC-data gate | `W_MQ_MAC_DL` availability | hold |
+| 3 | `nr_schedule_ue_spec` TB | `generate_dl_mac_pdu()` before `T(T_GNB_MAC_DL_PDU_WITH_DATA)` | `W_GNB_MAC_UE_DL_PDU_WITH_DATA` (+`W_INJECTED`) | injection + capture |
+| 4 | `nr_generate_Msg2` | `nr_generate_Msg2()` before `nr_add_msg3()` | `W_GNB_MAC_UE_DL_RAR_PDU_WITH_DATA` | capture (RAR) |
+| 5 | `nr_generate_Msg4` | `nr_generate_Msg4_MsgB()` before `T(...)` | `W_GNB_MAC_UE_DL_PDU_WITH_DATA` | capture (Msg4/MsgB) |
+| 6 | `nr_rx_sdu` (connected UE) | `_nr_rx_sdu()` | `W_GNB_MAC_UE_UL_PDU_WITH_DATA` | capture (UL) |
+| 7 | `nr_rx_sdu` (RA path) | `nr_rx_ra_sdu()` before its `T(...)` | `W_GNB_MAC_UE_UL_PDU_WITH_DATA` | capture (Msg3) |
+| 8 | `nr_ue_scheduler` | `nr_ue_ul_scheduler()` at the UL TX fill | `W_UE_UL_PDU_WITH_DATA` | capture (UE UL) |
+| 9 | `nr_pdcp_entity_recv_pdu` | same function | `W_GNB_PDCP_PLAIN_UL` | capture (PDCP UL) |
+| 10 | `nr_pdcp_entity_recv_sdu` | `nr_pdcp_entity_process_sdu()` (plain + post-security) | `W_GNB_PDCP_PLAIN_DL`, `W_GNB_PDCP_ENC_DL` | capture (PDCP DL) |
+
+`send_pdu_data_nr()` blocks after notifying, then copies the shared-memory
+payload back into the caller's buffer, which is how fuzzer-side mutations reach
+the gNB/UE (points 3, 4, 5, 6, 7, 8). Points 9 and 10 use the same mechanism on
+the PDCP queues.
+
+### Present in 2023.w03 but not interception points
+
+* `W_GNB_PHY_MIB` (`nr_common_signal_procedures`), `W_GNB_MAC_UE_DL_SIB`
+  (`schedule_nr_sib1`) and `W_GNB_PHY_INITIATE_RA_PROCEDURE`
+  (`L1_nr_prach_procedures`) exist in the 2023.w03 patch **commented out** and
+  never executed, so the fuzzer never received them. All three anchors still
+  exist in v3.0.0 and can be enabled later if broadcast-channel fuzzing is
+  wanted.
+* The `fuzz_nr_dup` duplication feature (hunks 19/21/23/25/26 plus the
+  `fuzz_duplication.py` helper) needs czmq and an external duplication source;
+  it is inactive in 2023.w03 at the sites that matter and is not part of the
+  mutation path. Not ported.
+* The czmq/json-c CMake hunks are build plumbing, not interception points; the
+  SHM code in `wd_shm.c` does not use either library.
+
+## Validation
+
+* applies to a pristine v3.0.0 checkout and to a `--depth 1 --branch v3.0.0`
+  clone, 0 rejects / 0 fuzz, and the eight patched files are byte-identical to
+  the tree the binaries were built from;
+* builds `nr-softmodem`, `nr-uesoftmodem`, `params_libconfig` and `rfsimulator`
+  (RelWithDebInfo, GCC 15.2) with all SHM symbols in both binaries;
+* the gNB starts, prints `[SHM] SHM not started` when no 5Ghoul server owns the
+  segment, and reaches the rfsimulator stage exactly like an unpatched build.
+
+Runtime validation through the 5Ghoul fuzzer could NOT be completed on this
+host: `bin/5g_fuzzer` fails its runtime module compilation
+(`src/ModulesInclude.hpp:108: 'string' does not name a type`, so 12/12 exploit
+modules fail to build and the fuzzer exits 1). That is a defect in the
+5Ghoul tooling, independent of this patch; the port is therefore validated at
+build level and at gNB-startup level only.
+
 ### Running the binaries: the memlock limit
 
 OAI locks its memory with `mlockall(MCL_CURRENT | MCL_FUTURE)`
@@ -84,19 +140,14 @@ In config_allocate_new() .../common/config/config_common.c:90
 calloc fails
 ```
 
-during `Initializing NR L1`. This is a run-environment limit, not a property of
-this patch: an **unpatched** build of the same tree, same flags, same config
-fails at exactly the same line (controlled A/B), while the smaller prebuilt
-GCC 11.4 binaries stay below 64 MiB and survive. Raise the limit before running:
+during `Initializing NR L1`. Raise the limit before running:
 
 ```bash
 sudo prlimit --memlock=unlimited:unlimited -- \
      ./build/nr-softmodem --rfsim -O ../5ghoul/configs/5gnr_gnb/rfsim.n78.106.conf
 ```
 
-With that, the patched gNB loads `librfsimulator.so`, reports
-`[RAU] has loaded RFSIMULATOR device` and waits for the simulator exactly like
-the reference binary. Build the radio module too, otherwise startup fails with
+Build the radio module too, otherwise startup fails with
 `library librfsimulator.so is not loaded`:
 
 ```bash

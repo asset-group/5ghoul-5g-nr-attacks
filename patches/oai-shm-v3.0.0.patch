@@ -91,6 +91,200 @@ index f9ebbc1..e6fecfc 100644
    T_Config_Init();
  #endif
    initTpool(get_softmodem_params()->threadPoolConfig, &(nrUE_params.Tpool), cpumeas(CPUMEAS_GETSTATE));
+diff --git a/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c b/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
+index 45ff543..f04fbf2 100644
+--- a/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
++++ b/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
+@@ -28,6 +28,9 @@
+ #include "openair2/LAYER2/nr_rlc/nr_rlc_oai_api.h"
+ #include "RRC/NR_UE/L2_interface_ue.h"
+ 
++/* WD 5Ghoul: SHM interface */
++#include "shm_interface/wd_shm_nr_utils.h"
++
+ //#define SRS_DEBUG
+ #define verifyMutex(a)                                                \
+   {                                                                   \
+@@ -2650,6 +2653,13 @@ void nr_ue_ul_scheduler(NR_UE_MAC_INST_t *mac, nr_uplink_indication_t *ul_info)
+               pdu->tx_request_body.fapiTxPdu = ulsch_input_buffer;
+               pdu->tx_request_body.pdu_length = TBS_bytes;
+               number_of_pdus++;
++              // WD 5Ghoul: SHM interface - send UE UL MAC PDU to the fuzzer
++              send_pdu_data_nr(W_UE_UL_PDU_WITH_DATA,
++                               NR_DIRECTION_UPLINK,
++                               NR_C_RNTI, mac->crnti,
++                               frame_tx, slot_tx, 0,
++                               ulsch_input_buffer, TBS_bytes);
++              /* -------------------- */
+               T(T_NRUE_MAC_UL_PDU_WITH_DATA,
+                 T_INT(mac->crnti),
+                 T_INT(frame_tx),
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c
+index 6910556..1679754 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c
+@@ -23,6 +23,9 @@
+ 
+ #include <executables/softmodem-common.h>
+ 
++/* WD 5Ghoul: SHM interface */
++#include "shm_interface/wd_shm_nr_utils.h"
++
+ typedef struct {
+   bool checked; // Validator covers this RA case.
+   bool valid; // RAPID accepted, or case unchecked.
+@@ -1800,6 +1803,13 @@ static void nr_generate_Msg2(gNB_MAC_INST *nr_mac,
+   // but required Msg3. Also, "if RAR includes a MAC subPDU with RAPID: [...]
+   // indicate the reception of an acknowledgement for SI request to upper
+   // layers." which is not the case here.
++  // WD 5Ghoul: SHM interface - send Msg2 (RAR) to the fuzzer
++  send_pdu_data_nr(W_GNB_MAC_UE_DL_RAR_PDU_WITH_DATA,
++                   NR_DIRECTION_DOWNLINK,
++                   NR_RA_RNTI, ra->RA_rnti,
++                   frameP, slotP, 0,
++                   (uint8_t *)&tx_req->TLVs[0].value.direct[0], tx_req->TLVs[0].length);
++
+   nr_add_msg3(cell, frameP, slotP, UE, (uint8_t *)&tx_req->TLVs[0].value.direct[0], beam.idx);
+ 
+   if (!ra->cfra) {
+@@ -2098,6 +2108,13 @@ static void nr_generate_Msg4_MsgB(gNB_MAC_INST *nr_mac,
+       }
+     }
+ 
++    // WD 5Ghoul: SHM interface - send Msg4/MsgB to the fuzzer
++    send_pdu_data_nr(W_GNB_MAC_UE_DL_PDU_WITH_DATA,
++                     NR_DIRECTION_DOWNLINK,
++                     NR_C_RNTI, UE->rnti,
++                     frameP, slotP, 0,
++                     harq->transportBlock.buf, harq->tb_size);
++
+     T(T_GNB_MAC_DL_PDU_WITH_DATA, T_INT(nr_mac->Mod_id), T_INT(cell->nr_cellid), T_INT(UE->rnti),
+       T_INT(frameP), T_INT(slotP), T_INT(current_harq_pid), T_BUFFER(harq->transportBlock.buf, harq->tb_size));
+ 
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_dlsch.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_dlsch.c
+index 7589603..f531102 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_dlsch.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_dlsch.c
+@@ -20,6 +20,9 @@
+ #include "executables/softmodem-common.h"
+ #include "../../../nfapi/oai_integration/vendor_ext.h"
+ 
++/* WD 5Ghoul: SHM interface */
++#include "shm_interface/wd_shm_nr_utils.h"
++
+ ////////////////////////////////////////////////////////
+ /////* DLSCH MAC PDU generation (6.1.2 TS 38.321) */////
+ ////////////////////////////////////////////////////////
+@@ -301,6 +304,18 @@ static uint32_t update_dlsch_buffer(frame_t frame, slot_t slot, NR_UE_info_t *UE
+   sched_ctrl->num_total_bytes = 0;
+   int dl_pdus_total = 0;
+ 
++  /* WD 5Ghoul: SHM interface (was nr_store_dlsch_buffer in 2023.w03).
++   * A queued injection carries its own 8-byte packet id trailer: expose its
++   * payload length as the pending byte count and skip the RLC status query so
++   * the scheduler builds a TB of exactly that size. */
++  const int shm_len = shm_mq_available(W_MQ_MAC_DL);
++  if (shm_len >= 8) {
++    sched_ctrl->num_total_bytes = shm_len - 8;
++    LOG_E(MAC, "[DUP] sched_ctrl->num_total_bytes = %d \n", sched_ctrl->num_total_bytes);
++    return sched_ctrl->num_total_bytes;
++  }
++  /* -------------------- */
++
+   logical_chan_id_t ch[NR_MAX_NUM_LCID];
+   int n = 0;
+   /* loop over all activated logical channels */
+@@ -1076,7 +1091,10 @@ static void generate_dl_mac_pdu(gNB_MAC_INST *mac,
+     start_meas(&candidate->UE->pcell->rlc_data_req);
+     int sdus = 0;
+ 
+-    if (sched_ctrl->num_total_bytes > 0) {
++    /* WD 5Ghoul: SHM interface (was the dl_lc_ids loop in nr_schedule_ue_spec).
++     * While an injected PDU is queued no RLC data is placed into the TB, so the
++     * injected payload is the only content. */
++    if (sched_ctrl->num_total_bytes > 0 && shm_mq_available(W_MQ_MAC_DL) < 8) {
+       /* ask the LCID allocation policy how many bytes each LC gets */
+       int lcid_alloc[NR_MAX_NUM_LCID] = {0};
+       mac->dl_lcid_alloc(mac, candidate, bufEnd - buf, lcid_alloc);
+@@ -1173,6 +1191,29 @@ static void generate_dl_mac_pdu(gNB_MAC_INST *mac,
+       LOG_D(NR_MAC, "%d.%2d UE %04x TA scheduled, setting next TA frame to %d\n", frame, slot, UE->rnti, sched_ctrl->ta_frame);
+     }
+ 
++    /* WD 5Ghoul: SHM interface - mutation (inject the queued PDU into the TB).
++     * Same framing as 2023.w03: payload followed by an 8-byte packet id, the TB
++     * is filled first and the PDU is then reported to the fuzzer with the
++     * W_INJECTED flag. */
++    mq_msg_t *inj_pkt = shm_mq_recv(W_MQ_MAC_DL);
++    uint64_t pkt_id = 0;
++    if (inj_pkt) {
++      int inj_len = inj_pkt->msg_size - 8;
++      memcpy(harq->transportBlock.buf, inj_pkt->msg_buf, (inj_len > TBS ? TBS : inj_len));
++      pkt_id = *((uint64_t *)(inj_pkt->msg_buf + inj_len));
++      LOG_E(MAC, "[DUP] TBS = %d, len=%d, buf: %02x %02x %02x %02x %02x %02x ...\n",
++            TBS, inj_pkt->msg_size,
++            inj_pkt->msg_buf[0], inj_pkt->msg_buf[1], inj_pkt->msg_buf[2],
++            inj_pkt->msg_buf[3], inj_pkt->msg_buf[4], inj_pkt->msg_buf[5]);
++    }
++    /* Send data to fuzzer (DLSCH), flagged when the TB carries an injection */
++    send_pdu_data_nr(W_GNB_MAC_UE_DL_PDU_WITH_DATA | (inj_pkt ? W_INJECTED : 0),
++                     NR_DIRECTION_DOWNLINK,
++                     NR_C_RNTI, rnti,
++                     frame, slot, pkt_id,
++                     (uint8_t *)harq->transportBlock.buf, TBS);
++    /* -------------------- */
++
+     T(T_GNB_MAC_DL_PDU_WITH_DATA,
+       T_INT(module_id),
+       T_INT(0),
+diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_ulsch.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_ulsch.c
+index fe68219..0e2e44e 100644
+--- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_ulsch.c
++++ b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_ulsch.c
+@@ -16,6 +16,9 @@
+ #include "openair3/NRPPA/nrppa_gNB_config.h"
+ #include "openair2/F1AP/lib/f1ap_positioning.h"
+ 
++/* WD 5Ghoul: SHM interface */
++#include "shm_interface/wd_shm_nr_utils.h"
++
+ static const uint16_t NR_TRANSFORM_PRECODE_RB_LUT[274] = {
+     0,   1,   2,   3,   4,   5,   6,   6,   8,   9,   10,  10,  12,  12,  12,  15,  16,  16,  18,  18,  20,  20,  20,  20,  24,
+     25,  25,  27,  27,  27,  30,  30,  32,  32,  32,  32,  36,  36,  36,  36,  40,  40,  40,  40,  40,  45,  45,  45,  48,  48,
+@@ -817,6 +820,15 @@ static void nr_rx_ra_sdu(gNB_MAC_INST *mac,
+     }
+   }
+ 
++  // WD 5Ghoul: SHM interface - send Msg3 (RA) UL PDU to the fuzzer
++  if (sdu && sdu_len) {
++    send_pdu_data_nr(W_GNB_MAC_UE_UL_PDU_WITH_DATA,
++                     NR_DIRECTION_UPLINK,
++                     NR_C_RNTI, rnti,
++                     frame, slot, 0,
++                     sdu, sdu_len);
++  }
++
+   T(T_GNB_MAC_UL_PDU_WITH_DATA, T_INT(mac->Mod_id), T_INT(cell->nr_cellid),
+     T_INT(rnti), T_INT(frame), T_INT(slot), T_INT(-1) /* harq_pid */,
+     T_BUFFER(sdu, sdu_len));
+@@ -934,7 +946,17 @@ static void _nr_rx_sdu(gNB_MAC_INST *gNB_mac,
+   NR_UE_info_t *UE = find_nr_UE(&gNB_mac->UE_info, current_rnti);
+   if (UE) {
+     NR_UE_sched_ctrl_t *UE_scheduling_control = &UE->UE_sched_ctrl;
+-    if (sduP)
++
++    // WD 5Ghoul: SHM interface - send UL MAC PDU to the fuzzer
++    if (sduP && sdu_lenP) {
++      send_pdu_data_nr(W_GNB_MAC_UE_UL_PDU_WITH_DATA,
++                       NR_DIRECTION_UPLINK,
++                       NR_C_RNTI, rntiP,
++                       frameP, slotP, 0,
++                       sduP, sdu_lenP);
++    }
++
++    if (sduP && sdu_lenP)
+       T(T_GNB_MAC_UL_PDU_WITH_DATA, T_INT(gNB_mac->Mod_id), T_INT( 0/*CC_idP*/),
+         T_INT(rntiP), T_INT(frameP), T_INT(slotP), T_INT(harq_pid),
+         T_BUFFER(sduP, sdu_lenP));
 diff --git a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c b/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
 index bd7c717..016a765 100644
 --- a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c

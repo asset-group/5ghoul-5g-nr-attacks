@@ -91,6 +91,27 @@ index f9ebbc1..e6fecfc 100644
    T_Config_Init();
  #endif
    initTpool(get_softmodem_params()->threadPoolConfig, &(nrUE_params.Tpool), cpumeas(CPUMEAS_GETSTATE));
+diff --git a/openair2/LAYER2/NR_MAC_UE/nr_ue_procedures.c b/openair2/LAYER2/NR_MAC_UE/nr_ue_procedures.c
+index d7d1031..3085e66 100644
+--- a/openair2/LAYER2/NR_MAC_UE/nr_ue_procedures.c
++++ b/openair2/LAYER2/NR_MAC_UE/nr_ue_procedures.c
+@@ -4175,7 +4175,15 @@ static void nr_ue_process_mac_pdu(NR_UE_MAC_INST_t *mac, nr_downlink_indication_
+         //  MSG4 RRC Setup 38.331
+         //  variable length
+         ret=get_mac_len(pduP, pdu_len, &mac_len, &mac_subheader_len);
+-        AssertFatal(ret, "The mac_len (%d) has an invalid size. PDU len = %d! \n", mac_len, pdu_len);
++        if (!ret) {
++          // WD 5Ghoul: fuzzed input robustness. A MAC PDU whose CCCH subheader
++          // declares a length that does not fit the received PDU used to abort the
++          // whole UE. Drop the PDU and let the RRC layer re-establish instead.
++          LOG_E(NR_MAC, "[UE] Invalid CCCH subheader, mac_len %d pdu_len %d, dropping PDU\n",
++                mac_len, pdu_len);
++          done = 1;
++          break;
++        }
+ 
+         // Check if it is a valid CCCH message, we get all 00's messages very often
+         int i = 0;
 diff --git a/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c b/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
 index 45ff543..f04fbf2 100644
 --- a/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c

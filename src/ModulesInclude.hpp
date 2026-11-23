@@ -6,6 +6,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 
 #include <linux/byteorder/little_endian.h>
 #include <linux/const.h>
@@ -105,7 +106,7 @@ typedef struct _wd_modules_ctx_t {
     Config *config;
     wd_t *wd;
     wd_module_request_t request;
-    string *state;
+    std::string *state;
 } wd_modules_ctx_t;
 
 // ---------------- Main API (declarations) ----------------

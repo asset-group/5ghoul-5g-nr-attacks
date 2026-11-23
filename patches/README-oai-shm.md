@@ -71,13 +71,34 @@ Porting the MAC/PHY injection sites is a separate task.
   server owns the segment, and then behaves exactly like an unpatched build of
   the same tree.
 
-### Known pre-existing issue (not caused by this patch)
+### Running the binaries: the memlock limit
 
-A v3.0.0 build produced by the plain CMake+GCC 15.2 route above aborts during
-`Initializing NR L1` with `Assertion (ptr) failed! ... calloc fails`, while the
-prebuilt `/opt/oai-latest/bin` binaries (GCC 11.4) get further. A controlled
-A/B in the same tree, same build dir, same flags and same config shows the
-**unpatched** build failing at exactly the same point, so the fault is in the
-build method/toolchain, not in this patch. Max RSS at the abort is only 65 MB,
-so it is not memory exhaustion. Resolve (older GCC / different flags) before
-using a self-built binary for fuzzing.
+OAI locks its memory with `mlockall(MCL_CURRENT | MCL_FUTURE)`
+(`common/utils/system.c`). Under WSL the default `RLIMIT_MEMLOCK` is 64 MiB, so
+as soon as the process' locked footprint crosses 64 MiB every further
+allocation fails and the gNB aborts with
+
+```
+Assertion (ptr) failed!
+In config_allocate_new() .../common/config/config_common.c:90
+calloc fails
+```
+
+during `Initializing NR L1`. This is a run-environment limit, not a property of
+this patch: an **unpatched** build of the same tree, same flags, same config
+fails at exactly the same line (controlled A/B), while the smaller prebuilt
+GCC 11.4 binaries stay below 64 MiB and survive. Raise the limit before running:
+
+```bash
+sudo prlimit --memlock=unlimited:unlimited -- \
+     ./build/nr-softmodem --rfsim -O ../5ghoul/configs/5gnr_gnb/rfsim.n78.106.conf
+```
+
+With that, the patched gNB loads `librfsimulator.so`, reports
+`[RAU] has loaded RFSIMULATOR device` and waits for the simulator exactly like
+the reference binary. Build the radio module too, otherwise startup fails with
+`library librfsimulator.so is not loaded`:
+
+```bash
+ninja nr-softmodem nr-uesoftmodem params_libconfig rfsimulator
+```

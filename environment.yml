@@ -1,90 +1,90 @@
-# Conda environment for building 5Ghoul (wdissector) in WSL2 / Ubuntu 26.04 LTS
-#
-# Derived from an audit of: requirements.sh (dev), Dockerfile, CMakeLists.txt,
-# libs/ and 3rd-party/.  conda-forge is listed first and is the only channel used.
-#
-# STATUS: validated.  These are the pins of the environment that built
-# bin/5g_fuzzer and ran the rfsim simulation (OAI gNB/UE + open5gs) on
-# WSL2 / Ubuntu 26.04.
-name: 5ghoul
+# Single default build/runtime environment for Ubuntu 26.04.
+# Create with: conda env create -f environment.yml
+# Configure with: ./run-configure.sh
+# Python tooling uses 3.11; the binary embeds vendored CPython 3.8.16.
+# pybind11 and nlohmann/json remain vendored; do not install competing headers.
+name: 5ghoul23
 channels:
   - conda-forge
 dependencies:
-  # ---- toolchain / build system (CMakeLists requires >=3.18.4, C++20, clang+lld) ----
+  - python=3.11
+  - pip
+  - clang=23.1.6
+  - clangxx=23.1.6
+  - clang-tools=23.1.6
+  - lld=23.1.6
+  - llvm=23.1.6
+  - llvm-tools=23.1.6
+  - llvmdev=23.1.6
+  - gcc=16.2.0
+  - gxx=16.2.0
   - cmake>=3.18.4
   - ninja
   - meson
-  - pkg-config
   - make
-  - clang=15
-  - clangxx=15
-  - clang-tools=15
-  - lld=15
-  - llvm=15
-  - gcc_linux-64=9
-  - gxx_linux-64=9
+  - pkg-config
   - flex
   - bison
   - swig
   - git
   - zstd
   - graphviz
-
-  # ---- core libraries CMake looks for directly ----
+  - cxxopts
   - glib
   - freetype
   - zlib
-  - libpcap                 # replaces libs/libpcap
-  - boost=1.78              # replaces the boost_1_78_0 source download in CMakeLists
-  - fmt                     # replaces libs/fmt
-  - double-conversion       # replaces libs/double-conversion
-  - folly                   # replaces libs/folly (version may need pinning; see audit)
-  - pagmo                   # header-only pagmo 2.x; sole copy (no vendored tree)
-  - zeromq                  # replaces libs/libzmq  (conda-forge name: zeromq, not libzmq)
-  - cppzmq                 # header-only zmq.hpp / zmq_addon.hpp
+  - libpcap
+  - libconfig
+  # Namespace-local subscriber database; Open5GS's C driver is built separately.
+  # conda-forge libmongoc/libbson 1.23.2 conflict with current ICU/snappy pins.
+  - mongodb=8.0.23
+  - libboost-devel=1.90.0
+  - folly=2026.10.26.00
+  - fmt=12.1.0
+  # Runtime and development headers are separate packages. 2.9 and 2.20.0
+  # are unsolvable with these host toolchain/library pins; use the proven pair.
+  - pagmo=2.19.1
+  - pagmo-devel=2.19.1
+  - nss=3.118
+  - nspr=4.41
+  - xorg-libxscrnsaver
+  - rtaudio=5.2.0
+  - glfw=3.4
+  - double-conversion
+  - zeromq
+  - cppzmq
   - czmq
   - json-c
-  - pybind11
   - snappy
   - lz4-c
   - libevent
   - libunwind
   - glog
   - gflags
-
-  # ---- wireshark runtime deps (wireshark itself stays vendored + patched) ----
   - libgcrypt
   - gnutls
   - libxml2
-  - libnghttp2              # conda-forge name: libnghttp2, not nghttp2
+  - libnghttp2
   - krb5
   - libnl
   - libcap
   - brotli
-  - lua=5.2
+  - lua=5.2                 # Wireshark Lua is disabled (non-PIC static archive).
   - c-ares
   - libssh
   - libmaxminddb
   - pcre2
   - speexdsp
-  - libopus                 # conda-forge name: libopus, not opus
+  - libopus
   - libtiff
   - tbb
-
-  # ---- misc runtime tools referenced by build.sh / requirements.sh ----
   - sshpass
   - bc
-  # kmod: not on conda-forge (apt runtime tool only)
   - curl
   - wget
   - nodejs
-  - python=3.11             # tooling only: the binary embeds its own CPython 3.8.16
-  - pip
-
-  # ---- NOT available on conda-forge (keep vendored / apt / skip) ----
-  # libsmi     404 on conda-forge -> wireshark builds without it (or -DENABLE_SMI=OFF)
-  # spandsp    404 on conda-forge -> wireshark optional codec, disable with -DENABLE_SPANDSP=OFF
-  # sbc        404 on conda-forge -> wireshark optional codec, -DENABLE_SBC=OFF
-  # gvpp       404 on conda-forge -> stays vendored (libs/gvpp, thin C++ wrapper over graphviz)
-  # psmisc     404 on conda-forge -> apt:psmisc or not needed for the build
-  # tcpdump    404 on conda-forge -> apt:tcpdump, runtime capture tool only
+  # Keep Python dependencies in their existing canonical requirements file.
+  - pip:
+      - -r modules/requirements.txt
+      - pymongo==4.20.1
+# Host-only runtime tools (not conda build dependencies): psmisc, tcpdump, kmod.

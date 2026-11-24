@@ -2,7 +2,6 @@
 
 set -eo pipefail
 
-CLANG_VERSION=15
 ARCH="$(uname -m)"
 KERNEL="$(uname -r)"
 
@@ -18,68 +17,24 @@ if [ "$1" == "dev" ]
 then
 	# Make sure that .config is used
 	git config --local include.path ../.gitconfig || true
-	# Ubuntu dev. requirements
-	sudo apt install software-properties-common kmod bc gzip curl git wget zstd python3-dev flex bison pkg-config swig graphviz libglib2.0-dev libgcrypt-dev libnl-genl-3-200 \
-	libgraphviz-dev liblz4-dev libsnappy-dev libgnutls28-dev libxml2-dev libnghttp2-dev libkrb5-dev libnl-3-dev libspandsp-dev libxrandr-dev libxinerama-dev libxcursor-dev \
-	libxi-dev libnl-genl-3-dev libnl-route-3-dev libnl-nf-3-dev libcap-dev libbrotli-dev libsmi2-dev liblua5.2-dev libc-ares-dev libsbc-dev libspeexdsp-dev libfreetype6-dev libxss1 \
-	libtbb-dev libnss3-dev libudev-dev libpulse-dev libpcre2-dev libasound2-dev libgl1-mesa-dev libssh-dev libmaxminddb-dev libopus-dev libusb-1.0-0 psmisc sshpass tcpdump -y
-	# folly requirements
-	sudo apt install libgoogle-glog-dev libzstd-dev libevent-dev libunwind-dev libdouble-conversion-dev libgflags-dev -y
+	# Host-only runtime utilities; build libraries come from environment.yml.
+	sudo apt install kmod psmisc tcpdump -y
 
-	# Install clang-15 for Ubuntu
-	sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y # add missing libgcc-s1 on Ubuntu18.04
-	sudo mkdir -p /usr/lib/python3.6/dist-packages/
-	sudo ./scripts/install_llvm.sh $CLANG_VERSION
-	CLANG_VERSION_FULL=$(clang-$CLANG_VERSION --version | grep -o -i -E "([0-9]+.){2}[0-9]")
-	# Fix lldb-15 on ubuntu18.04
-	sudo ln -sf /usr/lib/llvm-$CLANG_VERSION/lib/python3.6/site-packages/lldb /usr/lib/python3.6/dist-packages/lldb || true
-
-	# Install gcc-9 headers and libraries for use with Clang 15
-	sudo apt install gcc-9 g++-9 libstdc++-9-dev -y
-
-	# Install qt 5.12.2 on x86 arch
-	if [ $ARCH == "x86_64" ]
-	then
-		sudo add-apt-repository ppa:beineri/opt-qt-5.12.2-bionic -y
-		sudo apt install qt512base qt512tools qt512svg qt512multimedia mesa-common-dev -y
-	fi
-
-	# Install nodejs
-	if ! which node > /dev/null;
-	then
-		echo "nodejs not found, installing now..."
-		curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-		sudo apt update
-		sudo apt install nodejs -y
-	else
-		echo "nodejs found!"
-	fi
+	# One compiler/library profile; do not install a competing system toolchain.
+	source "$HOME/miniforge3/etc/profile.d/conda.sh"
+	conda env create -f "$(dirname "$0")/environment.yml"
+	conda activate 5ghoul23
 
 	# Install quicktype
 	if ! which quicktype > /dev/null; 
 	then
 	echo "quicktype not found, installing now..."
-	sudo npm install -g quicktype || echo -e "\nError. Make sure to install nodejs"
+	npm install -g quicktype
 	else
 	echo "quicktype found!"
 	fi
 
-	# Install python pip
-	if ! which pip3 > /dev/null;
-	then
-	echo "pip3 not found, installing now..."
-	wget https://bootstrap.pypa.io/pip/3.6/get-pip.py
-	sudo python3 get-pip.py
-	rm get-pip.py
-	else
-	echo "pip3 found!"
-	fi
-
-	# Python3 packages
-	sudo python3 -m pip install \
-	cmake==3.24.1 -U \
-	ninja==1.11.1 -U \
-	meson==0.53.0 --use-feature=2020-resolver
+	# Build tools and modules/requirements.txt are provisioned by environment.yml.
 
 elif [ "$1" == "doc" ]
 then

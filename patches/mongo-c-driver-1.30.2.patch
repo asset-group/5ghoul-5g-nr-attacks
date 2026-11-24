@@ -1,0 +1,20 @@
+diff --git a/src/libmongoc/CMakeLists.txt b/src/libmongoc/CMakeLists.txt
+--- a/src/libmongoc/CMakeLists.txt
++++ b/src/libmongoc/CMakeLists.txt
+@@ -432,6 +432,7 @@
+ function (mongoc_get_accept_args ARG2 ARG3)
++   SET (CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+    SET (VAR 0)
+    foreach (ARG2_VAL "struct sockaddr" "void")
+    foreach (ARG3_VAL "socklen_t" "size_t" "int")
+ 
+    MATH (EXPR VAR "${VAR}+1")
+@@ -453,7 +454,7 @@
+    TRY_COMPILE (RES ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/accept_test${VAR}.c CMAKE_FLAGS
+-   "-Werror -DCMAKE_CXX_LINK_EXECUTABLE='echo not linking now...'" OUTPUT_VARIABLE LOG2)
++   "-DCOMPILE_DEFINITIONS:STRING=-Werror" OUTPUT_VARIABLE LOG2)
+ 
+    if (RES)
+       message (
+          STATUS

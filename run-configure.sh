@@ -4,16 +4,15 @@
 #
 # Usage:
 #   ./run-configure.sh                 # env 5ghoul23, clang 23 (proven build)
-#   ./run-configure.sh 15 5ghoul       # env 5ghoul,   clang 15 (legacy, GCC 9 pins)
+#   conda env create -f environment.yml  # single default profile
 #
 # Everything that made configure work on Ubuntu 26.04 lives here on purpose:
 # conda clang has a sysroot that excludes /usr/include, lld has no implicit
 # $CONDA_PREFIX/lib search path, and the libstdc++ headers must come from the
 # conda GCC 16.2.0 install, selected explicitly with --gcc-install-dir below
-# (GCC 9 <valarray> breaks under C++20, and GCC 13+ <format> clashes with the
-# vendored fmt, which the stdcxx_compat.h include in CXXFLAGS works around).
+# (-include cstdint supplies declarations no longer transitively included).
 # ---------------------------------------------------------------------------
-set -o pipefail
+set -eo pipefail
 
 CLANG_MAJOR="${1:-23}"
 ENV_NAME="${2:-5ghoul23}"
@@ -21,8 +20,6 @@ CLONE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
 conda activate "$ENV_NAME" || { echo "FATAL: cannot activate $ENV_NAME"; exit 1; }
-# scripts/apply_patches.sh calls sudo; the tree is user-owned, so shim it out.
-export PATH="$HOME/.issue46-shim:$PATH"
 
 # --- conda-forge packaging gap: the boost_system component is missing ------
 # conda-forge's split boost packaging (recipe "boost-split") ships a cmake
@@ -33,26 +30,13 @@ export PATH="$HOME/.issue46-shim:$PATH"
 # the missing file.  Written here (not hand-edited into the env) so the fix is
 # reproducible from the repo.
 repair_boost_system_component() {
-  local ver dir d
-  # The component directories carry the full three-part version
-  # (boost_headers-1.90.0) while boost/version.hpp only carries
-  # BOOST_LIB_VERSION "1_90", i.e. 1.90.  Deriving from version.hpp therefore
-  # never matched the boost_headers-* guard below, so this repair silently
-  # no-opped and configure died in BoostConfig.cmake.  Take the version from
-  # the Boost-<ver> package directory BoostConfig.cmake itself lives in, and
-  # only fall back to version.hpp when that directory is absent.
-  for d in "$CONDA_PREFIX"/lib/cmake/Boost-*/; do
-    [ -d "$d" ] || continue
-    ver="${d%/}"; ver="${ver##*/}"; ver="${ver#Boost-}"
-    break
-  done
-  if [ -z "${ver:-}" ] && [ -f "$CONDA_PREFIX/include/boost/version.hpp" ]; then
-    ver=$(sed -n 's/.*BOOST_LIB_VERSION "\(.*\)".*/\1/p' \
-          "$CONDA_PREFIX/include/boost/version.hpp" | tr '_' '.')
-  fi
-  [ -n "${ver:-}" ] || return 0
+  local ver=1.90.0 dir headers
   dir="$CONDA_PREFIX/lib/cmake/boost_system-$ver"
-  if [ -d "$CONDA_PREFIX/lib/cmake/boost_headers-$ver" ] && [ ! -d "$dir" ]; then
+  headers="$CONDA_PREFIX/lib/cmake/boost_headers-$ver"
+  [ -f "$headers/boost_headers-config-version.cmake" ] || {
+    echo "FATAL: environment.yml requires Boost headers $ver" >&2; return 1;
+  }
+  if [ ! -f "$dir/boost_system-config.cmake" ]; then
     mkdir -p "$dir"
     cat > "$dir/boost_system-config.cmake" <<EOF
 # Generated for conda-forge's split boost $ver packaging, which omits the
@@ -61,39 +45,39 @@ if(TARGET Boost::system)
   return()
 endif()
 mark_as_advanced(boost_system_DIR)
-get_filename_component(_BOOST_CMAKEDIR "\${CMAKE_CURRENT_LIST_DIR}/../" REALPATH)
-get_filename_component(_BOOST_INCLUDEDIR "\${_BOOST_CMAKEDIR}/../../include/" ABSOLUTE)
+find_package(boost_headers $ver EXACT CONFIG REQUIRED)
 add_library(Boost::system INTERFACE IMPORTED)
 set_target_properties(Boost::system PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "\${_BOOST_INCLUDEDIR}"
+  INTERFACE_LINK_LIBRARIES Boost::headers
 )
-unset(_BOOST_INCLUDEDIR)
-unset(_BOOST_CMAKEDIR)
 set(boost_system_FOUND TRUE)
 EOF
-    cat > "$dir/boost_system-config-version.cmake" <<EOF
-set(PACKAGE_VERSION "$ver")
-if(PACKAGE_VERSION VERSION_LESS PACKAGE_FIND_VERSION)
-  set(PACKAGE_VERSION_COMPATIBLE FALSE)
-else()
-  set(PACKAGE_VERSION_COMPATIBLE TRUE)
-  if(PACKAGE_FIND_VERSION STREQUAL PACKAGE_VERSION)
-    set(PACKAGE_VERSION_EXACT TRUE)
-  endif()
-endif()
-EOF
+    cp "$headers/boost_headers-config-version.cmake" \
+       "$dir/boost_system-config-version.cmake"
     echo "[env repair] wrote missing boost_system component config for $ver"
   fi
 }
 repair_boost_system_component
+
+# Folly links the unversioned development name, absent in some conda exports.
+if [ ! -e "$CONDA_PREFIX/lib/liblzma.so" ]; then
+  [ -e "$CONDA_PREFIX/lib/liblzma.so.5" ] || {
+    echo "FATAL: missing $CONDA_PREFIX/lib/liblzma.so.5" >&2; exit 1;
+  }
+  ln -sfn liblzma.so.5 "$CONDA_PREFIX/lib/liblzma.so"
+fi
+GCC_INSTALL_DIR="$CONDA_PREFIX/lib/gcc/x86_64-conda-linux-gnu/16.2.0"
+[ -d "$GCC_INSTALL_DIR" ] || {
+  echo "FATAL: environment.yml requires GCC headers at $GCC_INSTALL_DIR" >&2
+  exit 1
+}
 
 export CC="clang-${CLANG_MAJOR}"
 export CXX="clang++-${CLANG_MAJOR}"
 
 # -idirafter /usr/include: conda clang is built with --sysroot, so system dev
 # headers are invisible; appended, so sysroot glibc headers still win.
-# -include stdcxx_compat.h: restores std headers that libstdc++ 9 leaked
-# transitively and newer libstdc++ no longer includes.
+# -include cstdint: GCC 16 no longer leaks fixed-width integer declarations.
 # -Wno-format-truncation: clang 23 diagnoses snprintf() calls that provably
 # truncate (libs/wireshark/epan/dissectors has several, e.g.
 # packet-5co-legacy.c:923), and vendored wireshark compiles with -Werror.
@@ -102,7 +86,7 @@ COMMON_FLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC \
 -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe \
 -Wno-format-truncation \
 -isystem $CONDA_PREFIX/include -idirafter /usr/include \
---gcc-install-dir=$CONDA_PREFIX/lib/gcc/x86_64-conda-linux-gnu/16.2.0"
+--gcc-install-dir=$GCC_INSTALL_DIR"
 # clang 20+ promotes several C diagnostics to errors by default (not via
 # -Werror).  Vendored wireshark trips them: its epan plugins register 3-arg
 # dissectors against the 4-arg dissector_t, e.g.
@@ -131,7 +115,7 @@ export CFLAGS="$COMMON_FLAGS \
 export CXXFLAGS="$COMMON_FLAGS -fvisibility-inlines-hidden \
 -DGLOG_USE_GLOG_EXPORT \
 -I$CLONE/libs/pybind11/include \
--include $HOME/.issue46-shim/stdcxx_compat.h"
+-include cstdint"
 # -L$CONDA_PREFIX/lib: lld has no implicit env lib dir.
 # -Wl,-rpath-link,...: resolve split GLVND/system libs at link time.
 export LDFLAGS="-L$CONDA_PREFIX/lib \
@@ -156,6 +140,7 @@ cd "$CLONE" || exit 1
 # so lld refuses to link it into bin/libwireshark.so ("relocation R_X86_64_32
 # cannot be used against local symbol").  Lua dissector support is not used by
 # 5Ghoul, so the feature is switched off rather than rebuilding lua.
+set +e
 cmake -B build -S . -G Ninja \
       -DWDS_CLANG_MAJOR="$CLANG_MAJOR" \
       -DWIRESHARK_GUI=OFF \

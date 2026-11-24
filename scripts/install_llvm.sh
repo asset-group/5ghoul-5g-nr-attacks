@@ -20,7 +20,8 @@ usage() {
     exit 1;
 }
 
-CURRENT_LLVM_STABLE=15
+# Optional system installer; the default build is provisioned by environment.yml.
+CURRENT_LLVM_STABLE=23
 BASE_URL="http://apt.llvm.org"
 
 # Check for required tools

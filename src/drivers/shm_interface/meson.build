@@ -8,10 +8,10 @@ libshm_interface_sources = files('''
 
 libshm_interface_inc = include_directories('.')
 
-libpthread_dep    = cc.find_library('libpthread')
-libz_dep          = cc.find_library('libz')
-libm_dep          = cc.find_library('libm')
-librt_dep         = cc.find_library('librt')
+libpthread_dep    = cc.find_library('pthread')
+libz_dep          = cc.find_library('z')
+libm_dep          = cc.find_library('m')
+librt_dep         = cc.find_library('rt')
 
 libshm_interface = static_library('shm_interface', 
     sources : libshm_interface_sources,

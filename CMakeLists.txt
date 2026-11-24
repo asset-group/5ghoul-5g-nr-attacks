@@ -4,8 +4,7 @@ cmake_minimum_required(VERSION 3.18.4)
 #
 # The compiler is conda-forge clang, selected by major version through the
 # WDS_CLANG_MAJOR cache variable (default 23 = clang/LLD/LLVM 23.1.6, the
-# newest release published on conda-forge).  15.0.7 is the version this tree
-# was first proven with: pass -DWDS_CLANG_MAJOR=15 to reproduce that build.
+# release pinned in the single default environment.yml).
 #
 # Two linker facts drive the code below:
 #  * conda-forge's clang ships no LLVMgold.so, so GNU ld cannot load the
@@ -25,7 +24,7 @@ cmake_minimum_required(VERSION 3.18.4)
 # archives require (conda's gcc-ar is plugin-less).
 # ---------------------------------------------------------------------------
 set(WDS_CLANG_MAJOR "23" CACHE STRING
-  "conda-forge clang major version to build with (23 = latest, 15 = original)")
+  "conda-forge clang major version to build with (default profile: 23)")
 set(CMAKE_C_COMPILER "clang-${WDS_CLANG_MAJOR}")
 set(CMAKE_CXX_COMPILER "clang++-${WDS_CLANG_MAJOR}")
 
@@ -122,10 +121,8 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 # Global compiler options
 # C++20 is required (std::unordered_map::contains, if constexpr on concepts).
-# The toolchain deliberately uses libstdc++ 12 headers: GCC 13 would add
-# std::format, which makes the unqualified format(...) calls in
-# Machine/Framework/Modules ambiguous against the vendored fmt::format via ADL,
-# while GCC 9's <valarray> has a noexcept mismatch that clang rejects in C++20.
+# The default profile uses GCC 16.2.0 headers with clang 23.1.6.
+# run-configure.sh selects that installation and includes cstdint explicitly.
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)

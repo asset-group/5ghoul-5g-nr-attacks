@@ -1,0 +1,12 @@
+diff --git a/libfdcore/sctp3436.c b/libfdcore/sctp3436.c
+--- a/libfdcore/sctp3436.c
++++ b/libfdcore/sctp3436.c
+@@ -488,7 +488,7 @@
+ 	li = find_or_next(sto, key, &match);
+ 	if (match) {
+ 		sr = (struct sr_data *)li;
+-		GNUTLS_TRACE( CHECK_MALLOC_DO(res.data = gnutls_malloc(sr->data.size), goto out ) );
++		CHECK_MALLOC_DO(res.data = gnutls_malloc(sr->data.size), goto out );
+ 		res.size = sr->data.size;
+ 		memcpy(res.data, sr->data.data, res.size);
+ 	}

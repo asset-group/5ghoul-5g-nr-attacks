@@ -432,17 +432,32 @@ sudo bin/5g_fuzzer --MCC=001 --MNC=01 --EnableMutation=true --gui # Run with gra
 
 ## 6. 🛠️ (Optional) Build _5Ghoul_ software from source
 
-Several requirements need to be installed before compiling the project. An automated script for **Ubuntu 18.04** is provided on `requirements.sh`. To compile from source, simply run the following commands:
+The default source build on **Ubuntu 26.04** uses Miniforge and the single
+`environment.yml` profile named `5ghoul23`: clang/LLVM/LLD 23.1.6, GCC/G++
+16.2.0 headers, Boost 1.90.0, folly 2026.10.26.00 and fmt 12.1.0.
+Python 3.11 tooling dependencies are installed from `modules/requirements.txt`
+by that environment file; pybind11 and nlohmann/json remain vendored.
+Install host runtime tools such as `psmisc`, `tcpdump` and `kmod` separately
+when needed. To compile from source:
 
 ```bash
 git clone https://github.com/asset-group/5ghoul-5g-nr-attacks
 cd 5ghoul-5g-nr-attacks
-./requirements.sh dev # Install all system requirements to compile 5ghoul fuzzer (Important)
-./requirements.sh 5g # Install all system requirements to compile OpenAirInterface and Open5GS
-./build.sh all # Compile all binaries WITH Wireshark. It may take around 20min. Go get a coffe!
-./build.sh dev # (OPTIONAL) Compile all binaries WITHOUT Wireshark.
-./build.sh # Run without arguments to quickly build the 5g_fuzzer after modifying any file inside ./src folder.
+source "$HOME/miniforge3/etc/profile.d/conda.sh"
+conda env create -f environment.yml
+conda activate 5ghoul23
+./run-configure.sh # Defaults: clang major 23, environment 5ghoul23
+cmake --build build --parallel
 ```
+
+`run-configure.sh` selects GCC 16.2.0 headers explicitly and supplies
+`-include cstdint`, avoiding external compatibility headers. It reproducibly
+repairs the environment-local Boost.System exact-version CMake component and
+missing `liblzma.so` development symlink. Patch application retains real sudo
+behavior; no external sudo shim is required. Wireshark GUI, Lua and WERROR are
+disabled in this configuration. Pagmo and pagmo-devel are both pinned to
+2.19.1: 2.9 and 2.20.0 are unsolvable with these host library/toolchain pins.
+OAI/Open5GS setup is separate from this compiler environment.
 
 The expected output during the build process is shown below:
 

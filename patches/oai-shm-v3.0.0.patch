@@ -1,8 +1,21 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5e58be3..4113134 100644
+index 5e58be3..41b2c8a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1879,6 +1879,7 @@ add_executable(nr-softmodem
+@@ -1417,6 +1417,12 @@ add_library( NR_L2_UE ${NR_L2_SRC_UE} ${MAC_NR_SRC_UE} )
+ target_link_libraries(NR_L2_UE PRIVATE nr_rlc ds alg)
+ target_link_libraries(NR_L2_UE PRIVATE asn1_nr_rrc_hdrs asn1_lte_rrc_hdrs nr_common nr_ue_power_procedures nr_ue_ra_procedures)
+ target_link_libraries(NR_L2_UE PRIVATE nr_nas)
++# WD 5Ghoul: NR_L2_UE is the UE build of the sources it shares with the gNB,
++# including nr_pdcp_entity.c. The fuzzer's SHM interception is gNB-only (the UE
++# never opens the segment), so the PDCP hooks are compiled out here and the UE
++# executable does not link wd_shm.c at all. L2_NR, the gNB build of the same
++# sources, is not touched.
++target_compile_definitions(NR_L2_UE PRIVATE WD_SHM_GNB_ONLY)
+ 
+ include_directories("${OPENAIR2_DIR}/NR_UE_PHY_INTERFACE")
+ include_directories("${OPENAIR2_DIR}/LAYER2")
+@@ -1879,6 +1885,7 @@ add_executable(nr-softmodem
    ${OPENAIR_DIR}/common/utils/lte/prach_utils.c
    ${PHY_INTERFACE_DIR}/queue_t.c
    ${OPENAIR1_DIR}/PHY/TOOLS/phy_scope_interface.c
@@ -10,14 +23,6 @@ index 5e58be3..4113134 100644
    )
  
  target_link_libraries(nr-softmodem PRIVATE
-@@ -1953,6 +1954,7 @@ add_executable(nr-uesoftmodem
-   ${OPENAIR1_DIR}/PHY/TOOLS/phy_scope_interface.c
-   ${NFAPI_USER_DIR}/nfapi.c
-   ${PHY_INTERFACE_DIR}/queue_t.c
-+    ${OPENAIR_DIR}/shm_interface/wd_shm.c
-   )
- 
- target_link_libraries(nr-uesoftmodem PRIVATE
 diff --git a/executables/nr-softmodem.c b/executables/nr-softmodem.c
 index 20c0e62..1b43a1a 100644
 --- a/executables/nr-softmodem.c
@@ -240,24 +245,28 @@ index fe68219..0e2e44e 100644
          T_INT(rntiP), T_INT(frameP), T_INT(slotP), T_INT(harq_pid),
          T_BUFFER(sduP, sdu_lenP));
 diff --git a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c b/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
-index bd7c717..016a765 100644
+index bd7c717..6ae1192 100644
 --- a/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
 +++ b/openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c
-@@ -16,6 +16,10 @@
+@@ -16,6 +16,13 @@
  
  #include "LOG/log.h"
  
-+/* WD 5Ghoul: SHM interface */
++/* WD 5Ghoul: SHM interface - gNB build only (WD_SHM_GNB_ONLY is defined for the
++ * UE library NR_L2_UE, which shares this file with the gNB library L2_NR). */
++#ifndef WD_SHM_GNB_ONLY
 +#include "shm_interface/wd_shm_nr_utils.h"
++#endif
 +/* ------------------------ */
 +
  /**
   * @brief returns the maximum PDCP PDU size
   *        which corresponds to data PDU for DRBs with 18 bits PDCP SN
-@@ -138,6 +142,19 @@ static void nr_pdcp_entity_recv_pdu(nr_pdcp_entity_t *entity,
+@@ -138,6 +145,21 @@ static void nr_pdcp_entity_recv_pdu(nr_pdcp_entity_t *entity,
      }
    }
  
++#ifndef WD_SHM_GNB_ONLY
 +  /* WD 5Ghoul: RX NR gNB interception */
 +  if (entity->is_gnb) {
 +    send_pdu_data_pdcp_nr(
@@ -269,15 +278,17 @@ index bd7c717..016a765 100644
 +        false, 0,
 +        buffer, header_size + size + integrity_size);
 +  }
++#endif
 +  /* ------------------------ */
 +
    if (rcvd_count < entity->rx_deliv
        || nr_pdcp_sdu_in_list(entity->rx_list, rcvd_count)) {
      /* 1280 ms = 128 frames @ 10 ms, to match MAC cadence */
-@@ -263,6 +280,20 @@ static int nr_pdcp_entity_process_sdu(nr_pdcp_entity_t *entity,
+@@ -263,6 +285,22 @@ static int nr_pdcp_entity_process_sdu(nr_pdcp_entity_t *entity,
  
    memcpy(buf + header_size, buffer, size);
  
++#ifndef WD_SHM_GNB_ONLY
 +  /* WD 5Ghoul: TX NR gNB interception (plaintext, MAC-I cleared) */
 +  if (entity->is_gnb) {
 +    memset(buf + header_size + size, 0, integrity_size);
@@ -290,15 +301,17 @@ index bd7c717..016a765 100644
 +        false, 0,
 +        (uint8_t *)buf, header_size + size + integrity_size);
 +  }
++#endif
 +  /* ------------------------ */
 +
    if (entity->has_integrity) {
      uint8_t integrity[PDCP_INTEGRITY_SIZE] = {0};
      entity->integrity(entity->integrity_context,
-@@ -283,6 +314,19 @@ static int nr_pdcp_entity_process_sdu(nr_pdcp_entity_t *entity,
+@@ -283,6 +321,21 @@ static int nr_pdcp_entity_process_sdu(nr_pdcp_entity_t *entity,
                     entity->rb_id, count, entity->is_gnb ? 1 : 0);
    }
  
++#ifndef WD_SHM_GNB_ONLY
 +  /* WD 5Ghoul: TX NR gNB interception (ciphered PDU) */
 +  if ((entity->has_integrity || entity->has_ciphering) && entity->is_gnb) {
 +    send_pdu_data_pdcp_nr(
@@ -310,6 +323,7 @@ index bd7c717..016a765 100644
 +        true, 0,
 +        (uint8_t *)buf, header_size + size + integrity_size);
 +  }
++#endif
 +  /* ------------------------ */
 +
    entity->tx_next++;

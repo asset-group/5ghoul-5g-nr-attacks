@@ -28,9 +28,9 @@ point instead.
 
 | File | Change |
 | --- | --- |
-| `CMakeLists.txt` | `wd_shm.c` added to the `nr-softmodem` and `nr-uesoftmodem` source lists (the UE one only because the shared `nr_pdcp_entity.c` translation unit references `shm_is_enabled`/`shm_wait`/`shm_notify`) |
+| `CMakeLists.txt` | `wd_shm.c` added to the `nr-softmodem` source list only, plus `target_compile_definitions(NR_L2_UE PRIVATE WD_SHM_GNB_ONLY)` so the shared PDCP hooks compile out of the UE build |
 | `executables/nr-softmodem.c` | include + `shm_init()` / `shm_set_max_timeout()` / `shm_mq_init(W_MQ_MAC_DL)` in `main()` |
-| `openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c` | include + three interception hooks: RX PDCP PDU (`nr_pdcp_entity_recv_pdu`), TX plaintext (`nr_pdcp_entity_process_sdu`, MAC-I cleared), TX post-security |
+| `openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c` | include + three interception hooks, all inside `#ifndef WD_SHM_GNB_ONLY` so only the gNB build compiles them: RX PDCP PDU (`nr_pdcp_entity_recv_pdu`), TX plaintext (`nr_pdcp_entity_process_sdu`, MAC-I cleared), TX post-security |
 
 The table above lists only the build wiring and the PDCP hooks. The MAC DL/UL,
 RAR, Msg4 and Msg3 points ported on top of them are listed in
@@ -88,14 +88,25 @@ were dropped, with their includes, so `executables/nr-uesoftmodem.c` and
 `openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c` are identical to vanilla v3.0.0 and
 no longer appear in the patch.
 
-`wd_shm.c` stays in the `nr-uesoftmodem` source list: the shared
-`nr_pdcp_entity.c` translation unit (built into `NR_L2_UE`) references
-`shm_is_enabled()`, `shm_wait()` and `shm_notify()`, so the UE would not link
-without it. With no `shm_init()` call in the UE that flag is never set, so the
-PDCP hooks return immediately and the UE can never attach to the segment:
-`nm nr-uesoftmodem` lists the `shm_*` symbols, `objdump -d nr-uesoftmodem`
-contains zero calls to `shm_init`, and a run shows no `[SHM]` line on the UE side
-at all.
+The UE build also carries no SHM code at all, enforced at compile time rather
+than left to a runtime flag:
+
+* `wd_shm.c` is gone from the `nr-uesoftmodem` source list, so the UE binary no
+  longer links the driver;
+* the `wd_shm_nr_utils.h` include and the three PDCP hook call sites in the
+  shared `nr_pdcp_entity.c` sit inside `#ifndef WD_SHM_GNB_ONLY`, and
+  `WD_SHM_GNB_ONLY` is defined on `NR_L2_UE`, the UE build of the L2 sources.
+  `L2_NR`, the gNB build of the same file, defines nothing and keeps the hooks
+  exactly as they were. The hooks were already gated at runtime on
+  `entity->is_gnb`, so this removes only code the UE could never execute.
+
+Verified on this tree: `nm nr-uesoftmodem` has zero `shm_*`/`wd_shm` symbols,
+defined or undefined, and `objdump -d` finds no call to `shm_init`;
+`nr-softmodem` keeps all 12 and its single `shm_init()` call. Sizes: UE
+48,902,008 -> 48,848,768 B, gNB 131,171,040 B unchanged. A 100 s run with
+mutation on still reports `[SHM] SHM started` on the gNB side, zero `[SHM]`
+lines on the UE side, Registration Accept, PDN established, 11 mutated PDUs and
+no UE abort.
 
 ### Receiver robustness: CCCH length check (not an interception point)
 

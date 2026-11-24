@@ -1,8 +1,8 @@
 diff --git a/.gitignore b/.gitignore
-index 1783da8be..8a8165a67 100644
+index 1481101c4..313447405 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -4,3 +4,7 @@ subprojects/libtins
+@@ -7,3 +7,7 @@ subprojects/prometheus-client-c
  subprojects/usrsctp
  
  webui/.next
@@ -66,31 +66,31 @@ index 000000000..015692406
 +
 +echo "Build completed"
 diff --git a/lib/core/ogs-pkbuf.c b/lib/core/ogs-pkbuf.c
-index a231ca8ef..202c12c37 100644
+index 6d3cbe76a..ea1705e31 100644
 --- a/lib/core/ogs-pkbuf.c
 +++ b/lib/core/ogs-pkbuf.c
-@@ -299,7 +299,7 @@ ogs_pkbuf_t *ogs_pkbuf_copy_debug(ogs_pkbuf_t *pkbuf, const char *file_line)
-     ogs_pkbuf_t *newbuf;
-     int size = pkbuf->end - pkbuf->head;
+@@ -326,7 +326,7 @@ ogs_pkbuf_t *ogs_pkbuf_copy_debug(ogs_pkbuf_t *pkbuf, const char *file_line)
  
--    ogs_assert(size > 0);
-+    // ogs_assert(size > 0);
-     newbuf = ogs_pkbuf_alloc_debug(NULL, size, file_line);
-     if (!pkbuf) {
-         ogs_error("ogs_pkbuf_alloc() failed [size=%d]", size);
+     ogs_assert(pkbuf);
+     size = pkbuf->end - pkbuf->head;
+-    if (size <= 0) {
++    if (size < 0) {
+         ogs_error("Invalid argument[size=%d, head=%p, end=%p] in (%s)",
+                 size, pkbuf->head, pkbuf->end, file_line);
+         return NULL;
 diff --git a/lib/nas/5gs/encoder.c b/lib/nas/5gs/encoder.c
-index 359fd464d..55e3bfd8e 100644
+index 2415e53d6..128575b09 100644
 --- a/lib/nas/5gs/encoder.c
 +++ b/lib/nas/5gs/encoder.c
 @@ -32,6 +32,7 @@
-  * from 24501-g41.docx
+  * from r19.6.2/24501-j62-ch8-ch9.docx
   ******************************************************************************/
  
 +#include <wd_shm_nas_utils.h>
  #include "ogs-nas-5gs.h"
  
  int ogs_nas_5gs_encode_registration_request(ogs_pkbuf_t *pkbuf, ogs_nas_5gs_message_t *message);
-@@ -2963,6 +2964,8 @@ ogs_pkbuf_t *ogs_nas_5gmm_encode(ogs_nas_5gs_message_t *message)
+@@ -4273,6 +4274,8 @@ ogs_pkbuf_t *ogs_nas_5gmm_encode(ogs_nas_5gs_message_t *message)
  
      pkbuf->len = encoded;
  
@@ -99,7 +99,7 @@ index 359fd464d..55e3bfd8e 100644
      return pkbuf;
  }
  
-@@ -3077,6 +3080,8 @@ ogs_pkbuf_t *ogs_nas_5gsm_encode(ogs_nas_5gs_message_t *message)
+@@ -4390,6 +4393,8 @@ ogs_pkbuf_t *ogs_nas_5gsm_encode(ogs_nas_5gs_message_t *message)
      ogs_assert(ogs_pkbuf_push(pkbuf, encoded));
      pkbuf->len = encoded;
  
@@ -109,36 +109,40 @@ index 359fd464d..55e3bfd8e 100644
  }
  
 diff --git a/lib/nas/common/meson.build b/lib/nas/common/meson.build
-index 6c3aaccd3..ed324e109 100644
+index 46781fa8b..d51fa967f 100644
 --- a/lib/nas/common/meson.build
 +++ b/lib/nas/common/meson.build
 @@ -28,10 +28,10 @@ libnas_common = library('ogsnas-common',
      version : libogslib_version,
      c_args : '-DOGS_NAS_COMPILATION',
      include_directories : [libnas_common_inc, libcrypt_inc, libinc],
--    dependencies : [libcore_dep, libcrypt_dep],
-+    dependencies : [libcore_dep, libcrypt_dep, libshm_interface_dep],
+-    dependencies : libcrypt_dep,
++    dependencies : [libcrypt_dep, libshm_interface_dep],
      install : true)
  
  libnas_common_dep = declare_dependency(
      link_with : libnas_common,
      include_directories : [libnas_common_inc, libcrypt_inc, libinc],
--    dependencies : [libcore_dep, libcrypt_dep])
-+    dependencies : [libcore_dep, libcrypt_dep, libshm_interface_dep])
+-    dependencies : libcrypt_dep)
++    dependencies : [libcrypt_dep, libshm_interface_dep])
 diff --git a/meson.build b/meson.build
-index 4f7507060..737a7c731 100644
+index a88a0cd1a..f56afe673 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -20,7 +20,7 @@ project('open5gs', 'c', 'cpp',
+@@ -18,10 +18,10 @@
+ project('open5gs', 'c', 'cpp',
+     version : '2.8.0',
      license : 'AGPL-3.0-or-later',
-     meson_version : '>= 0.43.0',
+-    meson_version : '>= 0.43.0',
++    meson_version : '>= 0.51.0',
      default_options : [
+         'warning_level=1',
 -        'c_std=gnu89',
 +        'c_std=gnu11',
      ],
  )
  
-@@ -109,6 +109,7 @@ add_project_arguments(
+@@ -121,6 +121,7 @@ add_project_arguments(
      cc.get_supported_arguments(possible_cc_flags),
      language : 'c')
  
@@ -147,20 +151,20 @@ index 4f7507060..737a7c731 100644
  subdir('lib')
  subdir('src')
 diff --git a/misc/netconf.sh b/misc/netconf.sh
-index e6025cdba..221209e69 100755
+index 7a0999eab..223565c2e 100755
 --- a/misc/netconf.sh
 +++ b/misc/netconf.sh
 @@ -10,8 +10,8 @@ if [ "$SYSTEM" = "Linux" ]; then
- 		echo "net.ipv6.conf.ogstun.disable_ipv6=0" > /etc/sysctl.d/30-open5gs.conf
- 		sysctl -p /etc/sysctl.d/30-open5gs.conf
- 	fi
+         echo "net.ipv6.conf.ogstun.disable_ipv6=0" > /etc/sysctl.d/30-open5gs.conf
+         sysctl -p /etc/sysctl.d/30-open5gs.conf
+     fi
 -    ip addr del 10.45.0.1/16 dev ogstun 2> /dev/null
 -    ip addr add 10.45.0.1/16 dev ogstun
 +    ip addr del 45.45.0.1/16 dev ogstun 2> /dev/null
 +    ip addr add 45.45.0.1/16 dev ogstun
      ip addr del 2001:db8:cafe::1/48 dev ogstun 2> /dev/null
      ip addr add 2001:db8:cafe::1/48 dev ogstun
-     ip link set ogstun up
+     ip addr del 10.46.0.1/16 dev ogstun2 2> /dev/null
 diff --git a/requirements.sh b/requirements.sh
 new file mode 100755
 index 000000000..8d886704f
@@ -199,7 +203,7 @@ index 000000000..3e1558716
 +../../src/drivers/shm_interface
 \ No newline at end of file
 diff --git a/src/amf/amf-sm.c b/src/amf/amf-sm.c
-index 164f46057..e00c5c2ec 100644
+index 1236df30e..e3a1db2f9 100644
 --- a/src/amf/amf-sm.c
 +++ b/src/amf/amf-sm.c
 @@ -17,6 +17,7 @@
@@ -210,17 +214,94 @@ index 164f46057..e00c5c2ec 100644
  #include "sbi-path.h"
  #include "ngap-path.h"
  #include "nas-path.h"
-@@ -779,6 +780,8 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
+@@ -1003,44 +1004,47 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
+                     }
                  }
-             }
  
+-                /*
+-                 * TS23.502
+-                 * 4.2.3.2 UE Triggered Service Request
+-                 *
+-                 * 4. [Conditional]
+-                 * AMF to SMF: Nsmf_PDUSession_UpdateSMContext Request
+-                 *
+-                 * The AMF may receive a Service Request to establish another
+-                 * NAS signalling connection via a NG-RAN while it has
+-                 * maintained an old NAS signalling connection for UE still
+-                 * via NG-RAN. In this case, AMF shall trigger the AN release
+-                 * procedure toward the old NG-RAN to release the old NAS
+-                 * signalling connection as defined in clause 4.2.6
+-                 * with following logic:
+-                 */
+-
+-                /* If NAS(amf_ue_t) has already been associated with
+-                 * older NG(ran_ue_t) context */
+-                if (CM_CONNECTED(amf_ue)) {
+-    /*
+-     * Issue #2786
+-     *
+-     * In cases where the UE sends an Integrity Un-Protected Registration
+-     * Request or Service Request, there is an issue of sending
+-     * a UEContextReleaseCommand for the OLD RAN Context.
+-     *
+-     * For example, if the UE switchs off and power-on after
+-     * the first connection, the 5G Core sends a UEContextReleaseCommand.
+-     *
+-     * However, since there is no RAN context for this on the gNB,
+-     * the gNB does not send a UEContextReleaseComplete,
+-     * so the deletion of the RAN Context does not function properly.
+-     *
+-     * To solve this problem, the 5G Core has been modified to implicitly
+-     * delete the RAN Context instead of sending a UEContextReleaseCommand.
+-     */
+-                    HOLDING_NG_CONTEXT(amf_ue);
+-                }
++            }
++
 +            wd_shm_send_pdu_nas(WD_SHM_EVT_NAS_5GS_UL_PLAIN, 0, pkbuf->data, pkbuf->len);
 +
-             /* 
-              * TS23.502
-              * 4.2.3.2 UE Triggered Service Request
++            /*
++             * TS23.502
++             * 4.2.3.2 UE Triggered Service Request
++             *
++             * 4. [Conditional]
++             * AMF to SMF: Nsmf_PDUSession_UpdateSMContext Request
++             *
++             * The AMF may receive a Service Request to establish another
++             * NAS signalling connection via a NG-RAN while it has
++             * maintained an old NAS signalling connection for UE still
++             * via NG-RAN. In this case, AMF shall trigger the AN release
++             * procedure toward the old NG-RAN to release the old NAS
++             * signalling connection as defined in clause 4.2.6
++             * with following logic:
++             */
++
++            /* If NAS(amf_ue_t) has already been associated with
++             * older NG(ran_ue_t) context */
++            if (CM_CONNECTED(amf_ue)) {
++/*
++ * Issue #2786
++ *
++ * In cases where the UE sends an Integrity Un-Protected Registration
++ * Request or Service Request, there is an issue of sending
++ * a UEContextReleaseCommand for the OLD RAN Context.
++ *
++ * For example, if the UE switchs off and power-on after
++ * the first connection, the 5G Core sends a UEContextReleaseCommand.
++ *
++ * However, since there is no RAN context for this on the gNB,
++ * the gNB does not send a UEContextReleaseComplete,
++ * so the deletion of the RAN Context does not function properly.
++ *
++ * To solve this problem, the 5G Core has been modified to implicitly
++ * delete the RAN Context instead of sending a UEContextReleaseCommand.
++ */
++                HOLDING_NG_CONTEXT(amf_ue);
+             }
+             amf_ue_associate_ran_ue(amf_ue, ran_ue);
+ 
 diff --git a/src/amf/gmm-handler.c b/src/amf/gmm-handler.c
-index c1ef48e9d..40ec38564 100644
+index fa01e53f2..a6a156c85 100644
 --- a/src/amf/gmm-handler.c
 +++ b/src/amf/gmm-handler.c
 @@ -17,6 +17,7 @@
@@ -231,54 +312,42 @@ index c1ef48e9d..40ec38564 100644
  #include "nas-security.h"
  
  #include "ngap-path.h"
-@@ -107,26 +108,26 @@ int gmm_handle_registration_request(amf_ue_t *amf_ue,
-         OGS_NAS_5GS_REGISTRATION_REQUEST_EPS_NAS_MESSAGE_CONTAINER_PRESENT| \
-         OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT)
+@@ -111,20 +112,20 @@ ogs_nas_5gmm_cause_t gmm_handle_registration_request(amf_ue_t *amf_ue,
+         OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT| \
+         OGS_NAS_5GS_REGISTRATION_REQUEST_ADDITIONAL_GUTI_PRESENT)
  
 -    if (ngap_code == NGAP_ProcedureCode_id_InitialUEMessage &&
 -        registration_request->presencemask &
 -        ~OGS_REGISTRATION_CLEARTEXT_PRESENT) {
 -        ogs_error("Non cleartext IEs is included [0x%llx]",
 -                (long long)registration_request->presencemask);
--        ogs_assert(OGS_OK ==
--            nas_5gs_send_registration_reject(amf_ue,
--                OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE));
--        return OGS_ERROR;
+-        return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
 -    }
 -
 -    if (!h.integrity_protected &&
 -        (registration_request->presencemask &
 -        OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT)) {
 -        ogs_error("NAS container present without Integrity-protected");
--        ogs_assert(OGS_OK ==
--            nas_5gs_send_registration_reject(amf_ue,
--                OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE));
--        return OGS_ERROR;
+-        return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
 -    }
 +    // if (ngap_code == NGAP_ProcedureCode_id_InitialUEMessage &&
 +    //     registration_request->presencemask &
 +    //     ~OGS_REGISTRATION_CLEARTEXT_PRESENT) {
 +    //     ogs_error("Non cleartext IEs is included [0x%llx]",
 +    //             (long long)registration_request->presencemask);
-+    //     ogs_assert(OGS_OK ==
-+    //         nas_5gs_send_registration_reject(amf_ue,
-+    //             OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE));
-+    //     return OGS_ERROR;
++    //     return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
 +    // }
-+
++    //
 +    // if (!h.integrity_protected &&
 +    //     (registration_request->presencemask &
 +    //     OGS_NAS_5GS_REGISTRATION_REQUEST_NAS_MESSAGE_CONTAINER_PRESENT)) {
 +    //     ogs_error("NAS container present without Integrity-protected");
-+    //     ogs_assert(OGS_OK ==
-+    //         nas_5gs_send_registration_reject(amf_ue,
-+    //             OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE));
-+    //     return OGS_ERROR;
++    //     return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
 +    // }
  
      if (!mobile_identity->length || !mobile_identity->buffer) {
          ogs_error("No Mobile Identity");
-@@ -730,16 +731,18 @@ int gmm_handle_authentication_response(amf_ue_t *amf_ue,
+@@ -985,16 +986,18 @@ int gmm_handle_authentication_response(amf_ue_t *amf_ue,
      ogs_kdf_hxres_star(
              amf_ue->rand, authentication_response_parameter->res, hxres_star);
  
@@ -306,17 +375,17 @@ index c1ef48e9d..40ec38564 100644
  
      memcpy(amf_ue->xres_star, authentication_response_parameter->res,
              authentication_response_parameter->length);
-@@ -1243,6 +1246,8 @@ static int gmm_handle_nas_message_container(
-         return OGS_ERROR;
+@@ -1823,6 +1826,8 @@ static ogs_nas_5gmm_cause_t gmm_handle_nas_message_container(
+         return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
      }
  
 +        wd_shm_send_pdu_nas(WD_SHM_EVT_NAS_5GS_UL_PLAIN, 0, nasbuf->data, nasbuf->len);
 +
-     switch (nas_message.gmm.h.message_type) {
-         case OGS_NAS_5GS_REGISTRATION_REQUEST:
-             ogs_debug("Registration request in NAS message container");
+     /*
+      * 3GPP TS 24.501 4.4.6 / TS 33.501 6.4.6
+      *
 diff --git a/src/amf/init.c b/src/amf/init.c
-index 625f40551..13ce14cec 100644
+index 1ee5c9b14..e0584b454 100644
 --- a/src/amf/init.c
 +++ b/src/amf/init.c
 @@ -16,7 +16,7 @@
@@ -327,8 +396,8 @@ index 625f40551..13ce14cec 100644
 +#include <wd_shm_nas_utils.h>
  #include "sbi-path.h"
  #include "ngap-path.h"
- 
-@@ -56,6 +56,11 @@ int amf_initialize()
+ #include "metrics.h"
+@@ -76,6 +76,11 @@ int amf_initialize(void)
  
      initialized = 1;
  
@@ -341,7 +410,7 @@ index 625f40551..13ce14cec 100644
  }
  
 diff --git a/tests/app/meson.build b/tests/app/meson.build
-index bee11824e..d1b961aa0 100644
+index 30a7e6419..ddf0fc3b8 100644
 --- a/tests/app/meson.build
 +++ b/tests/app/meson.build
 @@ -44,7 +44,9 @@ executable('epc',
@@ -353,7 +422,7 @@ index bee11824e..d1b961aa0 100644
 +    install_rpath : libdir,
 +    install : true)
  
- libtest5gc_cc_args = '-DDEFAULT_CONFIG_FILENAME="@0@/configs/sample.yaml"'.format(meson.build_root())
+ libtest5gc_cc_args = '-DDEFAULT_CONFIG_FILENAME="@0@/configs/sample.yaml"'.format(open5gs_build_dir)
  
 @@ -72,7 +74,9 @@ executable('5gc',
      sources : [test5gc_sources],
@@ -364,8 +433,44 @@ index bee11824e..d1b961aa0 100644
 +    install_rpath : libdir,
 +    install : true)
  
- libtestapp_cc_args = '-DDEFAULT_CONFIG_FILENAME="@0@/configs/sample.yaml"'.format(meson.build_root())
+ libtestapp_cc_args = '-DDEFAULT_CONFIG_FILENAME="@0@/configs/sample.yaml"'.format(open5gs_build_dir)
  
+diff --git a/tests/core/pkbuf-test.c b/tests/core/pkbuf-test.c
+index 797a71faa..7c7e4a410 100644
+--- a/tests/core/pkbuf-test.c
++++ b/tests/core/pkbuf-test.c
+@@ -70,12 +70,31 @@ static void test2_func(abts_case *tc, void *data)
+     ogs_pkbuf_free(p3);
+ }
+ 
++static void test_zero_capacity_copy(abts_case *tc, void *data)
++{
++    ogs_pkbuf_t *pkbuf = ogs_pkbuf_alloc(NULL, 0);
++    ogs_pkbuf_t *copy;
++
++    ABTS_PTR_NOTNULL(tc, pkbuf);
++    if (!pkbuf) return;
++    copy = ogs_pkbuf_copy(pkbuf);
++    ogs_pkbuf_free(pkbuf);
++    ABTS_PTR_NOTNULL(tc, copy);
++    if (!copy) return;
++
++    ABTS_INT_EQUAL(tc, 0, copy->len);
++    ABTS_TRUE(tc, copy->head == copy->end);
++    ABTS_TRUE(tc, copy->data == copy->tail);
++    ogs_pkbuf_free(copy);
++}
++
+ abts_suite *test_pkbuf(abts_suite *suite)
+ {
+     suite = ADD_SUITE(suite)
+ 
+     abts_run_test(suite, test1_func, NULL);
+     abts_run_test(suite, test2_func, NULL);
++    abts_run_test(suite, test_zero_capacity_copy, NULL);
+ 
+     return suite;
+ }
 diff --git a/webui.sh b/webui.sh
 new file mode 100755
 index 000000000..50ae12d08

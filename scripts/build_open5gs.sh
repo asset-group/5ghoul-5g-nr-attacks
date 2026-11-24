@@ -14,8 +14,16 @@ export CXXFLAGS="$CFLAGS"
 # Preserve build.sh's exact relative rpath, adding the new local dependencies.
 export LDFLAGS="-L/usr/lib/x86_64-linux-gnu -Wl,-rpath=\$ORIGIN:\$ORIGIN/../libs/x86_64-linux-gnu -Wl,-rpath,$L/mongo-driver-dist/lib:$P/lib"
 cd "$C"
+[[ $(git rev-parse HEAD) == 157f611a530e292e40ec50f9d23f0ef5d4fcd6a6 ]] || {
+  echo 'Open5GS checkout is not the pinned v2.8.0 commit' >&2; exit 1;
+}
+CORE_PATCH="$ROOT/3rd-party/open5gs-core.patch"
+if ! git apply -R --check "$CORE_PATCH" 2>/dev/null; then
+  git apply --check "$CORE_PATCH"
+  git apply "$CORE_PATCH"
+fi
 # Seed the exact wrap revisions explicitly; Meson itself stays nodownload.
-for PROJECT in freeDiameter libtins; do
+for PROJECT in freeDiameter libtins prometheus-client-c usrsctp; do
   WRAP="$C/subprojects/$PROJECT.wrap"
   URL=$(sed -n 's/^url *= *//p' "$WRAP")
   REVISION=$(sed -n 's/^revision *= *//p' "$WRAP")
@@ -33,6 +41,13 @@ PATCH="$ROOT/patches/freeDiameter-r1.5.0.patch"
 if ! git -C "$C/subprojects/freeDiameter" apply -R --check "$PATCH" 2>/dev/null; then
   git -C "$C/subprojects/freeDiameter" apply --check "$PATCH"
   git -C "$C/subprojects/freeDiameter" apply "$PATCH"
+fi
+# prometheus-client-c's CAS loops pass an _Atomic double as the expected
+# pointer, which clang 23 rejects (incompatible pointer types).
+PROM_PATCH="$ROOT/patches/prometheus-client-c-clang23-atomic.patch"
+if ! git -C "$C/subprojects/prometheus-client-c" apply -R --check "$PROM_PATCH" 2>/dev/null; then
+  git -C "$C/subprojects/prometheus-client-c" apply --check "$PROM_PATCH"
+  git -C "$C/subprojects/prometheus-client-c" apply "$PROM_PATCH"
 fi
 ARGS=(meson setup build --wrap-mode=nodownload "--prefix=$C/install")
 if [[ -f build/meson-private/coredata.dat ]]; then

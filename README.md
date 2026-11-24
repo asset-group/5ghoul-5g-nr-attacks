@@ -459,6 +459,32 @@ disabled in this configuration. Pagmo and pagmo-devel are both pinned to
 2.19.1: 2.9 and 2.20.0 are unsolvable with these host library/toolchain pins.
 OAI/Open5GS setup is separate from this compiler environment.
 
+The Open5GS submodule is pinned to **v2.8.0 (Release 19)**. The canonical
+`3rd-party/open5gs-core.patch` preserves the NAS SHM interception hooks and
+the deliberately relaxed registration/authentication checks used for fuzzing.
+These checks are unsuitable for a production core. The supplied core YAML uses
+the native SBI/PFCP server/client format and disables SEPP for non-roaming runs;
+old `addr`/`subnet` configurations must be migrated. Subscriber schema version 1
+and the existing K/OPC, slice and DNN fields remain compatible. Static subscriber
+addresses now use `ue.ipv4/ipv6` and `smf.ipv4/ipv6`, not `addr/addr6`; migrate
+stored static assignments before reusing an existing database. The bundled
+dbctl insertion, update and display commands use the new keys. AMBR units now
+scale by 1000 rather than 1024; unit-zero defaults are unaffected.
+
+After initializing and applying the vendored patches, build the MongoDB C driver
+and core with the same conda toolchain (the output directory must exist):
+
+```bash
+mkdir -p logs/core-build
+./scripts/build_mongo_driver.sh logs/core-build "$CONDA_PREFIX"
+./scripts/build_open5gs.sh logs/core-build "$CONDA_PREFIX"
+```
+
+The helpers pin libmongoc/libbson 1.30.2, compile with Clang 23 and GCC 16.2.0
+headers, and prepare the upstream wrap revisions explicitly before Meson runs
+with downloads disabled. Compatibility patches retain strict compilation for
+the MongoDB accept probe, freeDiameter and Prometheus atomic compare/exchange.
+
 The expected output during the build process is shown below:
 
 ![5ghoul-build-output](docs/figures/5ghoul-build-output.svg)

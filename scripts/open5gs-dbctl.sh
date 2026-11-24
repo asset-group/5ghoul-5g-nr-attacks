@@ -173,7 +173,7 @@ if [ "$1" = "add" ]; then
                         },
                         \"ue\": 
                         { 
-                            \"addr\": \"$IP\"
+                            \"ipv4\": \"$IP\"
                         },
                         \"pcc_rule\": [],
                         \"_id\": new ObjectId(),
@@ -380,7 +380,7 @@ if [ "$1" = "addT1" ]; then
                         },
                         \"ue\": 
                         { 
-                            \"addr\": \"$IP\"
+                            \"ipv4\": \"$IP\"
                         },
                         \"pcc_rule\": [],
                         \"_id\": new ObjectId(),
@@ -411,7 +411,7 @@ if [ "$1" = "addT1" ]; then
                         },
                         \"ue\": 
                         { 
-                            \"addr\": \"$IP\"
+                            \"ipv4\": \"$IP\"
                         },
                         \"pcc_rule\": [],
                         \"_id\": new ObjectId(),
@@ -442,7 +442,7 @@ if [ "$1" = "addT1" ]; then
                         },
                         \"ue\": 
                         { 
-                            \"addr\": \"$IP\"
+                            \"ipv4\": \"$IP\"
                         },
                         \"pcc_rule\": [],
                         \"_id\": new ObjectId(),
@@ -504,7 +504,7 @@ if [ "$1" = "static_ip" ]; then
     IMSI=$2 
     IP=$3
 
-    mongo --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.ue.addr\": \"$IP\" }});" $DB_URI
+    mongo --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.ue.ipv4\": \"$IP\" }});" $DB_URI
     exit $?
 fi
 
@@ -516,7 +516,7 @@ if [ "$1" = "static_ip6" ]; then
     IMSI=$2 
     IP=$3
 
-    mongo --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.ue.addr6\": \"$IP\" }});" $DB_URI
+    mongo --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.ue.ipv6\": \"$IP\" }});" $DB_URI
     exit $?
 fi
 
@@ -859,7 +859,7 @@ if [ "$1" = "showpretty" ]; then
         exit $?
 fi
 if [ "$1" = "showfiltered" ]; then
-   mongo --eval "db.subscribers.find({},{'_id':0,'imsi':1,'security.k':1, 'security.opc':1,'slice.session.name':1,'slice.session.ue.addr':1})" $DB_URI
+   mongo --eval "db.subscribers.find({},{'_id':0,'imsi':1,'security.k':1, 'security.opc':1,'slice.session.name':1,'slice.session.ue.ipv4':1})" $DB_URI
         exit $?
 fi
 

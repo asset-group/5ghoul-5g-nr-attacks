@@ -1,0 +1,82 @@
+# Conda environment for building 5Ghoul (wdissector) with the latest clang.
+#
+# Branch: clang-23-test (copy ~/5ghoul-clang23), branched from issue46-conda-fix.
+# Toolchain target: conda-forge clang/llvm/lld 23.1.6 (== upstream llvmorg-23.1.6,
+# released 17 Nov 2026), which is the newest clang published on conda-forge.
+#
+# libstdc++ stays at GCC 12 headers on purpose: GCC 9 <valarray> has a noexcept
+# mismatch clang rejects in C++20, and GCC 13+ adds <format>, which makes the
+# unqualified format(...) calls in src/ ambiguous against the vendored fmt via ADL.
+name: 5ghoul23
+channels:
+  - conda-forge
+dependencies:
+  # ---- toolchain / build system ----
+  - cmake>=3.18.4
+  - ninja
+  - meson
+  - pkg-config
+  - make
+  - clang=23.1.6
+  - clangxx=23.1.6
+  - clang-tools=23.1.6
+  - lld=23.1.6
+  - llvm=23.1.6
+  - gcc_linux-64=12
+  - gxx_linux-64=12
+  - flex
+  - bison
+  - swig
+  - git
+  - zstd
+  - graphviz
+
+  # ---- core libraries CMake looks for directly ----
+  - glib
+  - freetype
+  - zlib
+  - libpcap
+  - libboost-devel
+  - fmt
+  - double-conversion
+  - folly
+  - pagmo
+  - zeromq
+  - cppzmq
+  - czmq
+  - json-c
+  - pybind11
+  - snappy
+  - lz4-c
+  - libevent
+  - libunwind
+  - glog
+  - gflags
+
+  # ---- wireshark runtime deps (wireshark itself stays vendored + patched) ----
+  - libgcrypt
+  - gnutls
+  - libxml2
+  - libnghttp2
+  - krb5
+  - libnl
+  - libcap
+  - brotli
+  - lua=5.2
+  - c-ares
+  - libssh
+  - libmaxminddb
+  - pcre2
+  - speexdsp
+  - libopus
+  - libtiff
+  - tbb
+
+  # ---- misc ----
+  - sshpass
+  - bc
+  - curl
+  - wget
+  - nodejs
+  - python=3.11
+  - pip

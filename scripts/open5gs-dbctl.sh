@@ -53,13 +53,18 @@ if [ "$1" = "help" ]; then
     exit 1
 fi
 
+command -v mongosh >/dev/null 2>&1 || {
+    echo "open5gs-dbctl: mongosh is required; run scripts/install_mongosh.sh CONDA_PREFIX" >&2
+    exit 127
+}
+
 if [ "$1" = "add" ]; then
     if [ "$#" -eq 4 ]; then
         IMSI=$2 
         KI=$3
         OPC=$4
 
-        mongo --eval "db.subscribers.insertOne( 
+        mongosh --quiet --eval "db.subscribers.insertOne( 
             {
                 \"_id\": new ObjectId(),
                 \"schema_version\": NumberInt(1),
@@ -121,7 +126,7 @@ if [ "$1" = "add" ]; then
                 \"subscribed_rau_tau_timer\": 12,
                 \"__v\": 0
             }
-            );" $DB_URI
+            );" "$DB_URI"
         exit $?
     fi
 
@@ -131,7 +136,7 @@ if [ "$1" = "add" ]; then
         KI=$4
         OPC=$5
 
-        mongo --eval "db.subscribers.insertOne( 
+        mongosh --quiet --eval "db.subscribers.insertOne( 
             {
                 \"_id\": new ObjectId(),
                 \"schema_version\": NumberInt(1),
@@ -197,7 +202,7 @@ if [ "$1" = "add" ]; then
                 \"subscribed_rau_tau_timer\": 12,
                 \"__v\": 0
             }
-            );" $DB_URI
+            );" "$DB_URI"
         exit $?
     fi
 
@@ -211,7 +216,7 @@ if [ "$1" = "addT1" ]; then
         KI=$3
         OPC=$4
 
-        mongo --eval "db.subscribers.insertOne( 
+        mongosh --quiet --eval "db.subscribers.insertOne( 
             {
                 \"_id\": new ObjectId(),
                 \"schema_version\": NumberInt(1),
@@ -328,7 +333,7 @@ if [ "$1" = "addT1" ]; then
                 \"subscribed_rau_tau_timer\": 12,
                 \"__v\": 0
             }
-            );" $DB_URI
+            );" "$DB_URI"
         exit $?
     fi
 
@@ -338,7 +343,7 @@ if [ "$1" = "addT1" ]; then
         KI=$4
         OPC=$5
 
-        mongo --eval "db.subscribers.insertOne( 
+        mongosh --quiet --eval "db.subscribers.insertOne( 
             {
                 \"_id\": new ObjectId(),
                 \"schema_version\": NumberInt(1),
@@ -467,7 +472,7 @@ if [ "$1" = "addT1" ]; then
                 \"subscribed_rau_tau_timer\": 12,
                 \"__v\": 0
             }
-            );" $DB_URI
+            );" "$DB_URI"
         exit $?
     fi
 
@@ -482,7 +487,7 @@ if [ "$1" = "remove" ]; then
     fi
 
     IMSI=$2 
-    mongo --eval "db.subscribers.deleteOne({\"imsi\": \"$IMSI\"});" $DB_URI
+    mongosh --quiet --eval "db.subscribers.deleteOne({\"imsi\": \"$IMSI\"});" "$DB_URI"
     exit $?
 fi
 
@@ -492,7 +497,7 @@ if [ "$1" = "reset" ]; then
         exit 1
     fi
 
-    mongo --eval "db.subscribers.deleteMany({});" $DB_URI
+    mongosh --quiet --eval "db.subscribers.deleteMany({});" "$DB_URI"
     exit $?
 fi
 
@@ -504,7 +509,7 @@ if [ "$1" = "static_ip" ]; then
     IMSI=$2 
     IP=$3
 
-    mongo --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.ue.ipv4\": \"$IP\" }});" $DB_URI
+    mongosh --quiet --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.ue.ipv4\": \"$IP\" }});" "$DB_URI"
     exit $?
 fi
 
@@ -516,7 +521,7 @@ if [ "$1" = "static_ip6" ]; then
     IMSI=$2 
     IP=$3
 
-    mongo --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.ue.ipv6\": \"$IP\" }});" $DB_URI
+    mongosh --quiet --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.ue.ipv6\": \"$IP\" }});" "$DB_URI"
     exit $?
 fi
 
@@ -528,7 +533,7 @@ if [ "$1" = "type" ]; then
     IMSI=$2 
     TYPE=$3
 
-    mongo --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.type\": NumberInt($TYPE) }});" $DB_URI
+    mongosh --quiet --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},{\$set: { \"slice.0.session.0.type\": NumberInt($TYPE) }});" "$DB_URI"
     exit $?
 fi
 
@@ -539,7 +544,7 @@ if [ "$1" = "add_ue_with_apn" ]; then
         OPC=$4
         APN=$5
 
-        mongo --eval "db.subscribers.insertOne( 
+        mongosh --quiet --eval "db.subscribers.insertOne( 
             {
                 \"_id\": new ObjectId(),
                 \"schema_version\": NumberInt(1),
@@ -579,6 +584,7 @@ if [ "$1" = "add_ue_with_apn" ]; then
                                 \"unit\": NumberInt(0)
                             }
                         },
+                        \"ue\": { \"ipv4\": null, \"ipv6\": null },
                         \"pcc_rule\": [],
                         \"_id\": new ObjectId(),
                     }],
@@ -601,7 +607,7 @@ if [ "$1" = "add_ue_with_apn" ]; then
                 \"subscribed_rau_tau_timer\": 12,
                 \"__v\": 0
             }
-            );" $DB_URI
+            );" "$DB_URI"
         exit $?
     fi
 
@@ -616,7 +622,7 @@ if [ "$1" = "add_ue_with_apn_op" ]; then
         OP=$4
         APN=$5
 
-        mongo --eval "db.subscribers.insertOne( 
+        mongosh --quiet --eval "db.subscribers.insertOne( 
             {
                 \"_id\": new ObjectId(),
                 \"schema_version\": NumberInt(1),
@@ -678,7 +684,7 @@ if [ "$1" = "add_ue_with_apn_op" ]; then
                 \"subscribed_rau_tau_timer\": 12,
                 \"__v\": 0
             }
-            );" $DB_URI
+            );" "$DB_URI"
         exit $?
     fi
 
@@ -695,7 +701,7 @@ if [ "$1" = "add_ue_with_slice" ]; then
         SST=$6
         SD=$7
 
-        mongo --eval "db.subscribers.insertOne( 
+        mongosh --quiet --eval "db.subscribers.insertOne( 
             {
                 \"_id\": new ObjectId(),
                 \"schema_version\": NumberInt(1),
@@ -758,7 +764,7 @@ if [ "$1" = "add_ue_with_slice" ]; then
                 \"subscribed_rau_tau_timer\": 12,
                 \"__v\": 0
             }
-            );" $DB_URI
+            );" "$DB_URI"
         exit $?
     fi
 
@@ -772,7 +778,7 @@ if [ "$1" = "update_apn" ]; then
         APN=$3
         SLICE_NUM=$4
         
-        mongo --eval "db.subscribers.updateOne({ \"imsi\": \"$IMSI\"}, 
+        mongosh --quiet --eval "db.subscribers.updateOne({ \"imsi\": \"$IMSI\"}, 
             {\$push: { \"slice.$SLICE_NUM.session\":
                            {
                             \"name\" : \"$APN\", 
@@ -796,7 +802,7 @@ if [ "$1" = "update_apn" ]; then
                             }, 
                            }
                     }   
-            });" $DB_URI
+            });" "$DB_URI"
         exit $?
     fi
 
@@ -811,7 +817,7 @@ if [ "$1" = "update_slice" ]; then
         SST=$4
         SD=$5
         
-        mongo --eval "db.subscribers.updateOne({ \"imsi\": \"$IMSI\"}, 
+        mongosh --quiet --eval "db.subscribers.updateOne({ \"imsi\": \"$IMSI\"}, 
             {\$push: { \"slice\":
                            
                             { 
@@ -843,7 +849,7 @@ if [ "$1" = "update_slice" ]; then
                              }]
                             }
                     }   
-            });" $DB_URI
+            });" "$DB_URI"
         exit $?
     fi
 
@@ -851,15 +857,15 @@ if [ "$1" = "update_slice" ]; then
     exit 1
 fi
 if [ "$1" = "showall" ]; then
-   mongo --eval "db.subscribers.find()" $DB_URI
+   mongosh --quiet --eval "db.subscribers.find()" "$DB_URI"
         exit $?
 fi
 if [ "$1" = "showpretty" ]; then
-   mongo --eval "db.subscribers.find().pretty()" $DB_URI
+   mongosh --quiet --eval "db.subscribers.find().pretty()" "$DB_URI"
         exit $?
 fi
 if [ "$1" = "showfiltered" ]; then
-   mongo --eval "db.subscribers.find({},{'_id':0,'imsi':1,'security.k':1, 'security.opc':1,'slice.session.name':1,'slice.session.ue.ipv4':1})" $DB_URI
+   mongosh --quiet --eval "db.subscribers.find({},{'_id':0,'imsi':1,'security.k':1, 'security.opc':1,'slice.session.name':1,'slice.session.ue.ipv4':1})" "$DB_URI"
         exit $?
 fi
 
@@ -870,7 +876,7 @@ if [ "$1" = "ambr_speed" ]; then
         DL_UNIT=$4
         UL_VALUE=$5
         UL_UNIT=$6
-        mongo --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},
+        mongosh --quiet --eval "db.subscribers.updateOne({\"imsi\": \"$IMSI\"},
             {\$set: { 
                 \"ambr\" : {
                     \"downlink\" : {
@@ -893,7 +899,7 @@ if [ "$1" = "ambr_speed" ]; then
                     }
                 }
                      }
-            });" $DB_URI
+            });" "$DB_URI"
 
 
         exit $?

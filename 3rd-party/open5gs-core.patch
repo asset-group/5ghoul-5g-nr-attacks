@@ -1,5 +1,5 @@
 diff --git a/.gitignore b/.gitignore
-index 1481101c4..313447405 100644
+index 1481101c48d3b9572d90ee1cdac8e50ae5722971..3134474052d527ec2d03e1879657575080ecab66 100644
 --- a/.gitignore
 +++ b/.gitignore
 @@ -7,3 +7,7 @@ subprojects/prometheus-client-c
@@ -12,7 +12,7 @@ index 1481101c4..313447405 100644
 +install/
 diff --git a/.vscode/c_cpp_properties.json b/.vscode/c_cpp_properties.json
 new file mode 100644
-index 000000000..12a5c54c3
+index 0000000000000000000000000000000000000000..12a5c54c3819fddfa91d0416378213492a3a5579
 --- /dev/null
 +++ b/.vscode/c_cpp_properties.json
 @@ -0,0 +1,17 @@
@@ -36,7 +36,7 @@ index 000000000..12a5c54c3
 \ No newline at end of file
 diff --git a/.vscode/settings.json b/.vscode/settings.json
 new file mode 100644
-index 000000000..a614f51f0
+index 0000000000000000000000000000000000000000..a614f51f0c1086333c8a26a5388b1abcc4fa1462
 --- /dev/null
 +++ b/.vscode/settings.json
 @@ -0,0 +1,3 @@
@@ -46,7 +46,7 @@ index 000000000..a614f51f0
 \ No newline at end of file
 diff --git a/build.sh b/build.sh
 new file mode 100755
-index 000000000..015692406
+index 0000000000000000000000000000000000000000..015692406882fc5a88631468c2976b2548215341
 --- /dev/null
 +++ b/build.sh
 @@ -0,0 +1,15 @@
@@ -66,7 +66,7 @@ index 000000000..015692406
 +
 +echo "Build completed"
 diff --git a/lib/core/ogs-pkbuf.c b/lib/core/ogs-pkbuf.c
-index 6d3cbe76a..ea1705e31 100644
+index 6d3cbe76a987cec2c2538bce8786c390cef27148..ea1705e31e86ca236841739f4661efa04847bb58 100644
 --- a/lib/core/ogs-pkbuf.c
 +++ b/lib/core/ogs-pkbuf.c
 @@ -326,7 +326,7 @@ ogs_pkbuf_t *ogs_pkbuf_copy_debug(ogs_pkbuf_t *pkbuf, const char *file_line)
@@ -79,7 +79,7 @@ index 6d3cbe76a..ea1705e31 100644
                  size, pkbuf->head, pkbuf->end, file_line);
          return NULL;
 diff --git a/lib/nas/5gs/encoder.c b/lib/nas/5gs/encoder.c
-index 2415e53d6..128575b09 100644
+index 2415e53d697d285e8e28b9ab95b49945cbca4e66..128575b09c0142b475f984ff3bd306f1410187e2 100644
 --- a/lib/nas/5gs/encoder.c
 +++ b/lib/nas/5gs/encoder.c
 @@ -32,6 +32,7 @@
@@ -109,7 +109,7 @@ index 2415e53d6..128575b09 100644
  }
  
 diff --git a/lib/nas/common/meson.build b/lib/nas/common/meson.build
-index 46781fa8b..d51fa967f 100644
+index 46781fa8b94ff7416c9b90a78cc7deaa63467bad..d51fa967f66ac247b4e1f93f29db015c297ad765 100644
 --- a/lib/nas/common/meson.build
 +++ b/lib/nas/common/meson.build
 @@ -28,10 +28,10 @@ libnas_common = library('ogsnas-common',
@@ -126,7 +126,7 @@ index 46781fa8b..d51fa967f 100644
 -    dependencies : libcrypt_dep)
 +    dependencies : [libcrypt_dep, libshm_interface_dep])
 diff --git a/meson.build b/meson.build
-index a88a0cd1a..f56afe673 100644
+index a88a0cd1a49643aceca2003faf4ea07bfc151303..f56afe673d468f7073e3a1f954120f1ec3ee543c 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -18,10 +18,10 @@
@@ -151,7 +151,7 @@ index a88a0cd1a..f56afe673 100644
  subdir('lib')
  subdir('src')
 diff --git a/misc/netconf.sh b/misc/netconf.sh
-index 7a0999eab..223565c2e 100755
+index 7a0999eab1093d5be14ae422d272244b8a39bdeb..223565c2e2b63db727a06da242061a70bb5a4d0d 100755
 --- a/misc/netconf.sh
 +++ b/misc/netconf.sh
 @@ -10,8 +10,8 @@ if [ "$SYSTEM" = "Linux" ]; then
@@ -167,7 +167,7 @@ index 7a0999eab..223565c2e 100755
      ip addr del 10.46.0.1/16 dev ogstun2 2> /dev/null
 diff --git a/requirements.sh b/requirements.sh
 new file mode 100755
-index 000000000..8d886704f
+index 0000000000000000000000000000000000000000..8d886704f4c32754be8059bfb669e4ff4beacb74
 --- /dev/null
 +++ b/requirements.sh
 @@ -0,0 +1,23 @@
@@ -196,14 +196,14 @@ index 000000000..8d886704f
 +fi
 diff --git a/shm_interface b/shm_interface
 new file mode 120000
-index 000000000..3e1558716
+index 0000000000000000000000000000000000000000..3e15587165194e50121fc62ea60be52f7edda6ea
 --- /dev/null
 +++ b/shm_interface
 @@ -0,0 +1 @@
 +../../src/drivers/shm_interface
 \ No newline at end of file
 diff --git a/src/amf/amf-sm.c b/src/amf/amf-sm.c
-index 1236df30e..e3a1db2f9 100644
+index 1236df30ec1c6237200468799ad5817eb43849f2..e3a1db2f9920448ec50637c34f36243f2875c1e8 100644
 --- a/src/amf/amf-sm.c
 +++ b/src/amf/amf-sm.c
 @@ -17,6 +17,7 @@
@@ -301,7 +301,7 @@ index 1236df30e..e3a1db2f9 100644
              amf_ue_associate_ran_ue(amf_ue, ran_ue);
  
 diff --git a/src/amf/gmm-handler.c b/src/amf/gmm-handler.c
-index fa01e53f2..a6a156c85 100644
+index fa01e53f29cd065651cc022fc23a0c5777ca44f5..a6a156c851b7cdab9f3cfe3d2bb0b46e8ba69877 100644
 --- a/src/amf/gmm-handler.c
 +++ b/src/amf/gmm-handler.c
 @@ -17,6 +17,7 @@
@@ -385,7 +385,7 @@ index fa01e53f2..a6a156c85 100644
       * 3GPP TS 24.501 4.4.6 / TS 33.501 6.4.6
       *
 diff --git a/src/amf/init.c b/src/amf/init.c
-index 1ee5c9b14..e0584b454 100644
+index 1ee5c9b148c68ceb7ceb377a29e982b3c9985878..e0584b4540d067ddf66a5ac017cfd8a8d1060faf 100644
 --- a/src/amf/init.c
 +++ b/src/amf/init.c
 @@ -16,7 +16,7 @@
@@ -409,8 +409,32 @@ index 1ee5c9b14..e0584b454 100644
      return OGS_OK;
  }
  
+diff --git a/src/smf/init.c b/src/smf/init.c
+index 61d3951ea72f2a4e780dda435294b6b4dc81ce68..71256dbcd9e649a1aff9a3f74f6181d4bc728b4e 100644
+--- a/src/smf/init.c
++++ b/src/smf/init.c
+@@ -17,6 +17,7 @@
+  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  */
+ 
++#include <wd_shm_nas_utils.h>
+ #include "context.h"
+ #include "fd-path.h"
+ #include "gtp-path.h"
+@@ -98,6 +99,11 @@ int smf_initialize(void)
+ 
+     initialized = 1;
+ 
++    if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH))
++        ogs_info("[SHM] WD SHM Init Success");
++    else
++        ogs_info("[SHM] WD SHM Init Disabled");
++
+     return OGS_OK;
+ }
+ 
 diff --git a/tests/app/meson.build b/tests/app/meson.build
-index 30a7e6419..ddf0fc3b8 100644
+index 30a7e6419f5df42d47dcfc3bbd0a93f474c5832e..ddf0fc3b85d73cb640d7be43b9028f65f3017586 100644
 --- a/tests/app/meson.build
 +++ b/tests/app/meson.build
 @@ -44,7 +44,9 @@ executable('epc',
@@ -436,7 +460,7 @@ index 30a7e6419..ddf0fc3b8 100644
  libtestapp_cc_args = '-DDEFAULT_CONFIG_FILENAME="@0@/configs/sample.yaml"'.format(open5gs_build_dir)
  
 diff --git a/tests/core/pkbuf-test.c b/tests/core/pkbuf-test.c
-index 797a71faa..7c7e4a410 100644
+index 797a71faa84e34444df57bc94a12c18352c11792..7c7e4a410109fc6be331ed2f918ca2171eb1f07d 100644
 --- a/tests/core/pkbuf-test.c
 +++ b/tests/core/pkbuf-test.c
 @@ -70,12 +70,31 @@ static void test2_func(abts_case *tc, void *data)
@@ -473,7 +497,7 @@ index 797a71faa..7c7e4a410 100644
  }
 diff --git a/webui.sh b/webui.sh
 new file mode 100755
-index 000000000..50ae12d08
+index 0000000000000000000000000000000000000000..50ae12d086ae2e2eabb9699893bd801c7ad7c25e
 --- /dev/null
 +++ b/webui.sh
 @@ -0,0 +1,14 @@

@@ -25,6 +25,9 @@ then
 	conda env create -f "$(dirname "$0")/environment.yml"
 	conda activate 5ghoul23
 
+	# MongoDB 8 uses mongosh, not the removed legacy mongo shell.
+	"$(dirname "$0")/scripts/install_mongosh.sh" "$CONDA_PREFIX"
+
 	# Install quicktype
 	if ! which quicktype > /dev/null; 
 	then

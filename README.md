@@ -462,7 +462,10 @@ OAI/Open5GS setup is separate from this compiler environment.
 The Open5GS submodule is pinned to **v2.8.0 (Release 19)**. The canonical
 `3rd-party/open5gs-core.patch` preserves the NAS SHM interception hooks and
 the deliberately relaxed registration/authentication checks used for fuzzing.
-These checks are unsuitable for a production core. The supplied core YAML uses
+AMF and standalone SMF initialize the SHM client when `WD_SHM=1`; SMF's 5GSM
+downlink hook uses NAS channel 5 and waits for the fuzzer's release. Leave
+`WD_SHM` unset when running the core without the fuzzer. These checks are
+unsuitable for a production core. The supplied core YAML uses
 the native SBI/PFCP server/client format and disables SEPP for non-roaming runs;
 old `addr`/`subnet` configurations must be migrated. Subscriber schema version 1
 and the existing K/OPC, slice and DNN fields remain compatible. Static subscriber
@@ -470,6 +473,20 @@ addresses now use `ue.ipv4/ipv6` and `smf.ipv4/ipv6`, not `addr/addr6`; migrate
 stored static assignments before reusing an existing database. The bundled
 dbctl insertion, update and display commands use the new keys. AMBR units now
 scale by 1000 rather than 1024; unit-zero defaults are unaffected.
+
+Subscriber provisioning uses the real `mongosh` shell, not legacy `mongo`.
+`requirements.sh dev` installs pinned mongosh 2.14.3 in the conda environment;
+for an existing environment, run `./scripts/install_mongosh.sh "$CONDA_PREFIX"`
+and keep its `bin` directory on `PATH`, including when launching the fuzzer.
+dbctl fails explicitly if mongosh is missing; a no-op `mongo` cannot provision
+subscribers. To avoid migrating old records, start a fresh database, set
+`DB_URI` and the core YAML's `db_uri` to that database, then use
+`scripts/open5gs-dbctl.sh add_ue_with_apn IMSI K OPC internet`. Match the UE's
+IMSI/K/OPC and DNN to that new entry. `static_ip IMSI IPV4` and
+`static_ip6 IMSI IPV6` set optional static addresses; otherwise the APN-specific
+insert leaves `ue.ipv4/ipv6` null for dynamic allocation. The fuzzer removes
+and reinserts only its configured IMSIs at startup, so its APN-specific
+defaults are reapplied; it does not preserve prior static assignments.
 
 After initializing and applying the vendored patches, build the MongoDB C driver
 and core with the same conda toolchain (the output directory must exist):

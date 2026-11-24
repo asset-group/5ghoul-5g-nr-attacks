@@ -28,13 +28,12 @@ point instead.
 
 | File | Change |
 | --- | --- |
-| `CMakeLists.txt` | `wd_shm.c` added to the `nr-softmodem` and `nr-uesoftmodem` source lists |
+| `CMakeLists.txt` | `wd_shm.c` added to the `nr-softmodem` and `nr-uesoftmodem` source lists (the UE one only because the shared `nr_pdcp_entity.c` translation unit references `shm_is_enabled`/`shm_wait`/`shm_notify`) |
 | `executables/nr-softmodem.c` | include + `shm_init()` / `shm_set_max_timeout()` / `shm_mq_init(W_MQ_MAC_DL)` in `main()` |
-| `executables/nr-uesoftmodem.c` | same |
 | `openair2/LAYER2/nr_pdcp/nr_pdcp_entity.c` | include + three interception hooks: RX PDCP PDU (`nr_pdcp_entity_recv_pdu`), TX plaintext (`nr_pdcp_entity_process_sdu`, MAC-I cleared), TX post-security |
 
 The table above lists only the build wiring and the PDCP hooks. The MAC DL/UL,
-RAR, Msg4, Msg3 and UE UL points ported on top of them are listed in
+RAR, Msg4 and Msg3 points ported on top of them are listed in
 *Interception points* further down.
 
 ## What is NOT in the patch
@@ -65,14 +64,38 @@ the 5Ghoul side needs no modification.
 | 5 | `nr_generate_Msg4` | `nr_generate_Msg4_MsgB()` before `T(...)` | `W_GNB_MAC_UE_DL_PDU_WITH_DATA` | capture (Msg4/MsgB) |
 | 6 | `nr_rx_sdu` (connected UE) | `_nr_rx_sdu()` | `W_GNB_MAC_UE_UL_PDU_WITH_DATA` | capture (UL) |
 | 7 | `nr_rx_sdu` (RA path) | `nr_rx_ra_sdu()` before its `T(...)` | `W_GNB_MAC_UE_UL_PDU_WITH_DATA` | capture (Msg3) |
-| 8 | `nr_ue_scheduler` | `nr_ue_ul_scheduler()` at the UL TX fill | `W_UE_UL_PDU_WITH_DATA` | capture (UE UL) |
-| 9 | `nr_pdcp_entity_recv_pdu` | same function | `W_GNB_PDCP_PLAIN_UL` | capture (PDCP UL) |
-| 10 | `nr_pdcp_entity_recv_sdu` | `nr_pdcp_entity_process_sdu()` (plain + post-security) | `W_GNB_PDCP_PLAIN_DL`, `W_GNB_PDCP_ENC_DL` | capture (PDCP DL) |
+| 8 | `nr_pdcp_entity_recv_pdu` | same function | `W_GNB_PDCP_PLAIN_UL` | capture (PDCP UL) |
+| 9 | `nr_pdcp_entity_recv_sdu` | `nr_pdcp_entity_process_sdu()` (plain + post-security) | `W_GNB_PDCP_PLAIN_DL`, `W_GNB_PDCP_ENC_DL` | capture (PDCP DL) |
 
 `send_pdu_data_nr()` blocks after notifying, then copies the shared-memory
 payload back into the caller's buffer, which is how fuzzer-side mutations reach
-the gNB/UE (points 3, 4, 5, 6, 7, 8). Points 9 and 10 use the same mechanism on
-the PDCP queues.
+the gNB (points 3, 4, 5, 6, 7). Points 8 and 9 use the same mechanism on the
+PDCP queues.
+
+### Removed by design: the UE-side UL capture point
+
+The port originally mirrored 2023.w03 point 8, `nr_ue_ul_scheduler()` in
+`nr_ue_scheduler.c` (`W_UE_UL_PDU_WITH_DATA`, evt 210), and also initialised the
+segment from `nr-uesoftmodem.c`. That is dead code: the fuzzer owns the segment
+for the gNB process only, so in every run the UE logged `[SHM] SHM not started`
+while the gNB logged `[SHM] SHM started`. UE-originated uplink is captured at the
+gNB side instead, in `_nr_rx_sdu()` and `nr_rx_ra_sdu()` (points 6 and 7,
+`W_GNB_MAC_UE_UL_PDU_WITH_DATA`, evt 205) - 6,900 / 18,060 / 17,230 PDUs in the
+380 s and 120 s validation runs - which is where the fuzzer can act on it.
+
+The hook and the UE-side `shm_init()`/`shm_set_max_timeout()`/`shm_mq_init()`
+were dropped, with their includes, so `executables/nr-uesoftmodem.c` and
+`openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c` are identical to vanilla v3.0.0 and
+no longer appear in the patch.
+
+`wd_shm.c` stays in the `nr-uesoftmodem` source list: the shared
+`nr_pdcp_entity.c` translation unit (built into `NR_L2_UE`) references
+`shm_is_enabled()`, `shm_wait()` and `shm_notify()`, so the UE would not link
+without it. With no `shm_init()` call in the UE that flag is never set, so the
+PDCP hooks return immediately and the UE can never attach to the segment:
+`nm nr-uesoftmodem` lists the `shm_*` symbols, `objdump -d nr-uesoftmodem`
+contains zero calls to `shm_init`, and a run shows no `[SHM]` line on the UE side
+at all.
 
 ### Receiver robustness: CCCH length check (not an interception point)
 
@@ -115,7 +138,7 @@ PDUs on purpose.
 ## Validation
 
 * applies to a pristine v3.0.0 checkout and to a `--depth 1 --branch v3.0.0`
-  clone, 0 rejects / 0 fuzz, and the nine patched files are byte-identical to
+  clone, 0 rejects / 0 fuzz, and the seven patched files are byte-identical to
   the tree the binaries were built from;
 * builds `nr-softmodem`, `nr-uesoftmodem`, `params_libconfig` and `rfsimulator`
   (RelWithDebInfo, GCC 15.2) with all SHM symbols in both binaries;

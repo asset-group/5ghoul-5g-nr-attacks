@@ -52,45 +52,6 @@ index 20c0e62..1b43a1a 100644
    T_Config_Init();
  #endif
    set_taus_seed (0);
-diff --git a/executables/nr-uesoftmodem.c b/executables/nr-uesoftmodem.c
-index f9ebbc1..e6fecfc 100644
---- a/executables/nr-uesoftmodem.c
-+++ b/executables/nr-uesoftmodem.c
-@@ -1,3 +1,4 @@
-+#include <stdlib.h>
- /*
-  * SPDX-License-Identifier: LicenseRef-CSSL-1.0
-  */
-@@ -62,6 +63,10 @@ unsigned short config_frames[4] = {2,9,11,13};
- #include "executables/softmodem-common.h"
- #include "executables/thread-common.h"
- 
-+/* WD 5Ghoul: SHM interface */
-+#include "shm_interface/wd_shm_nr_utils.h"
-+/* ------------------------ */
-+
- #include "nr_nas_msg.h"
- #include "actor.h"
- 
-@@ -301,6 +306,18 @@ int main(int argc, char **argv)
-   softmodem_verify_mode(get_softmodem_params());
- 
- #if T_TRACER
-+  /* WD 5Ghoul: SHM interface.
-+   * Initialise the message queue only when the SHM segment could be attached:
-+   * with no 5Ghoul server running shm_init() fails and there is no shared
-+   * memory for the queue to attach to. */
-+  if (shm_init(WD_SHM_CLIENT, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH)) {
-+    LOG_W(UTIL, "[SHM] SHM started\n");
-+    shm_set_max_timeout(1);
-+    shm_mq_init(W_MQ_MAC_DL, WD_SHM_MAX_BUFFER_SIZE, WD_SHM_DEFAULT_PATH, 1);
-+  } else {
-+    LOG_W(UTIL, "[SHM] SHM not started\n");
-+  }
-+
-   T_Config_Init();
- #endif
-   initTpool(get_softmodem_params()->threadPoolConfig, &(nrUE_params.Tpool), cpumeas(CPUMEAS_GETSTATE));
 diff --git a/openair2/LAYER2/NR_MAC_UE/nr_ue_procedures.c b/openair2/LAYER2/NR_MAC_UE/nr_ue_procedures.c
 index d7d1031..3085e66 100644
 --- a/openair2/LAYER2/NR_MAC_UE/nr_ue_procedures.c
@@ -112,34 +73,6 @@ index d7d1031..3085e66 100644
  
          // Check if it is a valid CCCH message, we get all 00's messages very often
          int i = 0;
-diff --git a/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c b/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
-index 45ff543..f04fbf2 100644
---- a/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
-+++ b/openair2/LAYER2/NR_MAC_UE/nr_ue_scheduler.c
-@@ -28,6 +28,9 @@
- #include "openair2/LAYER2/nr_rlc/nr_rlc_oai_api.h"
- #include "RRC/NR_UE/L2_interface_ue.h"
- 
-+/* WD 5Ghoul: SHM interface */
-+#include "shm_interface/wd_shm_nr_utils.h"
-+
- //#define SRS_DEBUG
- #define verifyMutex(a)                                                \
-   {                                                                   \
-@@ -2650,6 +2653,13 @@ void nr_ue_ul_scheduler(NR_UE_MAC_INST_t *mac, nr_uplink_indication_t *ul_info)
-               pdu->tx_request_body.fapiTxPdu = ulsch_input_buffer;
-               pdu->tx_request_body.pdu_length = TBS_bytes;
-               number_of_pdus++;
-+              // WD 5Ghoul: SHM interface - send UE UL MAC PDU to the fuzzer
-+              send_pdu_data_nr(W_UE_UL_PDU_WITH_DATA,
-+                               NR_DIRECTION_UPLINK,
-+                               NR_C_RNTI, mac->crnti,
-+                               frame_tx, slot_tx, 0,
-+                               ulsch_input_buffer, TBS_bytes);
-+              /* -------------------- */
-               T(T_NRUE_MAC_UL_PDU_WITH_DATA,
-                 T_INT(mac->crnti),
-                 T_INT(frame_tx),
 diff --git a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c b/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c
 index 6910556..1679754 100644
 --- a/openair2/LAYER2/NR_MAC_gNB/gNB_scheduler_RA.c

@@ -15,8 +15,8 @@
             "LaunchProgramWithGDB": false,
             "ProgramsList": [
                 "3rd-party/open5gs-core/build/tests/app/5gc",
-                "/opt/oai-latest/bin-patched/nr-softmodem",
-                "/opt/oai-latest/bin-patched/nr-uesoftmodem"
+                ".deps/oai-shm/bin/nr-softmodem",
+                ".deps/oai-shm/bin/nr-uesoftmodem"
             ],
             "MainThreadCore": -1,
             "SaveCoreDump": false

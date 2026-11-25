@@ -122,7 +122,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 # Global compiler options
 # C++20 is required (std::unordered_map::contains, if constexpr on concepts).
 # The default profile uses GCC 16.2.0 headers with clang 23.1.6.
-# run-configure.sh selects that installation and includes cstdint explicitly.
+# build.sh selects that installation and includes cstdint explicitly.
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
@@ -203,10 +203,7 @@ set(WDISSECTOR_INCLUDES
 
 # ---------------- Libraries --------------------
 
-# Download submodules and apply patch to their source code
-execute_process(
-  COMMAND bash -c "./scripts/apply_patches.sh ./libs && ./scripts/apply_patches.sh ./modules"
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+# requirements.sh initializes and patches the vendored trees before configure.
 
 # libPCAP from the conda env (1.10.6).  The vendored tree used to provide the
 # `pcap` target that wireapi links, so recreate it as an INTERFACE target.

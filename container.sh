@@ -161,12 +161,6 @@ then
 		sudo docker build --progress=plain --compress -t $TAG_NAME --secret id=cred,src=.env \
 		-f scripts/docker_release.docker .
 
-	elif [ "$2" == "release-desktop" ]
-	then
-		TAG_NAME=${CONTAINER_REPO}:release-desktop-$ARCH
-		sudo docker build --progress=plain --compress -t $TAG_NAME --secret id=cred,src=.env \
-		-f scripts/docker_release_desktop.docker .
-
 	elif [ "$2" == "release-4g" ]
 	then
 		TAG_NAME=${CONTAINER_REPO}:release-4g-$ARCH
@@ -209,7 +203,7 @@ then
 elif [ "$1" == "compile" ]
 then
 	start_container
-	sudo docker exec ${CONTAINER_NAME}-dev scripts/docker_change_to_user.sh ./build.sh all # Compile library
+	sudo docker exec ${CONTAINER_NAME}-dev scripts/docker_change_to_user.sh ./build.sh # Compile library
 
 elif [ "$1" == "pull" ]
 then

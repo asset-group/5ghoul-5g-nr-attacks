@@ -3,15 +3,21 @@
 `patches/oai-shm-v3.0.0.patch` adds the 5Ghoul shared-memory interface to a
 vanilla OpenAirInterface checkout at tag **v3.0.0** (`6f89078`).
 
-Apply it with:
+The normal installation/build entry points are:
 
 ```bash
-./scripts/apply_oai_shm_patch.sh <path-to-oai-v3.0.0-checkout>
+./requirements.sh
+./build.sh
 ```
 
-The script refuses to patch anything whose `git describe --tags` is not
-`v3.0.0*`, creates the `shm_interface` symlink into
-`src/drivers/shm_interface`, and then `git apply`s the patch.
+The internal `scripts/build_oai_shm.sh` helper builds the exact v3.0.0 source,
+its pinned ASN1 compiler and SIMDe headers, then packages the gated binaries
+and modules under `.deps/oai-shm/bin`. It calls
+`scripts/apply_oai_shm_patch.sh`, which requires the exact tag and full commit
+`6f89078b409e671fa566782f67aae9de52fd55d8`, accepts vanilla or exactly patched
+sources, and rejects conflicting tracked/staged edits before changing the
+driver symlink. Repeated installation is incremental and does not discard
+local files. No `/opt` installation is used or replaced.
 
 ## Why this is not `3rd-party/oai_5g_sa.patch`
 

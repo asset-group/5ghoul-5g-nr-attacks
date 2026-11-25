@@ -1,7 +1,7 @@
 # Single default build/runtime environment for Ubuntu 26.04.
-# Create with: conda env create -f environment.yml
-# Configure with: ./run-configure.sh
-# Python tooling uses 3.11; the binary embeds vendored CPython 3.8.16.
+# Install with: ./requirements.sh
+# Configure and build with: ./build.sh
+# Python tooling and the embedded interpreter both use conda Python 3.11.
 # pybind11 and nlohmann/json remain vendored; do not install competing headers.
 name: 5ghoul23
 channels:

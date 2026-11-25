@@ -292,3 +292,4 @@ modules/eval/BlueFuzz
 modules/eval/bss
 
 scripts/WiresharkQMIDissector
+/.deps/

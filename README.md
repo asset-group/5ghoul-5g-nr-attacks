@@ -69,49 +69,37 @@
 
 5Ghoul drives OpenAirInterface over a POSIX shared-memory interface
 (`src/drivers/shm_interface`). A stock OAI build has no such interface, so the
-SHM patch in `patches/oai-shm-v3.0.0.patch` must be applied to an OAI checkout
-before building. It targets exactly tag **v3.0.0** (`6f89078`).
+installer applies `patches/oai-shm-v3.0.0.patch` to exactly **v3.0.0**
+(`6f89078b409e671fa566782f67aae9de52fd55d8`) before building.
 
 ```bash
-# 1. get 5Ghoul (this branch) and vanilla OAI v3.0.0 side by side
-git clone -b hdr-probe https://github.com/asset-group/5ghoul-5g-nr-attacks.git 5ghoul
-git clone --depth 1 --branch v3.0.0 \
-    https://gitlab.eurecom.fr/oai/openairinterface5g.git oai
-
-# 2. apply the SHM patch (creates the shm_interface symlink + applies the diff)
-./5ghoul/scripts/apply_oai_shm_patch.sh "$PWD/oai"
-
-# 3. build the gNB and the UE with the rfsimulator radio
-mkdir -p oai/build && cd oai/build
-cmake .. -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-      -DAUTO_DOWNLOAD_ASN1C=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-ninja nr-softmodem nr-uesoftmodem params_libconfig rfsimulator
+git clone -b hdr-probe https://github.com/asset-group/5ghoul-5g-nr-attacks.git
+cd 5ghoul-5g-nr-attacks
+./requirements.sh
+./build.sh
 ```
 
 `params_libconfig` provides the config loader the gNB dlopen()s at startup and
 `rfsimulator` the simulated radio; without them startup fails with
 `libparams_libconfig.so` / `librfsimulator.so` load errors.
+The installer places both executables and their runtime libraries in
+`.deps/oai-shm/bin`. It does not install or replace anything under `/opt`.
 
 OAI calls `mlockall()`, and WSL's default `RLIMIT_MEMLOCK` is 64 MiB, which is
 smaller than a self-built gNB's footprint — the process then aborts with
 `calloc fails` during `Initializing NR L1`. Run with the limit lifted:
 
 ```bash
-sudo prlimit --memlock=unlimited:unlimited -- ./nr-softmodem --rfsim \
-     -O ../../5ghoul/configs/5gnr_gnb/rfsim.n78.106.conf
+sudo prlimit --msgqueue=16777216:16777216 --memlock=unlimited:unlimited -- \
+     .deps/oai-shm/bin/nr-softmodem --rfsim \
+     -O configs/5gnr_gnb/rfsim.n78.106.conf
 ```
 
-`asn1c` is normally installed by `cmake_targets/build_oai`; the
-`AUTO_DOWNLOAD_ASN1C=ON` option above fetches and builds it inside the build
-tree instead, so no system packages are required. OAI also expects the SIMDe
-headers under `<oai>/openair1/simde`; if your checkout lacks them, run
-`./cmake_targets/build_oai --install-deps` once, or clone them manually:
-
-```bash
-git clone --depth 1 https://github.com/simd-everywhere/simde-no-tests.git \
-    oai/openair1/PHY/simde
-ln -sfn PHY/simde oai/openair1/simde
-```
+`requirements.sh` provisions OAI's pinned ASN1 compiler inside its own build
+tree and the validated SIMDe header checkout/symlink. No preinstalled
+`/opt/asn1c`, manual header clone, or `build_oai --install-deps` is needed.
+The installer requires the genuine UE-zero/gNB-12 SHM symbol gates and one
+gNB/zero UE `shm_init` calls before packaging the distribution.
 
 The patch adds:
 
@@ -432,32 +420,43 @@ sudo bin/5g_fuzzer --MCC=001 --MNC=01 --EnableMutation=true --gui # Run with gra
 
 ## 6. 🛠️ (Optional) Build _5Ghoul_ software from source
 
-The default source build on **Ubuntu 26.04** uses Miniforge and the single
+The default source build on **Ubuntu 26.04 x86_64** uses Miniforge and the single
 `environment.yml` profile named `5ghoul23`: clang/LLVM/LLD 23.1.6, GCC/G++
 16.2.0 headers, Boost 1.90.0, folly 2026.10.26.00 and fmt 12.1.0.
 Python 3.11 tooling dependencies are installed from `modules/requirements.txt`
 by that environment file; pybind11 and nlohmann/json remain vendored.
-Install host runtime tools such as `psmisc`, `tcpdump` and `kmod` separately
-when needed. To compile from source:
+There are exactly two source installation/build entry points:
 
 ```bash
-git clone https://github.com/asset-group/5ghoul-5g-nr-attacks
+git clone -b hdr-probe https://github.com/asset-group/5ghoul-5g-nr-attacks
 cd 5ghoul-5g-nr-attacks
-source "$HOME/miniforge3/etc/profile.d/conda.sh"
-conda env create -f environment.yml
-conda activate 5ghoul23
-./run-configure.sh # Defaults: clang major 23, environment 5ghoul23
-cmake --build build --parallel
+./requirements.sh
+./build.sh
 ```
 
-`run-configure.sh` selects GCC 16.2.0 headers explicitly and supplies
-`-include cstdint`, avoiding external compatibility headers. It reproducibly
-repairs the environment-local Boost.System exact-version CMake component and
-missing `liblzma.so` development symlink. Patch application retains real sudo
-behavior; no external sudo shim is required. Wireshark GUI, Lua and WERROR are
-disabled in this configuration. Pagmo and pagmo-devel are both pinned to
-2.19.1: 2.9 and 2.20.0 are unsolvable with these host library/toolchain pins.
-OAI/Open5GS setup is separate from this compiler environment.
+`requirements.sh` installs native Linux/core/OAI development and runtime
+packages, bootstraps checksummed Miniforge 26.9.4-2 if absent, creates or updates
+`5ghoul23` from **environment.yml only**, installs pip dependencies and mongosh,
+repairs Boost.System metadata and the liblzma development symlink, initializes
+all five submodules, and applies their patches without resetting/cleaning local
+files. Conflicting patches or dirty wrong-version checkouts fail loudly.
+It then builds libmongoc/libbson 1.30.2, patched Open5GS v2.8.0, and the separate
+OAI v3.0.0 SHM distribution. OAI uses native GCC/G++ 15 and its own pinned ASN1
+compiler; 5Ghoul/Open5GS use the conda Clang toolchain.
+
+`build.sh` always performs the one CMake configure and an incremental Ninja
+build through that conda environment. It selects GCC 16.2.0 headers explicitly,
+supplies `-include cstdint`, preserves lld probe/LLVM archive handling and the
+proven include/link flags, and disables Wireshark GUI, Lua and WERROR. It does
+not install dependencies, patch submodules or clean generated data. Set
+`JOBS=8` (the default) to bound build parallelism; `MINIFORGE_ROOT` overrides
+`$HOME/miniforge3` consistently in both entry points. Logs are under
+`logs/install` and `logs/build`. Neither script accepts the old mode arguments.
+
+Pagmo and pagmo-devel remain pinned to 2.19.1: 2.9 and 2.20.0 are unsolvable
+with these host toolchain/library pins. Sources and built dependencies remain
+under `.deps`, the core stays in its submodule, and OAI executables/libraries
+live only under `.deps/oai-shm/bin`. Existing `/opt/oai-shm` is never replaced.
 
 The Open5GS submodule is pinned to **v2.8.0 (Release 19)**. The canonical
 `3rd-party/open5gs-core.patch` preserves the NAS SHM interception hooks and
@@ -475,9 +474,9 @@ dbctl insertion, update and display commands use the new keys. AMBR units now
 scale by 1000 rather than 1024; unit-zero defaults are unaffected.
 
 Subscriber provisioning uses the real `mongosh` shell, not legacy `mongo`.
-`requirements.sh dev` installs pinned mongosh 2.14.3 in the conda environment;
-for an existing environment, run `./scripts/install_mongosh.sh "$CONDA_PREFIX"`
-and keep its `bin` directory on `PATH`, including when launching the fuzzer.
+`requirements.sh` installs pinned mongosh 2.14.3 in the conda environment;
+activate `5ghoul23` and keep its `bin` directory on `PATH`, including when
+launching the fuzzer.
 dbctl fails explicitly if mongosh is missing; a no-op `mongo` cannot provision
 subscribers. To avoid migrating old records, start a fresh database, set
 `DB_URI` and the core YAML's `db_uri` to that database, then use
@@ -488,19 +487,40 @@ insert leaves `ue.ipv4/ipv6` null for dynamic allocation. The fuzzer removes
 and reinserts only its configured IMSIs at startup, so its APN-specific
 defaults are reapplied; it does not preserve prior static assignments.
 
-After initializing and applying the vendored patches, build the MongoDB C driver
-and core with the same conda toolchain (the output directory must exist):
-
-```bash
-mkdir -p logs/core-build
-./scripts/build_mongo_driver.sh logs/core-build "$CONDA_PREFIX"
-./scripts/build_open5gs.sh logs/core-build "$CONDA_PREFIX"
-```
-
-The helpers pin libmongoc/libbson 1.30.2, compile with Clang 23 and GCC 16.2.0
+Internal installer helpers pin libmongoc/libbson 1.30.2, compile with Clang 23 and GCC 16.2.0
 headers, and prepare the upstream wrap revisions explicitly before Meson runs
 with downloads disabled. Compatibility patches retain strict compilation for
 the MongoDB accept probe, freeDiameter and Prometheus atomic compare/exchange.
+
+### Simulation run-copy conditions
+
+Do not launch the tracked hardware-oriented configuration unchanged for the
+simulation proof. Copy configs into an isolated run directory; point its core
+at the fresh `3rd-party/open5gs-core/build/tests/app/5gc`, and its gNB/UE at
+`.deps/oai-shm/bin`. Keep PLMN strings `"001"`/`"01"` and `no_sepp: true`.
+Use port **4044**, gNB `--rfsim` without `-E`, `--continuous-tx` or `--sa`, and
+the run-copy UE argument string:
+
+```text
+--rfsim --rfsimulator.[0].serveraddr 127.0.0.1 --rfsimulator.[0].serverport 4044 -C 3319680000 --ue-nb-ant-rx 2
+```
+
+This is 12 complete argv tokens including the executable and appended `-O`
+pair. The tracked UE argument string is intentionally unchanged; put the
+simulation arguments in the run copy. TinyProcess accepts at most 16 complete
+arguments, so leave room for the executable and `-O` pair. Also retain `ActiveMonitorTypes: [3]`
+with `Monitor.Enable: false`; an empty selection triggers a pre-existing crash.
+Before the root fuzzer launch, set `ulimit -q 16777216`; launch owned OAI
+processes with `prlimit --msgqueue=16777216:16777216 --memlock=unlimited:unlimited`.
+Set `BASICSIM_DELAY_US=2000`, conda `LD_LIBRARY_PATH`, mutation probability 0.2
+and two maximum mutated fields. Use a fresh owned MongoDB dbpath/database and
+matching newly inserted subscriber, not a live or foreign database copy.
+
+Private PID/network/mount/IPC namespaces prevent interference with other
+workloads; never clear host SHM/queues or stop processes by global name. On
+uutils coreutils 0.10.0, status **137 at the full configured cap** with graceful
+shutdown underway is cap completion; early exits or absent attach/session
+evidence are failures regardless of the timeout status.
 
 The expected output during the build process is shown below:
 

@@ -11,7 +11,7 @@ set -euo pipefail
 
 PATCH_NAME="oai-shm-v3.0.0.patch"
 EXPECTED_TAG="v3.0.0"
-EXPECTED_HEAD="6f89078"
+EXPECTED_HEAD="6f89078b409e671fa566782f67aae9de52fd55d8"
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
@@ -21,38 +21,47 @@ SHM_DIR="$ROOT/src/drivers/shm_interface"
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 [ $# -eq 1 ] || die "usage: $0 <path-to-oai-v3.0.0-checkout>"
-OAI="$1"
-[ -d "$OAI" ] || die "no such directory: $OAI"
+[ -d "$1" ] || die "no such directory: $1"
+OAI="$(cd "$1" && pwd -P)"
 [ -f "$PATCH" ] || die "patch not found: $PATCH"
 [ -d "$SHM_DIR" ] || die "shm driver dir not found: $SHM_DIR"
-[ -d "$OAI/.git" ] || die "$OAI is not a git checkout (needed for git apply + version check)"
+[ -e "$OAI/.git" ] || die "$OAI is not a git checkout"
+[ "$(git -C "$OAI" rev-parse --show-toplevel)" = "$OAI" ] || die "expected the checkout root"
 
 cd "$OAI"
-TAG="$(git describe --tags 2>/dev/null || true)"
-HEAD="$(git rev-parse --short HEAD)"
+HEAD="$(git rev-parse HEAD)"
+TAG_HEAD="$(git rev-parse --verify "refs/tags/$EXPECTED_TAG^{commit}" 2>/dev/null || true)"
 echo "target : $OAI"
-echo "version: ${TAG:-unknown} (HEAD $HEAD)"
-case "$TAG" in
-  "$EXPECTED_TAG"*) : ;;
-  *) die "expected $EXPECTED_TAG, found '${TAG:-unknown}' — refusing to patch" ;;
-esac
+echo "version: HEAD $HEAD"
+[ "$HEAD" = "$EXPECTED_HEAD" ] && [ "$TAG_HEAD" = "$EXPECTED_HEAD" ] ||
+  die "expected exactly $EXPECTED_TAG ($EXPECTED_HEAD); refusing to patch"
+git diff --cached --quiet || die "staged changes present; refusing to patch"
 
-# The OAI sources include "shm_interface/wd_shm_nr_utils.h" and compile
-# ${OPENAIR_DIR}/shm_interface/wd_shm.c, i.e. a symlink into 5Ghoul's driver.
-echo "symlink: $OAI/shm_interface -> $SHM_DIR"
-ln -sfn "$SHM_DIR" "$OAI/shm_interface"
+# Construct the expected patched index privately. Comparing the worktree to
+# it rejects extra tracked edits even when git apply --reverse --check passes.
+# The real index is never changed; .git may be a worktree metadata file.
+TMP="$(mktemp -d)"
+trap 'rm -rf -- "$TMP"' EXIT
+INDEX="$TMP/index"
+GIT_INDEX_FILE="$INDEX" git read-tree HEAD
+GIT_INDEX_FILE="$INDEX" git apply --cached --whitespace=nowarn "$PATCH"
 
-echo "checking patch applies cleanly..."
-if ! git apply --check "$PATCH"; then
-  die "patch does not apply cleanly (wrong version or already patched)"
+if GIT_INDEX_FILE="$INDEX" git diff --quiet; then
+  STATE=patched
+elif git diff --quiet && git apply --check "$PATCH"; then
+  STATE=vanilla
+else
+  die "checkout is neither vanilla nor exactly SHM-patched; preserving sources and symlink"
 fi
 
-echo "applying $PATCH_NAME"
-git apply --whitespace=nowarn "$PATCH"
-echo "OK: SHM patch applied to $OAI"
-echo
-echo "next: configure and build, e.g."
-echo "  mkdir -p $OAI/build && cd $OAI/build"
-echo "  cmake .. -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo \\"
-echo "        -DAUTO_DOWNLOAD_ASN1C=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
-echo "  ninja nr-softmodem nr-uesoftmodem"
+# Only a symlink may be replaced, and only after all source checks succeeded.
+if [ -e "$OAI/shm_interface" ] && [ ! -L "$OAI/shm_interface" ]; then
+  die "shm_interface is not a symlink; refusing to replace it"
+fi
+if [ "$STATE" = vanilla ]; then
+  git apply --whitespace=nowarn "$PATCH"
+fi
+if [ ! -L "$OAI/shm_interface" ] || [ "$(readlink "$OAI/shm_interface")" != "$SHM_DIR" ]; then
+  ln -sfnT "$SHM_DIR" "$OAI/shm_interface"
+fi
+echo "OK: exact SHM patch present in $OAI"

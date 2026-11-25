@@ -1,228 +1,102 @@
 #!/usr/bin/env bash
+# Install the complete Ubuntu 26.04 x86_64 simulation/build stack.
+set -euo pipefail
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+MINIFORGE=${MINIFORGE_ROOT:-$HOME/miniforge3}
+PREFIX="$MINIFORGE/envs/5ghoul23"
+DEPS="$ROOT/.deps"
+LOG="$ROOT/logs/install"
+die() { echo "requirements.sh: $*" >&2; exit 1; }
+[[ $# == 0 ]] || die 'usage: ./requirements.sh (no legacy modes)'
+[[ $(uname -m) == x86_64 ]] || die 'the pinned stack requires Linux x86_64'
+source /etc/os-release
+[[ $ID == ubuntu && $VERSION_ID == 26.04 ]] || die 'supported host: Ubuntu 26.04'
+cd "$ROOT"
+mkdir -p "$DEPS" "$LOG"
+exec > >(tee "$LOG/requirements.log") 2>&1
+trap 'echo "requirements.sh: failed at line $LINENO" >&2' ERR
+df -h "$ROOT"
 
-set -eo pipefail
+# Conda provides the 5Ghoul toolchain/libraries. Native development packages
+# are required for Linux SCTP/core metadata and OAI's separate GCC 15 build.
+SUDO=()
+if ((EUID)); then SUDO=(sudo); fi
+"${SUDO[@]}" apt-get update
+"${SUDO[@]}" apt-get install -y --no-install-recommends \
+  ca-certificates curl git sudo build-essential gcc-15 g++-15 cmake ninja-build \
+  pkg-config autoconf automake libtool bison flex binutils patchelf \
+  libconfig-dev libsctp-dev libtalloc-dev libyaml-dev libyaml-cpp-dev \
+  libssl-dev libgnutls28-dev zlib1g-dev libreadline-dev libfftw3-dev \
+  libmbedtls-dev libblas-dev liblapack-dev libgmp-dev libusb-1.0-0-dev \
+  libx11-dev libxft-dev libxt-dev libasound2-dev libpulse-dev \
+  libxss1 libnss3 libnspr4 libatk-bridge2.0-0 libxtst6 \
+  kmod psmisc tcpdump iproute2 iptables util-linux xxd
 
-ARCH="$(uname -m)"
-KERNEL="$(uname -r)"
-
-# Configure deploy token
-if [[ -v CI_DEPLOY_USER ]]
-then
-    echo "Configuring credentials for CI/CD..."
-    git config --global credential.helper store
-    echo "https://$CI_DEPLOY_USER:$CI_DEPLOY_PASSWORD@gitlab.com" > ~/.git-credentials
+if [[ ! -f "$MINIFORGE/etc/profile.d/conda.sh" ]]; then
+  [[ ! -e "$MINIFORGE" ]] || die "incomplete Miniforge directory: $MINIFORGE"
+  INSTALLER="$DEPS/Miniforge3-26.9.4-2-Linux-x86_64.sh"
+  curl --fail --location --output "$INSTALLER" \
+    https://github.com/conda-forge/miniforge/releases/download/26.9.4-2/Miniforge3-26.9.4-2-Linux-x86_64.sh
+  printf '%s  %s\n' bbaf16b3897da24c4be50315934ba74848f617b4495982841d6a0a60e0edbbdf "$INSTALLER" | sha256sum --check
+  bash "$INSTALLER" -b -p "$MINIFORGE"
 fi
 
-if [ "$1" == "dev" ]
-then
-	# Make sure that .config is used
-	git config --local include.path ../.gitconfig || true
-	# Host-only runtime utilities; build libraries come from environment.yml.
-	sudo apt install kmod psmisc tcpdump -y
-
-	# One compiler/library profile; do not install a competing system toolchain.
-	source "$HOME/miniforge3/etc/profile.d/conda.sh"
-	conda env create -f "$(dirname "$0")/environment.yml"
-	conda activate 5ghoul23
-
-	# MongoDB 8 uses mongosh, not the removed legacy mongo shell.
-	"$(dirname "$0")/scripts/install_mongosh.sh" "$CONDA_PREFIX"
-
-	# Install quicktype
-	if ! which quicktype > /dev/null; 
-	then
-	echo "quicktype not found, installing now..."
-	npm install -g quicktype
-	else
-	echo "quicktype found!"
-	fi
-
-	# Build tools and modules/requirements.txt are provisioned by environment.yml.
-
-elif [ "$1" == "doc" ]
-then
-	sudo apt install python build-essential fonts-noto-color-emoji -y
-
-	# Install nodejs
-	if ! which node > /dev/null;
-	then
-		echo "nodejs not found, installing now..."
-		curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-		sudo apt update
-		sudo apt install nodejs -y
-	else
-		echo "nodejs found!"
-	fi
-	# Install local nodejs documentation requirements
-	npm install
-	cd docs/old_greyhound/
-	npm install
-	cd ../../
-
-elif [ "$1" == "3gpp" ]
-then
-	if [ ! -f ".3gpp" ] # 
-	then
-		# Install basic runtime requirements
-		./requirements.sh
-
-		# Install extra requirements
-		sudo apt install -y wget xxd libc-bin
-
-		# Clone 3rd-party tools and apply patches
-		./scripts/apply_patches.sh 3rd-party
-
-		# Install python pip
-		if ! which pip3 > /dev/null;
-		then
-			echo "pip3 not found, installing now..."
-			wget https://bootstrap.pypa.io/pip/3.6/get-pip.py
-			sudo python3 get-pip.py
-			rm get-pip.py
-		else
-			echo "pip3 found!"
-		fi
-
-		# Python3 packages
-		sudo python3 -m pip install \
-		cmake==3.24.1 -U \
-		ninja==1.11.1 -U \
-		meson==0.53.0 --use-feature=2020-resolver || true
-
-		sudo python3 -m pip install \
-		cmake==3.24.1 -U \
-		ninja==1.11.1 -U \
-		meson==0.53.0 || true
-
-		# Install ModemManager requirements
-		cd 3rd-party/ModemManager/
-		./requirements.sh
-		./build.sh
-		cd ../../
-		cd 3rd-party/open5gs-core/
-		./requirements.sh
-		./build.sh
-		cd ../
-
-		# Build and install misc requirements (TODO: remove)
-		# libzmq
-		git clone https://github.com/zeromq/libzmq.git --depth=1 || true
-		cd libzmq
-		./autogen.sh
-		./configure
-		make -j
-		sudo make install
-		sudo ldconfig
-		cd ../
-
-		# libczmq
-		git clone https://github.com/zeromq/czmq.git --depth=1 || true
-		cd czmq
-		./autogen.sh
-		./configure
-		make -j
-		sudo make install
-		sudo ldconfig
-		cd ../
-
-		# libjson-c
-		git clone https://github.com/json-c/json-c.git --depth=1 || true
-		cd json-c
-		mkdir -p build
-		cd build
-		cmake ../
-		make -j
-		sudo make install
-		sudo ldconfig
-
-		cd ../../../
-		touch .3gpp
-	fi
-	echo -e "3GPP requirements built and installed"
-
-elif [ "$1" == "4g" ]
-then
-	./requirements.sh 3gpp
-	cd 3rd-party/oai_4g_lte/openair-ran
-	./build_all.sh
-
-elif [ "$1" == "5g" ]
-then
-	./requirements.sh 3gpp
-	cd 3rd-party/oai_5g_sa
-	source oaienv
-	cd cmake_targets
-	./build_oai -I -w USRP --gNB --nrUE --ninja --noavx512
-	# TODO: add --noavx512 later
-
-elif [ "$1" == "all" ]
-then
-	./requirements.sh 3gpp 4g
-	./requirements.sh 3gpp 5g
-	# TODO
-
-elif [ "$1" == "wifi" ]
-then
-	# Install basic runtime requirements
-	./requirements.sh
-	# Wi-Fi requirements
-	sudo apt install linux-headers-${KERNEL} -y || true
-	sudo apt install dnsmasq net-tools iptables -y
-	sudo cp src/drivers/wifi/rtl8812au/85-nm-unmanaged.rules /etc/udev/rules.d/85-nm-unmanaged.rules
-	sudo udevadm control --reload-rules && sudo udevadm trigger
-	cd src/drivers/wifi/rtl8812au/
-	make -j4
-	cd ../../../../
-
-elif [ "$1" == "evaluation" ]
-then
-	# Evaluation packages
-	sudo python3 -m pip install numpy pandas python-pcapng==1.0 matplotlib
-	sudo apt install expect
-
+# Activation scripts can reference unset variables; strict mode resumes after
+# activation. Never replace the canonical profile with an exported old env.
+set +u
+source "$MINIFORGE/etc/profile.d/conda.sh"
+set -u
+if [[ -d "$PREFIX/conda-meta" ]]; then
+  conda env update --prefix "$PREFIX" --file "$ROOT/environment.yml" --prune
 else
-	# Minimal Ubuntu Packages to run binary WDissector and Wireshark distribution
-	sudo apt update
-	sudo apt install -y g++ software-properties-common kmod libglib2.0-dev libsnappy1v5 libsmi2ldbl liblua5.2-0 libc-ares2 \
-	libnl-route-3-200 libnl-genl-3-200 libfreetype6 graphviz libtbb2 libxss1 libnss3 libspandsp2 libsbc1 libbrotli1 libnghttp2-14 \
-	libasound2 psmisc sshpass libpulse0 libasound2 libpcre2-dev libmaxminddb0 libopus0 libspeex1 bc tcpdump libgoogle-glog0v5 \
-	libgflags2.2 libzstd1 libunwind8 libcap2 libspeexdsp1 libxtst6 libatk-bridge2.0-0 libusb-1.0-0
-
-	# Install updated c++ glibcxx
-	sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-	sudo apt install libstdc++-9-dev -y
-
-	# Install qt 5.12.2 runtime for ubuntu
-	if [ "$(lsb_release -sr)" == "18.04" ]
-	then
-		if [ $ARCH == "x86_64" ]
-		then
-			sudo add-apt-repository ppa:beineri/opt-qt-5.12.2-bionic -y || true
-			sudo apt install qt512base qt512multimedia -y || true
-		fi
-	else
-		# For ubuntu 20.04 and beyound
-		if [ $ARCH == "x86_64" ] # Only install qt for x86_64
-		then
-			sudo apt install qtbase5-dev libqt5multimedia5 -y || true
-		fi
-		# For ubuntu 22.04 and beyound
-		if [  $(echo "$(lsb_release -sr) >= 22.04" | bc ) == "1" ]
-		then
-			# Install missing libssl1.1.1 for ubuntu 22.04 and beyound
-			if [ -z "$(dpkg -l | grep libssl1.1)" ]
-			then
-				if [ $ARCH == "x86_64" ]
-				then
-                    wget http://launchpadlibrarian.net/367327833/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-                    sudo apt install -y ./libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-                    rm libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-				else
-                    wget http://launchpadlibrarian.net/367327970/libssl1.1_1.1.0g-2ubuntu4_arm64.deb
-                    sudo apt install -y ./libssl1.1_1.1.0g-2ubuntu4_arm64.deb
-                    rm libssl1.1_1.1.0g-2ubuntu4_arm64.deb
-				fi
-			fi
-		fi
-	fi
+  conda env create --prefix "$PREFIX" --file "$ROOT/environment.yml" --yes
 fi
+set +u
+conda activate "$PREFIX"
+set -u
+export LD_LIBRARY_PATH="$PREFIX/lib"
+unset LD_PRELOAD
+conda list --json > "$LOG/conda-packages.json"
+
+# Boost.System is header-only; conda's split 1.90 package omits its component
+# metadata. Reproduce the exact version semantics of the headers component.
+BOOST_HEADERS="$PREFIX/lib/cmake/boost_headers-1.90.0"
+BOOST_SYSTEM="$PREFIX/lib/cmake/boost_system-1.90.0"
+[[ -f "$BOOST_HEADERS/boost_headers-config-version.cmake" ]] || die 'Boost headers 1.90.0 missing'
+mkdir -p "$BOOST_SYSTEM"
+if [[ ! -f "$BOOST_SYSTEM/boost_system-config.cmake" ]]; then
+  cat > "$BOOST_SYSTEM/boost_system-config.cmake" <<'EOF'
+if(TARGET Boost::system)
+  return()
+endif()
+mark_as_advanced(boost_system_DIR)
+find_package(boost_headers 1.90.0 EXACT CONFIG REQUIRED)
+add_library(Boost::system INTERFACE IMPORTED)
+set_target_properties(Boost::system PROPERTIES INTERFACE_LINK_LIBRARIES Boost::headers)
+set(boost_system_FOUND TRUE)
+EOF
+fi
+if [[ ! -f "$BOOST_SYSTEM/boost_system-config-version.cmake" ]]; then
+  cp "$BOOST_HEADERS/boost_headers-config-version.cmake" "$BOOST_SYSTEM/boost_system-config-version.cmake"
+fi
+if [[ ! -e "$PREFIX/lib/liblzma.so" ]]; then
+  [[ -e "$PREFIX/lib/liblzma.so.5" ]] || die 'liblzma.so.5 missing'
+  ln -s liblzma.so.5 "$PREFIX/lib/liblzma.so"
+fi
+
+# The environment file installs modules/requirements.txt and PyMongo through
+# its pip section. npm installs only developer quicktype and the real shell.
+if [[ ! -x "$PREFIX/bin/quicktype" ]]; then
+  "$PREFIX/bin/npm" install --global --prefix "$PREFIX" --no-audit --no-fund quicktype
+fi
+"$ROOT/scripts/install_mongosh.sh" "$PREFIX"
+
+# Initialization and patching happen here, never during CMake configuration.
+"$ROOT/scripts/apply_patches.sh" 3rd-party
+"$ROOT/scripts/apply_patches.sh" ./libs
+"$ROOT/scripts/apply_patches.sh" ./modules
+"$ROOT/scripts/build_mongo_driver.sh" "$DEPS" "$PREFIX"
+"$ROOT/scripts/build_open5gs.sh" "$DEPS" "$PREFIX"
+"$ROOT/scripts/build_oai_shm.sh" "$PREFIX"
+printf '\nInstalled env: %s\nOpen5GS: %s\nOAI dist: %s\nNext: ./build.sh\n' \
+  "$PREFIX" "$ROOT/3rd-party/open5gs-core/build/tests/app/5gc" "$ROOT/.deps/oai-shm/bin"
